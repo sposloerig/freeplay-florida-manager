@@ -1,5 +1,6 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { SmtpClient } from 'npm:nodemailer';
+// @deno-types="npm:@types/nodemailer"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,25 +27,23 @@ serve(async (req) => {
       );
     }
 
-    // Initialize SMTP transport
-    const transport = new SmtpClient({
-      host: Deno.env.get('SMTP_HOST'),
-      port: Number(Deno.env.get('SMTP_PORT')),
-      secure: true,
-      auth: {
-        user: Deno.env.get('SMTP_USER'),
-        pass: Deno.env.get('SMTP_PASS'),
-      },
+    // Initialize SMTP client
+    const client = new SmtpClient();
+
+    // Connect to SMTP server
+    await client.connectTLS({
+      hostname: Deno.env.get('SMTP_HOST') || '',
+      port: Number(Deno.env.get('SMTP_PORT')) || 587,
+      username: Deno.env.get('SMTP_USER') || '',
+      password: Deno.env.get('SMTP_PASS') || '',
     });
 
     // Send email
-    await transport.sendMail({
-      from: `"Contact Form" <${Deno.env.get('SMTP_FROM')}>`,
-      to: Deno.env.get('CONTACT_EMAIL'),
-      replyTo: email,
+    await client.send({
+      from: Deno.env.get('SMTP_FROM') || '',
+      to: Deno.env.get('CONTACT_EMAIL') || '',
       subject: `[Contact Form] ${subject}`,
-      text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
-      html: `
+      content: `
         <h3>New Contact Form Submission</h3>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
@@ -52,7 +51,11 @@ serve(async (req) => {
         <p><strong>Message:</strong></p>
         <p>${message.replace(/\n/g, '<br>')}</p>
       `,
+      html: true,
     });
+
+    // Close the connection
+    await client.close();
 
     return new Response(
       JSON.stringify({ message: 'Email sent successfully' }),
