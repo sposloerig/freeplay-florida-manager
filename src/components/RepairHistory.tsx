@@ -2,21 +2,7 @@ import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
 import { Repair, RepairStatus, Part } from '../types';
-import { 
-  Wrench, 
-  AlertTriangle, 
-  Clock, 
-  CheckCircle, 
-  Plus, 
-  ChevronDown, 
-  ChevronUp, 
-  DollarSign, 
-  Trash2, 
-  Tool,
-  Calendar,
-  Tag,
-  Package
-} from 'lucide-react';
+import { Wrench, AlertTriangle, Clock, CheckCircle, Plus, ChevronDown, ChevronUp, DollarSign, Trash2, PenTool as Tool, Calendar, Tag, Package } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 
 const supabase = createClient(
@@ -45,7 +31,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const getStatusIcon = (status: RepairStatus) => {
     switch (status) {
       case 'Open':
-        return <AlertTriangle className="text-red-500" size={18} />;
+        return <AlertTriangle className="text-red-500\" size={18} />;
       case 'In Progress':
         return <Clock className="text-yellow-500" size={18} />;
       case 'Completed':
