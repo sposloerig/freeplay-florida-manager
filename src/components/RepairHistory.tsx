@@ -2,7 +2,22 @@ import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
 import { Repair, RepairStatus, Part } from '../types';
-import { Wrench, AlertCircle, Clock, CheckCircle, Plus, ChevronDown, ChevronUp, DollarSign, Trash2, PenTool as Tool } from 'lucide-react';
+import { 
+  Wrench, 
+  AlertTriangle, 
+  Clock, 
+  CheckCircle, 
+  Filter,
+  Search,
+  SortAsc,
+  SortDesc,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  Trash2,
+  PenTool as Tool
+} from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 
 const supabase = createClient(
@@ -31,7 +46,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const getStatusIcon = (status: RepairStatus) => {
     switch (status) {
       case 'Open':
-        return <AlertCircle className="text-red-500\" size={18} />;
+        return <AlertTriangle className="text-red-500" size={18} />;
       case 'In Progress':
         return <Clock className="text-yellow-500" size={18} />;
       case 'Completed':
@@ -48,17 +63,17 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const getStatusColor = (status: RepairStatus) => {
     switch (status) {
       case 'Open':
-        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
       case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
       case 'Completed':
-        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
       case 'On Hold':
-        return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300';
       case 'Waiting for Parts':
-        return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
     }
   };
 
@@ -86,7 +101,6 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
 
       if (error) throw error;
 
-      // Refresh the page to show updated repairs
       window.location.reload();
     } catch (err) {
       console.error('Error deleting repair:', err);
@@ -107,33 +121,6 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
     }
-  };
-
-  const getRepairDates = (repair: Repair) => {
-    const dates = [];
-    
-    if (repair.repairStartDate) {
-      dates.push({
-        label: 'Started',
-        date: repair.repairStartDate
-      });
-    }
-    
-    if (repair.estimatedCompletionDate) {
-      dates.push({
-        label: 'Est. Completion',
-        date: repair.estimatedCompletionDate
-      });
-    }
-    
-    if (repair.repairCompletionDate) {
-      dates.push({
-        label: 'Completed',
-        date: repair.repairCompletionDate
-      });
-    }
-    
-    return dates;
   };
 
   return (
@@ -174,16 +161,26 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
                   <div className="flex items-center space-x-4">
                     {getStatusIcon(repair.status)}
                     <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">
+                      <p className="text-gray-600 dark:text-gray-300">
                         {repair.requestDescription}
-                      </h3>
+                      </p>
                       <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        {getRepairDates(repair).map((dateInfo, index) => (
-                          <span key={index} className="flex items-center">
+                        <span className="flex items-center">
+                          <Clock size={14} className="mr-1" />
+                          Created: {formatDate(repair.createdAt)}
+                        </span>
+                        {repair.repairStartDate && (
+                          <span className="flex items-center">
                             <Clock size={14} className="mr-1" />
-                            {dateInfo.label}: {formatDate(dateInfo.date)}
+                            Started: {formatDate(repair.repairStartDate)}
                           </span>
-                        ))}
+                        )}
+                        {repair.estimatedCompletionDate && (
+                          <span className="flex items-center">
+                            <Clock size={14} className="mr-1" />
+                            Est. Completion: {formatDate(repair.estimatedCompletionDate)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -298,7 +295,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full m-4 p-6">
             <div className="flex items-center mb-4">
-              <AlertCircle size={24} className="text-red-500 mr-2" />
+              <AlertTriangle size={24} className="text-red-500 mr-2" />
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 Delete Repair Record
               </h3>
