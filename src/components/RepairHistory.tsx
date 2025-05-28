@@ -7,16 +7,12 @@ import {
   AlertTriangle, 
   Clock, 
   CheckCircle, 
-  Filter,
-  Search,
-  SortAsc,
-  SortDesc,
-  Plus,
-  ChevronDown,
-  ChevronUp,
-  DollarSign,
-  Trash2,
-  PenTool as Tool
+  Plus, 
+  ChevronDown, 
+  ChevronUp, 
+  DollarSign, 
+  Trash2, 
+  PenTool as Tool 
 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 
@@ -46,7 +42,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const getStatusIcon = (status: RepairStatus) => {
     switch (status) {
       case 'Open':
-        return <AlertTriangle className="text-red-500\" size={18} />;
+        return <AlertTriangle className="text-red-500" size={18} />;
       case 'In Progress':
         return <Clock className="text-yellow-500" size={18} />;
       case 'Completed':
@@ -100,7 +96,6 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
         .eq('id', repairId);
 
       if (error) throw error;
-
       window.location.reload();
     } catch (err) {
       console.error('Error deleting repair:', err);
@@ -161,10 +156,10 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
                   <div className="flex items-center space-x-4">
                     {getStatusIcon(repair.status)}
                     <div>
-                      <p className="text-gray-600 dark:text-gray-300">
+                      <h3 className="font-medium text-gray-900 dark:text-white mb-2">
                         {repair.requestDescription}
-                      </p>
-                      <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                      </h3>
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <span className="flex items-center">
                           <Clock size={14} className="mr-1" />
                           Created: {formatDate(repair.createdAt)}
