@@ -12,7 +12,10 @@ import {
   ChevronUp, 
   DollarSign, 
   Trash2, 
-  PenTool as Tool 
+  Tool,
+  Calendar,
+  Tag,
+  Package
 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 
@@ -42,7 +45,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const getStatusIcon = (status: RepairStatus) => {
     switch (status) {
       case 'Open':
-        return <AlertTriangle className="text-red-500\" size={18} />;
+        return <AlertTriangle className="text-red-500" size={18} />;
       case 'In Progress':
         return <Clock className="text-yellow-500" size={18} />;
       case 'Completed':
@@ -50,7 +53,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
       case 'On Hold':
         return <Clock className="text-orange-500" size={18} />;
       case 'Waiting for Parts':
-        return <Clock className="text-purple-500" size={18} />;
+        return <Package className="text-purple-500" size={18} />;
       default:
         return <Clock className="text-gray-500" size={18} />;
     }
@@ -73,12 +76,42 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
     }
   };
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'Critical':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
+      case 'High':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300';
+      case 'Medium':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
+      case 'Low':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
+    }
+  };
+
+  const getPartStatusColor = (status: string) => {
+    switch (status) {
+      case 'Needed':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
+      case 'Ordered':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
+      case 'Received':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
+      case 'Installed':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
+    }
+  };
+
   const calculateTotalCost = (parts: Part[]) => {
     return parts.reduce((total, part) => total + (part.estimatedCost ?? 0), 0);
   };
 
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return 'No date';
+    if (!dateString) return 'Not set';
     try {
       const date = parseISO(dateString);
       if (!isValid(date)) return 'Invalid date';
@@ -100,21 +133,6 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
     } catch (err) {
       console.error('Error deleting repair:', err);
       alert('Failed to delete repair. Please try again.');
-    }
-  };
-
-  const getPartStatusColor = (status: string) => {
-    switch (status) {
-      case 'Needed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
-      case 'Ordered':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
-      case 'Received':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
-      case 'Installed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
     }
   };
 
@@ -152,16 +170,26 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
                 className="p-4 cursor-pointer"
                 onClick={() => toggleRepair(repair.id)}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-4">
                     {getStatusIcon(repair.status)}
                     <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(repair.status)}`}>
+                          {repair.status}
+                        </span>
+                        {repair.priority && (
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(repair.priority)}`}>
+                            {repair.priority} Priority
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                         {repair.requestDescription}
                       </h3>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-400">
                         <span className="flex items-center">
-                          <Clock size={14} className="mr-1" />
+                          <Calendar size={14} className="mr-1" />
                           Created: {formatDate(repair.createdAt)}
                         </span>
                         {repair.repairStartDate && (
@@ -172,27 +200,20 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
                         )}
                         {repair.estimatedCompletionDate && (
                           <span className="flex items-center">
-                            <Clock size={14} className="mr-1" />
+                            <Calendar size={14} className="mr-1" />
                             Est. Completion: {formatDate(repair.estimatedCompletionDate)}
+                          </span>
+                        )}
+                        {repair.repairCompletionDate && (
+                          <span className="flex items-center">
+                            <CheckCircle size={14} className="mr-1" />
+                            Completed: {formatDate(repair.repairCompletionDate)}
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(repair.status)}`}>
-                      {repair.status}
-                    </span>
-                    {repair.priority && (
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        repair.priority === 'Critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
-                        repair.priority === 'High' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300' :
-                        repair.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
-                        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300'
-                      }`}>
-                        {repair.priority}
-                      </span>
-                    )}
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -219,7 +240,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
                       <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Repair Notes
                       </h4>
-                      <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                      <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
                         {repair.repairNotes}
                       </p>
                     </div>
@@ -227,14 +248,15 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
 
                   {repair.parts && repair.parts.length > 0 && (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Parts
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                        <Package size={16} className="mr-2" />
+                        Parts Required
                       </h4>
                       <div className="space-y-2">
                         {repair.parts.map((part) => (
                           <div 
                             key={part.id}
-                            className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-2 rounded-md"
+                            className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-3 rounded-md"
                           >
                             <div>
                               <p className="font-medium text-gray-900 dark:text-white">
@@ -307,7 +329,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
               </button>
               <button
                 onClick={() => {
-                  handleDelete(deleteConfirm);
+                  if (deleteConfirm) handleDelete(deleteConfirm);
                   setDeleteConfirm(null);
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
