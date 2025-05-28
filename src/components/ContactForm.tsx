@@ -7,10 +7,10 @@ interface ContactFormProps {
 
 const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
+    name: 'Test User',
+    email: 'test@example.com',
+    subject: 'Test Contact Form',
+    message: 'This is a test message to verify the contact form functionality.',
   });
 
   const [status, setStatus] = useState<{
@@ -48,13 +48,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Failed to send message');
 
       setStatus({
         type: 'success',
-        message: 'Message sent successfully! We\'ll get back to you soon.',
+        message: 'Test message sent successfully! Check your email.',
       });
       setFormData({
         name: '',
@@ -63,9 +63,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
         message: '',
       });
     } catch (error) {
+      console.error('Error sending message:', error);
       setStatus({
         type: 'error',
-        message: 'Failed to send message. Please try again later.',
+        message: error instanceof Error ? error.message : 'Failed to send message. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
