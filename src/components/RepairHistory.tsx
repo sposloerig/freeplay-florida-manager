@@ -31,7 +31,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const getStatusIcon = (status: RepairStatus) => {
     switch (status) {
       case 'Open':
-        return <AlertCircle className="text-red-500" size={18} />;
+        return <AlertCircle className="text-red-500\" size={18} />;
       case 'In Progress':
         return <Clock className="text-yellow-500" size={18} />;
       case 'Completed':
