@@ -1,6 +1,4 @@
-// @deno-types="npm:@types/nodemailer"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,35 +25,37 @@ serve(async (req) => {
       );
     }
 
-    // Initialize SMTP client
-    const client = new SmtpClient();
+    // Format email content
+    const emailContent = `
+      <h3>New Contact Form Submission</h3>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message.replace(/\n/g, '<br>')}</p>
+    `;
 
-    // Connect to SMTP server
-    await client.connectTLS({
-      hostname: Deno.env.get('SMTP_HOST') || '',
-      port: Number(Deno.env.get('SMTP_PORT')) || 587,
-      username: Deno.env.get('SMTP_USER') || '',
-      password: Deno.env.get('SMTP_PASS') || '',
+    // Send email using Resend API
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: Deno.env.get('CONTACT_FROM_EMAIL') || 'onboarding@resend.dev',
+        to: Deno.env.get('CONTACT_EMAIL'),
+        subject: `[Contact Form] ${subject}`,
+        html: emailContent,
+        reply_to: email,
+      }),
     });
 
-    // Send email
-    await client.send({
-      from: Deno.env.get('SMTP_FROM') || '',
-      to: Deno.env.get('CONTACT_EMAIL') || '',
-      subject: `[Contact Form] ${subject}`,
-      content: `
-        <h3>New Contact Form Submission</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-      `,
-      html: true,
-    });
-
-    // Close the connection
-    await client.close();
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Resend API error:', error);
+      throw new Error('Failed to send email');
+    }
 
     return new Response(
       JSON.stringify({ message: 'Email sent successfully' }),
