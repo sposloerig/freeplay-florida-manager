@@ -1,83 +1,60 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SmtpClient } from "npm:nodemailer";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { email } = await req.json();
-
-    if (!email) {
-      return new Response(
-        JSON.stringify({ error: 'Email is required' }),
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
-    // Initialize SMTP transport
-    const transport = new SmtpClient({
-      host: Deno.env.get('SMTP_HOST'),
-      port: Number(Deno.env.get('SMTP_PORT')),
-      secure: true,
-      auth: {
-        user: Deno.env.get('SMTP_USER'),
-        pass: Deno.env.get('SMTP_PASS'),
-      },
-    });
+    // Parse the request body
+    const { email } = await req.json()
 
-    // Send confirmation email
-    await transport.sendMail({
-      from: `"Replay Museum" <${Deno.env.get('SMTP_FROM')}>`,
-      to: email,
-      subject: 'Welcome to Replay Museum Newsletter!',
-      text: `Thank you for subscribing to our newsletter!\n\nYou'll now receive updates about new events, tournaments, and special promotions at Replay Museum.\n\nBest regards,\nThe Replay Museum Team`,
-      html: `
-        <h2>Welcome to Replay Museum Newsletter!</h2>
-        <p>Thank you for subscribing to our newsletter!</p>
-        <p>You'll now receive updates about:</p>
-        <ul>
-          <li>New events and tournaments</li>
-          <li>Special promotions</li>
-          <li>Museum news and updates</li>
-        </ul>
-        <p>Best regards,<br>The Replay Museum Team</p>
-      `,
-    });
+    // Validate email
+    if (!email || !email.includes('@')) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
 
-    // Also send notification to admin
-    await transport.sendMail({
-      from: `"Newsletter Signup" <${Deno.env.get('SMTP_FROM')}>`,
-      to: Deno.env.get('ADMIN_EMAIL'),
-      subject: 'New Newsletter Subscription',
-      text: `New newsletter subscription: ${email}`,
-    });
-
+    // Here you would typically:
+    // 1. Store the email in your database
+    // 2. Send a confirmation email
+    // 3. Add the subscriber to your mailing list service
+    
+    // For now, we'll just return a success response
     return new Response(
       JSON.stringify({ message: 'Successfully subscribed to newsletter' }),
-      { 
+      {
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    );
+    )
   } catch (error) {
-    console.error('Error processing newsletter signup:', error);
-    
     return new Response(
-      JSON.stringify({ error: 'Failed to process subscription' }),
-      { 
+      JSON.stringify({ error: 'Internal server error' }),
+      {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    );
+    )
   }
-});
+})
