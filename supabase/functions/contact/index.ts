@@ -73,10 +73,13 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Resend API error:', error);
-      throw new Error('Failed to send email: ' + error);
+      const errorData = await response.text();
+      console.error('Resend API error response:', errorData);
+      throw new Error(`Failed to send email: ${errorData}`);
     }
+
+    const responseData = await response.json();
+    console.log('Email sent successfully:', responseData);
 
     return new Response(
       JSON.stringify({ message: 'Email sent successfully' }),
