@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'npm:@supabase/supabase-js@2.39.3'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,13 +42,11 @@ serve(async (req) => {
     // Validate environment variables
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const newsletterEmail = Deno.env.get('NEWSLETTER_EMAIL');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    if (!resendApiKey || !newsletterEmail) {
-      console.error('Missing required environment variables:', {
-        hasResendApiKey: !!resendApiKey,
-        hasNewsletterEmail: !!newsletterEmail
-      });
-      
+    if (!resendApiKey || !newsletterEmail || !supabaseUrl || !supabaseKey) {
+      console.error('Missing required environment variables');
       return new Response(
         JSON.stringify({ 
           error: 'Newsletter service not properly configured. Please contact the administrator.' 
@@ -57,6 +56,33 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
+    }
+
+    // Initialize Supabase client
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Save subscriber to database
+    const { error: dbError } = await supabase
+      .from('newsletter_subscribers')
+      .insert([
+        { 
+          email,
+          confirmed: false
+        }
+      ]);
+
+    if (dbError) {
+      // Check if it's a unique violation
+      if (dbError.code === '23505') {
+        return new Response(
+          JSON.stringify({ error: 'This email is already subscribed to our newsletter' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+      throw dbError;
     }
 
     // Send confirmation email
@@ -92,6 +118,16 @@ serve(async (req) => {
 
     const responseData = await response.json();
     console.log('Newsletter confirmation sent successfully:', responseData);
+
+    // Mark subscriber as confirmed
+    const { error: updateError } = await supabase
+      .from('newsletter_subscribers')
+      .update({ confirmed: true })
+      .eq('email', email);
+
+    if (updateError) {
+      console.error('Error updating subscriber confirmation status:', updateError);
+    }
     
     return new Response(
       JSON.stringify({ message: 'Successfully subscribed to newsletter' }),
