@@ -65,3 +65,9 @@ export interface Vendor {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export const MANAGER_EMAILS = [
+  'amy@straylite.com',
+  'fred@replaymuseum.com',
+  'play@replaymuseum.com'
+];

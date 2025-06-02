@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   Wrench,
   QrCode,
-  ClipboardList
+  ClipboardList,
+  Lock
 } from 'lucide-react';
 import { Game, Repair } from '../types';
 
@@ -31,7 +32,7 @@ const supabase = createClient(
 const GameDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { games, getGame, deleteGame } = useGameContext();
-  const { user } = useAuth();
+  const { user, isManager } = useAuth();
   const navigate = useNavigate();
   
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
@@ -60,8 +61,12 @@ const GameDetailPage: React.FC = () => {
       return;
     }
 
-    fetchRepairs();
-  }, [slug, game]);
+    if (isManager) {
+      fetchRepairs();
+    } else {
+      setLoading(false);
+    }
+  }, [slug, game, isManager]);
 
   const fetchRepairs = async () => {
     if (!game) return;
@@ -254,8 +259,8 @@ const GameDetailPage: React.FC = () => {
               )}
             </div>
 
-            {/* Condition Notes Section */}
-            {game.conditionNotes && (
+            {/* Condition Notes Section - Only visible to managers */}
+            {isManager && game.conditionNotes && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-3">
                   <ClipboardList size={18} className="text-indigo-600 dark:text-indigo-400 mr-2" />
@@ -309,25 +314,34 @@ const GameDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Repair History */}
-        <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
-          {loading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        {/* Repair History - Only visible to managers */}
+        {isManager ? (
+          <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-600 dark:text-red-400">
+                <AlertTriangle size={24} className="mx-auto mb-2" />
+                <p>{error}</p>
+              </div>
+            ) : (
+              <RepairHistory
+                gameId={game.id}
+                repairs={repairs}
+                onAddRepair={handleAddRepair}
+              />
+            )}
+          </div>
+        ) : user && (
+          <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700 text-center">
+            <div className="flex items-center justify-center text-gray-500 dark:text-gray-400">
+              <Lock size={18} className="mr-2" />
+              <p>Repair history is only visible to managers</p>
             </div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-600 dark:text-red-400">
-              <AlertTriangle size={24} className="mx-auto mb-2" />
-              <p>{error}</p>
-            </div>
-          ) : (
-            <RepairHistory
-              gameId={game.id}
-              repairs={repairs}
-              onAddRepair={handleAddRepair}
-            />
-          )}
-        </div>
+          </div>
+        )}
       </div>
       
       {/* Delete confirmation modal */}
