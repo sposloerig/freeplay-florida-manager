@@ -69,5 +69,6 @@ export interface Vendor {
 export const MANAGER_EMAILS = [
   'amy@straylite.com',
   'fred@replaymuseum.com',
-  'play@replaymuseum.com'
+  'play@replaymuseum.com',
+  'brian@replaymuseum.com'
 ];
