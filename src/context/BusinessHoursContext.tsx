@@ -1,11 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface BusinessHours {
   dayOfWeek: number;
@@ -163,7 +158,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const updateBusinessHours = async (hours: BusinessHours[]) => {
-    if (!isManager) return;
+    if (!isManager) {
+      throw new Error('Unauthorized');
+    }
     
     try {
       const { error } = await supabase
@@ -186,7 +183,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const addSpecialHours = async (hours: Omit<SpecialHours, 'id'>) => {
-    if (!isManager) return;
+    if (!isManager) {
+      throw new Error('Unauthorized');
+    }
     
     try {
       const { error } = await supabase
@@ -208,7 +207,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const removeSpecialHours = async (date: string) => {
-    if (!isManager) return;
+    if (!isManager) {
+      throw new Error('Unauthorized');
+    }
     
     try {
       const { error } = await supabase
@@ -225,7 +226,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const addAnnouncement = async (announcement: Omit<Announcement, 'id'>) => {
-    if (!isManager) return;
+    if (!isManager) {
+      throw new Error('Unauthorized');
+    }
     
     try {
       const { error } = await supabase
@@ -247,7 +250,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const removeAnnouncement = async (id: string) => {
-    if (!isManager) return;
+    if (!isManager) {
+      throw new Error('Unauthorized');
+    }
     
     try {
       const { error } = await supabase
