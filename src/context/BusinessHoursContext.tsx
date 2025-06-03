@@ -72,6 +72,17 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (regularError) throw regularError;
 
+      // Transform the data to match our interface
+      const transformedHours: BusinessHours[] = (regularData || []).map(hour => ({
+        dayOfWeek: hour.day_of_week,
+        openTime: hour.open_time,
+        closeTime: hour.close_time,
+        isClosed: hour.is_closed
+      }));
+
+      // Sort by day of week to ensure correct order
+      transformedHours.sort((a, b) => a.dayOfWeek - b.dayOfWeek);
+
       // Fetch special hours
       const { data: specialData, error: specialError } = await supabase
         .from('special_hours')
@@ -92,7 +103,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (announcementError) throw announcementError;
 
-      setRegularHours(regularData || []);
+      setRegularHours(transformedHours);
       setSpecialHours(specialData || []);
       setAnnouncements(announcementData || []);
       setCurrentAnnouncement(announcementData?.[0] || null);
