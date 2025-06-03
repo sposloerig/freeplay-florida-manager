@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBusinessHours } from '../context/BusinessHoursContext';
 import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 import { Clock, Calendar, Bell, Plus, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -17,12 +18,34 @@ const AdminHoursPage: React.FC = () => {
     loading,
     error 
   } = useBusinessHours();
-  const { isManager } = useAuth();
+  const { user, isManager } = useAuth();
 
   const [editingRegularHours, setEditingRegularHours] = useState(false);
   const [editedHours, setEditedHours] = useState(regularHours);
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  // If not authenticated, redirect to login
+  if (!user) {
+    return <Navigate to="/login" state={{ from: '/admin/hours' }} replace />;
+  }
+
+  // If authenticated but not a manager, show access denied
+  if (!isManager) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">
+          <AlertTriangle size={48} className="mx-auto text-yellow-500 mb-4" />
+          <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            You don't have permission to manage business hours.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleRegularHoursSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,22 +104,6 @@ const AdminHoursPage: React.FC = () => {
       console.error('Error adding announcement:', err);
     }
   };
-
-  if (!isManager) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">
-          <AlertTriangle size={48} className="mx-auto text-yellow-500 mb-4" />
-          <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-            Access Denied
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            You don't have permission to manage business hours.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
