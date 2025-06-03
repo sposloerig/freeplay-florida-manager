@@ -18,6 +18,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminEventsPage from './pages/AdminEventsPage';
 import AdminFaqPage from './pages/AdminFaqPage';
 import AdminShopPage from './pages/AdminShopPage';
+import AdminHoursPage from './pages/AdminHoursPage';
 import QRCodePrintPage from './pages/QRCodePrintPage';
 import AboutPage from './pages/AboutPage';
 import EventsPage from './pages/EventsPage';
@@ -50,6 +51,11 @@ function App() {
                   <Route path="/admin" element={
                     <ProtectedRoute>
                       <AdminDashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/hours" element={
+                    <ProtectedRoute>
+                      <AdminHoursPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/add" element={
