@@ -178,9 +178,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
       await fetchBusinessHours();
-    } catch (err) {
-      console.error('Error updating business hours:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error updating business hours:', error);
+      throw error;
     }
   };
 
@@ -202,9 +202,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
       await fetchBusinessHours();
-    } catch (err) {
-      console.error('Error adding special hours:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error adding special hours:', error);
+      throw error;
     }
   };
 
@@ -221,9 +221,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
       await fetchBusinessHours();
-    } catch (err) {
-      console.error('Error removing special hours:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error removing special hours:', error);
+      throw error;
     }
   };
 
@@ -245,9 +245,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
       await fetchBusinessHours();
-    } catch (err) {
-      console.error('Error adding announcement:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error adding announcement:', error);
+      throw error;
     }
   };
 
@@ -264,9 +264,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
       await fetchBusinessHours();
-    } catch (err) {
-      console.error('Error removing announcement:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error removing announcement:', error);
+      throw error;
     }
   };
 
