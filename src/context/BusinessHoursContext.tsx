@@ -51,7 +51,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isManager } = useAuth();
+  const { user, isManager } = useAuth();
 
   useEffect(() => {
     fetchBusinessHours();
@@ -61,6 +61,9 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchBusinessHours = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       // Fetch regular hours
       const { data: regularData, error: regularError } = await supabase
         .from('business_hours')
@@ -95,7 +98,6 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
       setCurrentAnnouncement(announcementData?.[0] || null);
       
       checkOpenStatus();
-      setError(null);
     } catch (err) {
       console.error('Error fetching business hours:', err);
       setError('Failed to load business hours');
@@ -158,7 +160,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const updateBusinessHours = async (hours: BusinessHours[]) => {
-    if (!isManager) {
+    if (!user || !isManager) {
       throw new Error('Unauthorized');
     }
     
@@ -183,7 +185,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const addSpecialHours = async (hours: Omit<SpecialHours, 'id'>) => {
-    if (!isManager) {
+    if (!user || !isManager) {
       throw new Error('Unauthorized');
     }
     
@@ -207,7 +209,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const removeSpecialHours = async (date: string) => {
-    if (!isManager) {
+    if (!user || !isManager) {
       throw new Error('Unauthorized');
     }
     
@@ -226,7 +228,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const addAnnouncement = async (announcement: Omit<Announcement, 'id'>) => {
-    if (!isManager) {
+    if (!user || !isManager) {
       throw new Error('Unauthorized');
     }
     
@@ -250,7 +252,7 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const removeAnnouncement = async (id: string) => {
-    if (!isManager) {
+    if (!user || !isManager) {
       throw new Error('Unauthorized');
     }
     
