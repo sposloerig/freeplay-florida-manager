@@ -12,7 +12,8 @@ import {
   HelpCircle,
   ShoppingBag,
   Phone,
-  QrCode
+  QrCode,
+  Clock
 } from 'lucide-react';
 
 const Footer: React.FC = () => {
@@ -100,6 +101,13 @@ const Footer: React.FC = () => {
                 >
                   <Calendar size={16} className="mr-1" />
                   Manage Events
+                </Link>
+                <Link 
+                  to="/admin/hours"
+                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
+                >
+                  <Clock size={16} className="mr-1" />
+                  Manage Hours
                 </Link>
                 <Link 
                   to="/admin/faq"
