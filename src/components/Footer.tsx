@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useBusinessHours } from '../context/BusinessHoursContext';
 import NewsletterSignup from './NewsletterSignup';
 import { 
   Mail,
@@ -19,7 +20,23 @@ import {
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const { user, signOut } = useAuth();
+  const { regularHours, isOpen } = useBusinessHours();
   
+  // Format hours for display
+  const formatHours = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'pm' : 'am';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}${minutes !== '00' ? ':' + minutes : ''}${ampm}`;
+  };
+
+  const getDisplayHours = (dayOfWeek: number) => {
+    const hours = regularHours.find(h => h.dayOfWeek === dayOfWeek);
+    if (!hours || hours.isClosed) return 'Closed';
+    return `${formatHours(hours.openTime)} - ${formatHours(hours.closeTime)}`;
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -56,10 +73,13 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-bold mb-2">Hours</h3>
             <ul className="text-sm text-gray-400 space-y-1">
-              <li>Wed-Thu: 11am - 7pm</li>
-              <li>Fri-Sat: 11am - 11pm</li>
-              <li>Sun: 11am - 7pm</li>
-              <li>Mon-Tue: Closed</li>
+              <li>Sunday: {getDisplayHours(0)}</li>
+              <li>Monday: {getDisplayHours(1)}</li>
+              <li>Tuesday: {getDisplayHours(2)}</li>
+              <li>Wednesday: {getDisplayHours(3)}</li>
+              <li>Thursday: {getDisplayHours(4)}</li>
+              <li>Friday: {getDisplayHours(5)}</li>
+              <li>Saturday: {getDisplayHours(6)}</li>
               <li className="text-indigo-400 mt-2">Late Night Date Night after 8pm Fri-Sat!</li>
             </ul>
           </div>
