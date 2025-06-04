@@ -176,6 +176,20 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     
     try {
+      // Get the user's email from the session
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
+      if (!currentUser?.email) {
+        throw new Error('User email not found');
+      }
+
+      // Check if the user's email is in the allowed list
+      const allowedEmails = ['amy@straylite.com', 'fred@replaymuseum.com', 'play@replaymuseum.com'];
+      if (!allowedEmails.includes(currentUser.email)) {
+        throw new Error('User not authorized to update business hours');
+      }
+
       const { error } = await supabase
         .from('business_hours')
         .upsert(
