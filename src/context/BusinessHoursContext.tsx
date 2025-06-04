@@ -184,7 +184,11 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
             open_time: h.openTime,
             close_time: h.closeTime,
             is_closed: h.isClosed
-          }))
+          })),
+          {
+            onConflict: 'day_of_week',
+            ignoreDuplicates: false
+          }
         );
 
       if (error) throw error;
