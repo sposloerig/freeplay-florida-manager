@@ -126,7 +126,8 @@ const AdminHoursPage: React.FC = () => {
 
   const formatAnnouncementDate = (dateString: string | Date) => {
     try {
-      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+      // Use parseISO for string dates, or keep as is if already a Date object
+      const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
       return format(date, 'MMM d, yyyy h:mm a');
     } catch (err) {
       console.error('Error formatting date:', err);
