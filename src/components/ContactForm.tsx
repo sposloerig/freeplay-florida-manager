@@ -7,10 +7,10 @@ interface ContactFormProps {
 
 const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
   const [formData, setFormData] = useState({
-    name: 'Test User',
-    email: 'test@example.com',
-    subject: 'Test Contact Form',
-    message: 'This is a test message to verify the contact form functionality.',
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
 
   const [status, setStatus] = useState<{
@@ -54,7 +54,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
 
       setStatus({
         type: 'success',
-        message: 'Test message sent successfully! Check your email.',
+        message: 'Message sent successfully! We will get back to you soon.',
       });
       setFormData({
         name: '',
