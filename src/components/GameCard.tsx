@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Game } from '../types';
-import { Calendar, MapPin, Trophy, Wrench } from 'lucide-react';
+import { Calendar, MapPin, Trophy, Wrench, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface GameCardProps {
@@ -8,6 +8,9 @@ interface GameCardProps {
 }
 
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Operational':
@@ -29,12 +32,28 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+        {!imageLoaded && !imageError && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+        {imageError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+            <ImageOff size={32} className="mb-2" />
+            <span className="text-sm">Image not available</span>
+          </div>
+        )}
         <img
           src={game.images?.[0] || defaultImage}
           alt={game.name}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          loading="lazy"
+          onLoad={() => setImageLoaded(true)}
           onError={(e) => {
+            setImageError(true);
             const target = e.target as HTMLImageElement;
             if (target.src !== defaultImage) {
               target.src = defaultImage;
