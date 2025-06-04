@@ -25,6 +25,28 @@ const AdminHoursPage: React.FC = () => {
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+  // Format current date and time for datetime-local inputs
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    return format(now, "yyyy-MM-dd'T'HH:mm");
+  };
+
+  const [newSpecialHours, setNewSpecialHours] = useState({
+    date: '',
+    openTime: '',
+    closeTime: '',
+    isClosed: false,
+    reason: ''
+  });
+
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    message: '',
+    type: 'info' as 'info' | 'warning' | 'success' | 'error',
+    startDate: getCurrentDateTime(), // Store as string
+    endDate: getCurrentDateTime(), // Store as string
+    isActive: true
+  });
+
   // If not authenticated, redirect to login
   if (!user) {
     return <Navigate to="/login" state={{ from: '/admin/hours' }} replace />;
@@ -57,14 +79,6 @@ const AdminHoursPage: React.FC = () => {
     }
   };
 
-  const [newSpecialHours, setNewSpecialHours] = useState({
-    date: '',
-    openTime: '',
-    closeTime: '',
-    isClosed: false,
-    reason: ''
-  });
-
   const handleSpecialHoursSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -81,23 +95,20 @@ const AdminHoursPage: React.FC = () => {
     }
   };
 
-  const [newAnnouncement, setNewAnnouncement] = useState({
-    message: '',
-    type: 'info' as 'info' | 'warning' | 'success' | 'error',
-    startDate: new Date(),
-    endDate: new Date(),
-    isActive: true
-  });
-
   const handleAnnouncementSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addAnnouncement(newAnnouncement);
+      // Convert string dates to Date objects when submitting
+      await addAnnouncement({
+        ...newAnnouncement,
+        startDate: new Date(newAnnouncement.startDate),
+        endDate: new Date(newAnnouncement.endDate)
+      });
       setNewAnnouncement({
         message: '',
         type: 'info',
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: getCurrentDateTime(),
+        endDate: getCurrentDateTime(),
         isActive: true
       });
     } catch (err) {
@@ -112,6 +123,16 @@ const AdminHoursPage: React.FC = () => {
       </div>
     );
   }
+
+  const formatAnnouncementDate = (dateString: string | Date) => {
+    try {
+      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+      return format(date, 'MMM d, yyyy h:mm a');
+    } catch (err) {
+      console.error('Error formatting date:', err);
+      return 'Invalid date';
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -402,10 +423,10 @@ const AdminHoursPage: React.FC = () => {
               <label className="block text-sm font-medium mb-1">Start Date</label>
               <input
                 type="datetime-local"
-                value={format(newAnnouncement.startDate, "yyyy-MM-dd'T'HH:mm")}
+                value={newAnnouncement.startDate}
                 onChange={(e) => setNewAnnouncement({
                   ...newAnnouncement,
-                  startDate: new Date(e.target.value)
+                  startDate: e.target.value
                 })}
                 className="w-full p-2 border rounded"
                 required
@@ -415,10 +436,10 @@ const AdminHoursPage: React.FC = () => {
               <label className="block text-sm font-medium mb-1">End Date</label>
               <input
                 type="datetime-local"
-                value={format(newAnnouncement.endDate, "yyyy-MM-dd'T'HH:mm")}
+                value={newAnnouncement.endDate}
                 onChange={(e) => setNewAnnouncement({
                   ...newAnnouncement,
-                  endDate: new Date(e.target.value)
+                  endDate: e.target.value
                 })}
                 className="w-full p-2 border rounded"
                 required
@@ -442,8 +463,8 @@ const AdminHoursPage: React.FC = () => {
               <div>
                 <div className="font-medium">{announcement.message}</div>
                 <div className="text-sm text-gray-500">
-                  {format(new Date(announcement.startDate), 'MMM d, yyyy h:mm a')} -
-                  {format(new Date(announcement.endDate), 'MMM d, yyyy h:mm a')}
+                  {formatAnnouncementDate(announcement.startDate)} -
+                  {formatAnnouncementDate(announcement.endDate)}
                 </div>
                 <span className={`inline-block px-2 py-1 text-xs rounded-full ${
                   announcement.type === 'info' ? 'bg-blue-100 text-blue-800' :
