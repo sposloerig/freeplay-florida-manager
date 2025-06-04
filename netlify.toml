@@ -8,17 +8,15 @@
   to = "/index.html"
   status = 200
 
-[[redirects]]
-  from = "https://www.replaymuseum.com/*"
-  to = "https://replaymuseum.com/:splat"
-  status = 301
-  force = true
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
-[[redirects]]
-  from = "http://*"
-  to = "https://:splat"
-  status = 301
-  force = true
+[[headers]]
+  for = "/assets/*"
+    [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [build.processing]
   skip_processing = false
