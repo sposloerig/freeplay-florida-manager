@@ -28,6 +28,7 @@ const AboutPage: React.FC = () => {
                     <li>Wednesday - Thursday: 11am - 7pm</li>
                     <li>Friday - Saturday: 11am - 11pm</li>
                     <li>Sunday: 11am - 7pm</li>
+                    <li>Monday - Tuesday: Closed</li>
                     <li className="text-sm italic mt-2">Late Night Date Night Special after 8pm on Fridays & Saturdays!</li>
                   </ul>
                 </div>
