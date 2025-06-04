@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { MANAGER_EMAILS } from '../types';
 
 interface BusinessHours {
   dayOfWeek: number;
@@ -184,9 +185,8 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('User email not found');
       }
 
-      // Check if the user's email is in the allowed list
-      const allowedEmails = ['amy@straylite.com', 'fred@replaymuseum.com', 'play@replaymuseum.com'];
-      if (!allowedEmails.includes(currentUser.email)) {
+      // Check if the user's email is in the allowed list using MANAGER_EMAILS
+      if (!MANAGER_EMAILS.includes(currentUser.email)) {
         throw new Error('User not authorized to update business hours');
       }
 
