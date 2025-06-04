@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock, ArrowRight, TowerControl as GameController } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import NewsletterSignup from '../components/NewsletterSignup';
+import { useBusinessHours } from '../context/BusinessHoursContext';
 
-// Create Supabase client with additional options
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY,
@@ -58,6 +58,7 @@ const HomePage: React.FC = () => {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { regularHours } = useBusinessHours();
 
   useEffect(() => {
     fetchUpcomingEvents();
@@ -73,7 +74,6 @@ const HomePage: React.FC = () => {
 
   const fetchUpcomingEvents = async () => {
     try {
-      // Ensure we have the required environment variables
       if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
         throw new Error('Missing Supabase configuration');
       }
@@ -103,9 +103,22 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const formatHours = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'pm' : 'am';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}${minutes !== '00' ? ':' + minutes : ''}${ampm}`;
+  };
+
+  const getDisplayHours = (dayOfWeek: number) => {
+    const hours = regularHours.find(h => h.dayOfWeek === dayOfWeek);
+    if (!hours || hours.isClosed) return 'Closed';
+    return `${formatHours(hours.openTime)} - ${formatHours(hours.closeTime)}`;
+  };
+
   return (
     <div>
-      {/* Hero Section */}
       <div className="relative h-[500px] overflow-hidden">
         {heroImages.map((image, index) => (
           <div
@@ -149,7 +162,6 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Newsletter Section */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-xl mx-auto">
@@ -158,7 +170,6 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Info Section */}
       <div className="bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -167,10 +178,13 @@ const HomePage: React.FC = () => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Hours</h3>
                 <ul className="text-gray-600 dark:text-gray-300 space-y-1">
-                  <li>Wed-Thu: 11am - 7pm</li>
-                  <li>Fri-Sat: 11am - 11pm</li>
-                  <li>Sun: 11am - 7pm</li>
-                  <li>Mon-Tue: Closed</li>
+                  <li>Sunday: {getDisplayHours(0)}</li>
+                  <li>Monday: {getDisplayHours(1)}</li>
+                  <li>Tuesday: {getDisplayHours(2)}</li>
+                  <li>Wednesday: {getDisplayHours(3)}</li>
+                  <li>Thursday: {getDisplayHours(4)}</li>
+                  <li>Friday: {getDisplayHours(5)}</li>
+                  <li>Saturday: {getDisplayHours(6)}</li>
                   <li className="text-sm italic mt-2">Late Night Date Night after 8pm Fri-Sat!</li>
                 </ul>
               </div>
@@ -214,7 +228,6 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Upcoming Events */}
       <div className="bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex justify-between items-center mb-8">
