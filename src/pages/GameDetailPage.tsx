@@ -20,7 +20,8 @@ import {
   Wrench,
   QrCode,
   ClipboardList,
-  Lock
+  Lock,
+  ImageOff
 } from 'lucide-react';
 import { Game, Repair } from '../types';
 
@@ -41,6 +42,7 @@ const GameDetailPage: React.FC = () => {
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<number, boolean>>({});
   
   // Find game by slug (URL-friendly name)
   const game = games.find(g => {
@@ -126,6 +128,13 @@ const GameDetailPage: React.FC = () => {
   const handleAddRepair = () => {
     if (!game) return;
     navigate(`/repairs/new?gameId=${game.id}`);
+  };
+
+  const handleImageError = (index: number) => {
+    setImageLoadErrors(prev => ({
+      ...prev,
+      [index]: true
+    }));
   };
 
   if (!slug || !game) {
@@ -304,11 +313,21 @@ const GameDetailPage: React.FC = () => {
                 className="relative h-48 overflow-hidden rounded-md cursor-pointer shadow-sm hover:shadow-md transition-shadow"
                 onClick={() => setActiveImageIndex(index)}
               >
-                <img
-                  src={image}
-                  alt={`${game.name} - Image ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                />
+                {imageLoadErrors[index] ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
+                    <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">
+                      Game Image Coming Soon
+                    </span>
+                  </div>
+                ) : (
+                  <img
+                    src={image}
+                    alt={`${game.name} - Image ${index + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    onError={() => handleImageError(index)}
+                  />
+                )}
               </div>
             ))}
           </div>
