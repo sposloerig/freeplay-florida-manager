@@ -24,8 +24,8 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     }
   };
 
-  // Create URL-friendly slug from game name
-  const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  // Create URL-friendly slug from game name and location
+  const slug = `${game.name}-${game.location}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   // Get the best available image URL
   const imageUrl = game.thumbnailUrl || game.images?.[0];
