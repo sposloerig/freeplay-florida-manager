@@ -27,11 +27,8 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   // Create URL-friendly slug from game name
   const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-  // Default placeholder showing an arcade cabinet silhouette
-  const defaultImage = 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=200&q=80&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
-  // Use thumbnail URL if available, otherwise fall back to full image
-  const thumbnailUrl = game.thumbnailUrl || game.images?.[0] || defaultImage;
+  // Use thumbnail if available, otherwise use first image
+  const displayImage = game.thumbnailUrl || game.images?.[0];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -42,26 +39,22 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
           </div>
         )}
         {imageError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800">
-            <ImageOff size={32} className="mb-2" />
-            <span className="text-sm font-medium">Arcade Image Coming Soon</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
+            <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Arcade Image Coming Soon
+            </span>
           </div>
         )}
         <img
-          src={thumbnailUrl}
+          src={displayImage}
           alt={game.name}
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
-          onError={(e) => {
-            setImageError(true);
-            const target = e.target as HTMLImageElement;
-            if (target.src !== defaultImage) {
-              target.src = defaultImage;
-            }
-          }}
+          onError={() => setImageError(true)}
         />
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
