@@ -9,7 +9,7 @@ interface GameCardProps {
 
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const [imageError, setImageError] = useState(!game.thumbnailUrl && !game.images?.[0]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -43,16 +43,18 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             </span>
           </div>
         )}
-        <img
-          src={game.thumbnailUrl || game.images?.[0]}
-          alt={game.name}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          loading="lazy"
-          onLoad={() => setImageLoaded(true)}
-          onError={() => setImageError(true)}
-        />
+        {(game.thumbnailUrl || game.images?.[0]) && (
+          <img
+            src={game.thumbnailUrl || game.images[0]}
+            alt={game.name}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+          />
+        )}
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
             {game.status}
