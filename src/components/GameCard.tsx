@@ -27,9 +27,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   // Create URL-friendly slug from game name
   const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-  // Default placeholder image
-  const defaultImage = 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=200';
-  
+  // Default placeholder image showing "Game Image Coming Soon"
+  const defaultImage = 'https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg?auto=compress&cs=tinysrgb&w=200';
+
   // Use thumbnail URL if available, otherwise fall back to full image
   const thumbnailUrl = game.thumbnailUrl || game.images?.[0] || defaultImage;
 
@@ -44,7 +44,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
         {imageError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
             <ImageOff size={32} className="mb-2" />
-            <span className="text-sm">Image not available</span>
+            <span className="text-sm">Game Image Coming Soon</span>
           </div>
         )}
         <img
@@ -107,4 +107,4 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   );
 };
 
-export default GameCard
+export default GameCard;
