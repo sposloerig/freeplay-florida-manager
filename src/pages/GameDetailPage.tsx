@@ -36,6 +36,12 @@ const GameDetailPage: React.FC = () => {
   const { user, isManager } = useAuth();
   const navigate = useNavigate();
   
+  // Find game by slug (URL-friendly name) - Move this before any state that depends on it
+  const game = games.find(g => {
+    const gameSlug = g.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return gameSlug === slug;
+  });
+  
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
@@ -44,12 +50,6 @@ const GameDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<number, boolean>>({});
   const [mainImageError, setMainImageError] = useState(!game?.images?.[0]);
-  
-  // Find game by slug (URL-friendly name)
-  const game = games.find(g => {
-    const gameSlug = g.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return gameSlug === slug;
-  });
 
   useEffect(() => {
     if (!slug) {
