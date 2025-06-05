@@ -28,7 +28,10 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   // Default placeholder image
-  const defaultImage = 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg';
+  const defaultImage = 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=200';
+  
+  // Use thumbnail URL if available, otherwise fall back to full image
+  const thumbnailUrl = game.thumbnailUrl || game.images?.[0] || defaultImage;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -45,7 +48,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
           </div>
         )}
         <img
-          src={game.images?.[0] || defaultImage}
+          src={thumbnailUrl}
           alt={game.name}
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
@@ -103,5 +106,3 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     </div>
   );
 };
-
-export default GameCard;

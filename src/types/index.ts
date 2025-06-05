@@ -24,6 +24,7 @@ export interface Game {
   highScore?: number;
   yearMade?: number;
   images: string[];
+  thumbnailUrl?: string;
   dateAdded: Date;
   lastUpdated: Date;
 }
