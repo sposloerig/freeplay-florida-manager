@@ -43,6 +43,7 @@ const GameDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<number, boolean>>({});
+  const [mainImageError, setMainImageError] = useState(!game?.images?.[0]);
   
   // Find game by slug (URL-friendly name)
   const game = games.find(g => {
@@ -174,12 +175,22 @@ const GameDetailPage: React.FC = () => {
         <div className="md:flex">
           {/* Main image */}
           <div className="md:w-1/2 h-64 md:h-auto relative">
-            <img 
-              src={game.images[0]} 
-              alt={game.name}
-              className="w-full h-full object-cover"
-              onClick={() => setActiveImageIndex(0)}
-            />
+            {mainImageError ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700">
+                <ImageOff size={48} className="text-gray-400 dark:text-gray-500 mb-3" />
+                <span className="text-base font-medium text-gray-500 dark:text-gray-400 text-center px-4">
+                  Game Image Coming Soon
+                </span>
+              </div>
+            ) : (
+              <img 
+                src={game.images[0]} 
+                alt={game.name}
+                className="w-full h-full object-cover"
+                onError={() => setMainImageError(true)}
+                onClick={() => !mainImageError && setActiveImageIndex(0)}
+              />
+            )}
             <div className="absolute bottom-4 left-4">
               <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(game.status)}`}>
                 {game.status}

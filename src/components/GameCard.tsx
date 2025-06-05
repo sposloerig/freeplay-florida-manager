@@ -9,7 +9,7 @@ interface GameCardProps {
 
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(!game.thumbnailUrl && !game.images?.[0]);
+  const [imageError, setImageError] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -27,6 +27,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   // Create URL-friendly slug from game name
   const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+  // Get the best available image URL
+  const imageUrl = game.thumbnailUrl || game.images?.[0];
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -35,7 +38,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
-        {imageError && (
+        {(imageError || !imageUrl) && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
             <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">
@@ -43,9 +46,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             </span>
           </div>
         )}
-        {(game.thumbnailUrl || game.images?.[0]) && (
+        {imageUrl && (
           <img
-            src={game.thumbnailUrl || game.images[0]}
+            src={imageUrl}
             alt={game.name}
             className={`w-full h-full object-cover transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
