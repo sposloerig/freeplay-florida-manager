@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube } from 'lucide-react';
+import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube, Mail } from 'lucide-react';
 
 const MANAGER_EMAILS = [
   'amy@straylite.com',
@@ -17,6 +17,7 @@ const AdminPasswordResetPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [testingEmail, setTestingEmail] = useState(false);
+  const [testingPasswordEmail, setTestingPasswordEmail] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -51,6 +52,39 @@ const AdminPasswordResetPage: React.FC = () => {
       setError(`Email test failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setTestingEmail(false);
+    }
+  };
+
+  const testPasswordResetEmail = async () => {
+    setTestingPasswordEmail(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/password-reset-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          email: 'test@example.com',
+          resetUrl: `${window.location.origin}/reset-password?test=true`
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send test password reset email');
+      }
+
+      setSuccess(`Password reset email test sent successfully! Email ID: ${data.emailId}`);
+    } catch (err) {
+      console.error('Error testing password reset email:', err);
+      setError(`Password reset email test failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setTestingPasswordEmail(false);
     }
   };
 
@@ -164,25 +198,37 @@ const AdminPasswordResetPage: React.FC = () => {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        {/* Test Email Button */}
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div className="flex justify-between items-center">
-            <div>
-              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                Email System Test
-              </h4>
-              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                Test the email system to ensure it's working before resetting passwords
-              </p>
+        {/* Email System Tests */}
+        <div className="mb-6 space-y-4">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <div>
+                <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Email System Tests
+                </h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Test the email system to ensure it's working before resetting passwords
+                </p>
+              </div>
             </div>
-            <button
-              onClick={testEmailSystem}
-              disabled={testingEmail}
-              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              <TestTube size={16} className="mr-2" />
-              {testingEmail ? 'Testing...' : 'Test Email'}
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={testEmailSystem}
+                disabled={testingEmail}
+                className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                <TestTube size={16} className="mr-2" />
+                {testingEmail ? 'Testing...' : 'Test Basic Email'}
+              </button>
+              <button
+                onClick={testPasswordResetEmail}
+                disabled={testingPasswordEmail}
+                className="flex items-center px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+              >
+                <Mail size={16} className="mr-2" />
+                {testingPasswordEmail ? 'Testing...' : 'Test Password Reset Email'}
+              </button>
+            </div>
           </div>
         </div>
 

@@ -32,7 +32,6 @@ const LoginPage: React.FC = () => {
       if (remainingTime > 0) {
         setResetCooldown(remainingTime);
       } else {
-        // Cooldown has expired, remove from storage
         localStorage.removeItem(COOLDOWN_STORAGE_KEY);
       }
     }
@@ -45,7 +44,6 @@ const LoginPage: React.FC = () => {
         const newCooldown = resetCooldown - 1;
         setResetCooldown(newCooldown);
         
-        // Remove from localStorage when cooldown reaches 0
         if (newCooldown === 0) {
           localStorage.removeItem(COOLDOWN_STORAGE_KEY);
         }
@@ -54,7 +52,6 @@ const LoginPage: React.FC = () => {
     }
   }, [resetCooldown]);
 
-  // Helper function to set cooldown and persist to localStorage
   const setCooldownWithPersistence = (seconds: number) => {
     setResetCooldown(seconds);
     if (seconds > 0) {
@@ -94,19 +91,49 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      // Use our custom edge function for better email delivery
+      const resetUrl = `${window.location.origin}/reset-password`;
+      
+      // First, trigger the Supabase password reset to generate the tokens
+      const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: resetUrl,
       });
 
-      if (error) {
-        if (error.message.includes('rate limit') || 
-            error.status === 429 || 
-            error.message.includes('email rate limit exceeded') ||
-            (error as any)?.code === 'over_email_send_rate_limit') {
+      if (supabaseError) {
+        if (supabaseError.message.includes('rate limit') || 
+            supabaseError.status === 429 || 
+            supabaseError.message.includes('email rate limit exceeded') ||
+            (supabaseError as any)?.code === 'over_email_send_rate_limit') {
           setCooldownWithPersistence(900); // 15 minutes
           throw new Error('You have made too many password reset requests. Please wait 15 minutes before trying again.');
         }
-        throw error;
+        
+        // For other errors, still try our custom email function
+        console.warn('Supabase reset error, trying custom email:', supabaseError);
+      }
+
+      // Also send our custom email for better delivery
+      try {
+        const customEmailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/password-reset-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email: email,
+            resetUrl: resetUrl
+          }),
+        });
+
+        if (customEmailResponse.ok) {
+          console.log('Custom password reset email sent successfully');
+        } else {
+          console.warn('Custom email failed, but Supabase email should work');
+        }
+      } catch (customEmailError) {
+        console.warn('Custom email function failed:', customEmailError);
+        // Don't throw here, as Supabase email might still work
       }
       
       setResetSent(true);
@@ -131,14 +158,12 @@ const LoginPage: React.FC = () => {
     setIsResetMode(!isResetMode);
     setError('');
     setResetSent(false);
-    // Don't clear cooldown when switching modes to maintain rate limiting
   };
 
   const handleBackToLogin = () => {
     setIsResetMode(false);
     setResetSent(false);
     setError('');
-    // Don't clear cooldown to maintain rate limiting
   };
 
   if (resetSent) {
@@ -157,8 +182,14 @@ const LoginPage: React.FC = () => {
             </p>
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>Important:</strong> The reset link will expire in 1 hour. If you don't see the email, check your spam folder.
+                <strong>Important:</strong> The reset link will expire in 1 hour. If you don't see the email:
               </p>
+              <ul className="text-sm text-blue-700 dark:text-blue-300 mt-2 list-disc list-inside">
+                <li>Check your spam/junk folder</li>
+                <li>Check your promotions tab (Gmail)</li>
+                <li>Wait a few minutes for delivery</li>
+                <li>Ensure you entered the correct email address</li>
+              </ul>
             </div>
             {resetCooldown > 0 && (
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -294,14 +325,15 @@ const LoginPage: React.FC = () => {
         {isResetMode && (
           <div className="mt-6 bg-gray-50 dark:bg-gray-800 rounded-md p-4">
             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-              Security Tips:
+              Troubleshooting:
             </h4>
             <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
               <li>• Reset links expire after 1 hour for security</li>
               <li>• Check your spam folder if you don't see the email</li>
-              <li>• Only use this feature if you've forgotten your password</li>
+              <li>• Gmail users: check your Promotions tab</li>
+              <li>• Wait 2-3 minutes for email delivery</li>
+              <li>• Ensure you entered the correct email address</li>
               <li>• Contact an administrator if you continue having issues</li>
-              <li>• Rate limiting prevents abuse - cooldowns persist across page refreshes</li>
             </ul>
           </div>
         )}
