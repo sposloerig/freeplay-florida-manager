@@ -19,6 +19,8 @@ import AdminEventsPage from './pages/AdminEventsPage';
 import AdminFaqPage from './pages/AdminFaqPage';
 import AdminShopPage from './pages/AdminShopPage';
 import AdminHoursPage from './pages/AdminHoursPage';
+import AdminGameSalesPage from './pages/AdminGameSalesPage';
+import GameSalesPage from './pages/GameSalesPage';
 import QRCodePrintPage from './pages/QRCodePrintPage';
 import AboutPage from './pages/AboutPage';
 import EventsPage from './pages/EventsPage';
@@ -47,6 +49,9 @@ function App() {
                   <Route path="/sell-donate" element={<SellDonatePage />} />
                   <Route path="/login" element={<LoginPage />} />
                   
+                  {/* Private sales page - not linked in public UI */}
+                  <Route path="/games-for-sale" element={<GameSalesPage />} />
+                  
                   {/* Protected Routes */}
                   <Route path="/admin" element={
                     <ProtectedRoute>
@@ -56,6 +61,11 @@ function App() {
                   <Route path="/admin/hours" element={
                     <ProtectedRoute>
                       <AdminHoursPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/sales" element={
+                    <ProtectedRoute>
+                      <AdminGameSalesPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/add" element={

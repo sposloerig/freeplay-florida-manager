@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag } from 'lucide-react';
+import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign } from 'lucide-react';
 
 const AdminDashboardPage: React.FC = () => {
   const adminFeatures = [
@@ -11,6 +11,15 @@ const AdminDashboardPage: React.FC = () => {
       links: [
         { to: '/add', text: 'Add New Game', icon: Plus },
         { to: '/collection', text: 'View Collection', icon: GameController }
+      ]
+    },
+    {
+      title: 'Game Sales',
+      icon: DollarSign,
+      description: 'Manage games for sale, set pricing, track buyer inquiries, and handle sales transactions.',
+      links: [
+        { to: '/admin/sales', text: 'Manage Sales', icon: DollarSign },
+        { to: '/games-for-sale', text: 'View Sales Page', icon: Tag }
       ]
     },
     {

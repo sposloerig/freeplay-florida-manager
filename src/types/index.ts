@@ -27,6 +27,12 @@ export interface Game {
   thumbnailUrl?: string;
   dateAdded: Date;
   lastUpdated: Date;
+  // Sales-related fields
+  askingPrice?: number;
+  forSale?: boolean;
+  saleConditionNotes?: string;
+  missingParts?: string[];
+  saleNotes?: string;
 }
 
 export interface Repair {
@@ -63,6 +69,19 @@ export interface Vendor {
   id: string;
   name: string;
   contactInfo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BuyerInquiry {
+  id: string;
+  gameId: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone?: string;
+  offerAmount?: number;
+  message: string;
+  status: 'pending' | 'responded' | 'accepted' | 'declined';
   createdAt: Date;
   updatedAt: Date;
 }
