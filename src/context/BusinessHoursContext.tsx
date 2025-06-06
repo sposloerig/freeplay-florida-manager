@@ -104,10 +104,20 @@ export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (announcementError) throw announcementError;
 
+      // Transform announcement data to convert date strings to Date objects
+      const transformedAnnouncements: Announcement[] = (announcementData || []).map(announcement => ({
+        id: announcement.id,
+        message: announcement.message,
+        type: announcement.type,
+        startDate: new Date(announcement.start_date),
+        endDate: new Date(announcement.end_date),
+        isActive: announcement.is_active
+      }));
+
       setRegularHours(transformedHours);
       setSpecialHours(specialData || []);
-      setAnnouncements(announcementData || []);
-      setCurrentAnnouncement(announcementData?.[0] || null);
+      setAnnouncements(transformedAnnouncements);
+      setCurrentAnnouncement(transformedAnnouncements?.[0] || null);
       
       checkOpenStatus();
     } catch (err) {
