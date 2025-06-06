@@ -30,6 +30,7 @@ import ShopPage from './pages/ShopPage';
 import SellDonatePage from './pages/SellDonatePage';
 import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import LLMInfoPage from './pages/LLMInfoPage';
 
 function App() {
   return (
@@ -51,6 +52,9 @@ function App() {
                   <Route path="/sell-donate" element={<SellDonatePage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  
+                  {/* LLM/SEO Information Page */}
+                  <Route path="/museum-info" element={<LLMInfoPage />} />
                   
                   {/* Private sales page - not linked in public UI */}
                   <Route path="/games-for-sale" element={<GameSalesPage />} />
