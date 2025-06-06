@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag } from 'lucide-react';
+import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart } from 'lucide-react';
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -46,6 +46,7 @@ const GameSalesPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameForSale | null>(null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [inquiryType, setInquiryType] = useState<'purchase' | 'offer'>('offer');
   const [inquiryForm, setInquiryForm] = useState<BuyerInquiry>({
     game_id: '',
     buyer_name: '',
@@ -78,8 +79,23 @@ const GameSalesPage: React.FC = () => {
     }
   };
 
-  const handleInquiry = (game: GameForSale) => {
+  const handlePurchase = (game: GameForSale) => {
     setSelectedGame(game);
+    setInquiryType('purchase');
+    setInquiryForm({
+      game_id: game.id,
+      buyer_name: '',
+      buyer_email: '',
+      buyer_phone: '',
+      offer_amount: game.asking_price, // Set to asking price for purchase
+      message: `I would like to purchase ${game.name} at the full asking price of $${game.asking_price?.toLocaleString()}.`
+    });
+    setShowInquiryForm(true);
+  };
+
+  const handleMakeOffer = (game: GameForSale) => {
+    setSelectedGame(game);
+    setInquiryType('offer');
     setInquiryForm({
       game_id: game.id,
       buyer_name: '',
@@ -102,7 +118,8 @@ const GameSalesPage: React.FC = () => {
 
       if (error) throw error;
 
-      alert('Your inquiry has been submitted successfully! We will contact you soon.');
+      const actionText = inquiryType === 'purchase' ? 'purchase request' : 'offer';
+      alert(`Your ${actionText} has been submitted successfully! We will contact you soon.`);
       setShowInquiryForm(false);
       setSelectedGame(null);
     } catch (err) {
@@ -361,17 +378,41 @@ const GameSalesPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
-                  {formatPrice(game.asking_price)}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">
+                    {formatPrice(game.asking_price)}
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleInquiry(game)}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
-                >
-                  <MessageSquare size={16} className="mr-2" />
-                  {game.asking_price ? 'Make Offer' : 'Inquire'}
-                </button>
+                
+                <div className="space-y-2">
+                  {game.asking_price ? (
+                    <>
+                      <button
+                        onClick={() => handlePurchase(game)}
+                        className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+                      >
+                        <ShoppingCart size={16} className="mr-2" />
+                        Purchase (${game.asking_price.toLocaleString()})
+                      </button>
+                      <button
+                        onClick={() => handleMakeOffer(game)}
+                        className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                      >
+                        <MessageSquare size={16} className="mr-2" />
+                        Make Offer
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleMakeOffer(game)}
+                      className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                    >
+                      <MessageSquare size={16} className="mr-2" />
+                      Make Offer
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -391,8 +432,16 @@ const GameSalesPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full m-4 p-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-              Inquiry for {selectedGame.name}
+              {inquiryType === 'purchase' ? 'Purchase Request' : 'Make Offer'} for {selectedGame.name}
             </h3>
+
+            {inquiryType === 'purchase' && selectedGame.asking_price && (
+              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+                <p className="text-sm text-green-800 dark:text-green-200">
+                  <strong>Purchase Price:</strong> ${selectedGame.asking_price.toLocaleString()}
+                </p>
+              </div>
+            )}
 
             <form onSubmit={submitInquiry} className="space-y-4">
               <div>
@@ -433,19 +482,21 @@ const GameSalesPage: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Offer Amount
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={inquiryForm.offer_amount || ''}
-                  onChange={(e) => setInquiryForm({ ...inquiryForm, offer_amount: parseFloat(e.target.value) || undefined })}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
-                  placeholder={selectedGame.asking_price ? `Asking: $${selectedGame.asking_price}` : 'Your offer'}
-                />
-              </div>
+              {inquiryType === 'offer' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Your Offer Amount
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={inquiryForm.offer_amount || ''}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, offer_amount: parseFloat(e.target.value) || undefined })}
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+                    placeholder={selectedGame.asking_price ? `Asking: $${selectedGame.asking_price}` : 'Your offer'}
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -457,7 +508,10 @@ const GameSalesPage: React.FC = () => {
                   value={inquiryForm.message}
                   onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
-                  placeholder="Tell us about your interest in this game..."
+                  placeholder={inquiryType === 'purchase' 
+                    ? "Confirm your purchase request and provide any additional details..."
+                    : "Tell us about your offer and interest in this game..."
+                  }
                 />
               </div>
 
@@ -472,9 +526,13 @@ const GameSalesPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                  className={`px-4 py-2 text-white rounded-md disabled:opacity-50 ${
+                    inquiryType === 'purchase' 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-indigo-600 hover:bg-indigo-700'
+                  }`}
                 >
-                  {submitting ? 'Sending...' : 'Send Inquiry'}
+                  {submitting ? 'Sending...' : inquiryType === 'purchase' ? 'Submit Purchase Request' : 'Send Offer'}
                 </button>
               </div>
             </form>
