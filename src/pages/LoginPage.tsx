@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { Lock, AlertTriangle, ArrowLeft, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+const COOLDOWN_STORAGE_KEY = 'password_reset_cooldown';
+
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,13 +21,49 @@ const LoginPage: React.FC = () => {
   const from = (location.state as any)?.from?.pathname || '/admin';
   const successMessage = (location.state as any)?.message;
 
+  // Initialize cooldown from localStorage on component mount
+  React.useEffect(() => {
+    const storedCooldownEnd = localStorage.getItem(COOLDOWN_STORAGE_KEY);
+    if (storedCooldownEnd) {
+      const cooldownEndTime = parseInt(storedCooldownEnd, 10);
+      const now = Date.now();
+      const remainingTime = Math.max(0, Math.floor((cooldownEndTime - now) / 1000));
+      
+      if (remainingTime > 0) {
+        setResetCooldown(remainingTime);
+      } else {
+        // Cooldown has expired, remove from storage
+        localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+      }
+    }
+  }, []);
+
   // Cooldown timer effect
   React.useEffect(() => {
     if (resetCooldown > 0) {
-      const timer = setTimeout(() => setResetCooldown(resetCooldown - 1), 1000);
+      const timer = setTimeout(() => {
+        const newCooldown = resetCooldown - 1;
+        setResetCooldown(newCooldown);
+        
+        // Remove from localStorage when cooldown reaches 0
+        if (newCooldown === 0) {
+          localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+        }
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [resetCooldown]);
+
+  // Helper function to set cooldown and persist to localStorage
+  const setCooldownWithPersistence = (seconds: number) => {
+    setResetCooldown(seconds);
+    if (seconds > 0) {
+      const cooldownEndTime = Date.now() + (seconds * 1000);
+      localStorage.setItem(COOLDOWN_STORAGE_KEY, cooldownEndTime.toString());
+    } else {
+      localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,14 +103,14 @@ const LoginPage: React.FC = () => {
             error.status === 429 || 
             error.message.includes('email rate limit exceeded') ||
             (error as any)?.code === 'over_email_send_rate_limit') {
-          setResetCooldown(900); // 15 minutes
+          setCooldownWithPersistence(900); // 15 minutes
           throw new Error('You have made too many password reset requests. Please wait 15 minutes before trying again.');
         }
         throw error;
       }
       
       setResetSent(true);
-      setResetCooldown(60); // 1 minute cooldown for successful requests
+      setCooldownWithPersistence(60); // 1 minute cooldown for successful requests
     } catch (err: any) {
       setError(err.message || 'Failed to send password reset email. Please try again.');
     } finally {
@@ -87,6 +125,20 @@ const LoginPage: React.FC = () => {
       return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
     return `${remainingSeconds}s`;
+  };
+
+  const handleModeSwitch = () => {
+    setIsResetMode(!isResetMode);
+    setError('');
+    setResetSent(false);
+    // Don't clear cooldown when switching modes to maintain rate limiting
+  };
+
+  const handleBackToLogin = () => {
+    setIsResetMode(false);
+    setResetSent(false);
+    setError('');
+    // Don't clear cooldown to maintain rate limiting
   };
 
   if (resetSent) {
@@ -115,11 +167,7 @@ const LoginPage: React.FC = () => {
             )}
           </div>
           <button
-            onClick={() => {
-              setIsResetMode(false);
-              setResetSent(false);
-              setError('');
-            }}
+            onClick={handleBackToLogin}
             className="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
           >
             <ArrowLeft size={16} className="mr-2" />
@@ -234,11 +282,7 @@ const LoginPage: React.FC = () => {
           <div className="flex items-center justify-center">
             <button
               type="button"
-              onClick={() => {
-                setIsResetMode(!isResetMode);
-                setError('');
-                setResetSent(false);
-              }}
+              onClick={handleModeSwitch}
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
             >
               {isResetMode ? 'Back to Login' : 'Forgot your password?'}
@@ -257,6 +301,7 @@ const LoginPage: React.FC = () => {
               <li>• Check your spam folder if you don't see the email</li>
               <li>• Only use this feature if you've forgotten your password</li>
               <li>• Contact an administrator if you continue having issues</li>
+              <li>• Rate limiting prevents abuse - cooldowns persist across page refreshes</li>
             </ul>
           </div>
         )}
