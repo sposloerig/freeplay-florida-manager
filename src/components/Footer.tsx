@@ -7,14 +7,9 @@ import {
   Mail,
   Lock,
   LogOut,
-  Plus,
-  Wrench,
-  Calendar,
-  HelpCircle,
-  ShoppingBag,
   Phone,
-  QrCode,
-  Clock
+  Clock,
+  Settings
 } from 'lucide-react';
 
 const Footer: React.FC = () => {
@@ -103,53 +98,11 @@ const Footer: React.FC = () => {
             {user ? (
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link 
-                  to="/add"
+                  to="/admin"
                   className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
                 >
-                  <Plus size={16} className="mr-1" />
-                  Add Game
-                </Link>
-                <Link 
-                  to="/repairs"
-                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-                >
-                  <Wrench size={16} className="mr-1" />
-                  Repairs
-                </Link>
-                <Link 
-                  to="/admin/events"
-                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-                >
-                  <Calendar size={16} className="mr-1" />
-                  Manage Events
-                </Link>
-                <Link 
-                  to="/admin/hours"
-                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-                >
-                  <Clock size={16} className="mr-1" />
-                  Manage Hours
-                </Link>
-                <Link 
-                  to="/admin/faq"
-                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-                >
-                  <HelpCircle size={16} className="mr-1" />
-                  Manage FAQ
-                </Link>
-                <Link 
-                  to="/admin/shop"
-                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-                >
-                  <ShoppingBag size={16} className="mr-1" />
-                  Manage Shop
-                </Link>
-                <Link 
-                  to="/qr-codes"
-                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-                >
-                  <QrCode size={16} className="mr-1" />
-                  Print QR Codes
+                  <Settings size={16} className="mr-1" />
+                  Admin Dashboard
                 </Link>
                 <button
                   onClick={() => signOut()}

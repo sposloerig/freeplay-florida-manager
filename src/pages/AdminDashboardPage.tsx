@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key } from 'lucide-react';
+import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock } from 'lucide-react';
 
 const AdminDashboardPage: React.FC = () => {
   const adminFeatures = [
@@ -10,7 +10,8 @@ const AdminDashboardPage: React.FC = () => {
       description: 'Add, edit, or remove arcade and pinball machines from the collection. Track game status, location, and maintenance history.',
       links: [
         { to: '/add', text: 'Add New Game', icon: Plus },
-        { to: '/collection', text: 'View Collection', icon: GameController }
+        { to: '/collection', text: 'View Collection', icon: GameController },
+        { to: '/qr-codes', text: 'Print QR Codes', icon: QrCode }
       ]
     },
     {
@@ -39,11 +40,12 @@ const AdminDashboardPage: React.FC = () => {
       ]
     },
     {
-      title: 'FAQ Management',
+      title: 'Content Management',
       icon: HelpCircle,
-      description: 'Update frequently asked questions and their answers. Organize FAQs by category and set display order.',
+      description: 'Update frequently asked questions, manage business hours, and handle announcements.',
       links: [
-        { to: '/admin/faq', text: 'Manage FAQs', icon: Settings }
+        { to: '/admin/faq', text: 'Manage FAQs', icon: Settings },
+        { to: '/admin/hours', text: 'Manage Hours & Announcements', icon: Clock }
       ]
     },
     {
@@ -60,8 +62,7 @@ const AdminDashboardPage: React.FC = () => {
       icon: Key,
       description: 'Manage user accounts, reset passwords, and handle system-level administrative tasks.',
       links: [
-        { to: '/admin/password-reset', text: 'Reset Passwords', icon: Key },
-        { to: '/admin/hours', text: 'Manage Hours', icon: Settings }
+        { to: '/admin/password-reset', text: 'Reset Passwords', icon: Key }
       ]
     }
   ];
