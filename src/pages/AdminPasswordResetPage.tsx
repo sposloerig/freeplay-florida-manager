@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key } from 'lucide-react';
+import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube } from 'lucide-react';
 
 const MANAGER_EMAILS = [
   'amy@straylite.com',
@@ -16,6 +16,7 @@ const AdminPasswordResetPage: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -23,6 +24,35 @@ const AdminPasswordResetPage: React.FC = () => {
   if (!user || !isManager) {
     return <Navigate to="/login" replace />;
   }
+
+  const testEmailSystem = async () => {
+    setTestingEmail(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/test-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send test email');
+      }
+
+      setSuccess(`Test email sent successfully! Email ID: ${data.emailId}. Check your Resend logs.`);
+    } catch (err) {
+      console.error('Error testing email:', err);
+      setError(`Email test failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setTestingEmail(false);
+    }
+  };
 
   const generateSecurePassword = () => {
     const length = 12;
@@ -134,6 +164,28 @@ const AdminPasswordResetPage: React.FC = () => {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        {/* Test Email Button */}
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex justify-between items-center">
+            <div>
+              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                Email System Test
+              </h4>
+              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                Test the email system to ensure it's working before resetting passwords
+              </p>
+            </div>
+            <button
+              onClick={testEmailSystem}
+              disabled={testingEmail}
+              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              <TestTube size={16} className="mr-2" />
+              {testingEmail ? 'Testing...' : 'Test Email'}
+            </button>
+          </div>
+        </div>
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-200 flex items-center">
             <AlertTriangle size={20} className="mr-2" />
