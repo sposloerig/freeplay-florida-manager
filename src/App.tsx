@@ -28,6 +28,7 @@ import FaqPage from './pages/FaqPage';
 import ShopPage from './pages/ShopPage';
 import SellDonatePage from './pages/SellDonatePage';
 import LoginPage from './pages/LoginPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
                   <Route path="/shop" element={<ShopPage />} />
                   <Route path="/sell-donate" element={<SellDonatePage />} />
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
                   
                   {/* Private sales page - not linked in public UI */}
                   <Route path="/games-for-sale" element={<GameSalesPage />} />
