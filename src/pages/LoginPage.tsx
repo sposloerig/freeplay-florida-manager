@@ -47,8 +47,11 @@ const LoginPage: React.FC = () => {
       });
 
       if (error) {
-        if (error.message.includes('rate limit') || error.status === 429) {
-          throw new Error('Too many password reset requests. Please wait a few minutes before trying again.');
+        if (error.message.includes('rate limit') || 
+            error.status === 429 || 
+            error.message.includes('email rate limit exceeded') ||
+            (error as any)?.code === 'over_email_send_rate_limit') {
+          throw new Error('You have made too many password reset requests. Please wait 15 minutes before trying again.');
         }
         throw error;
       }
