@@ -20,6 +20,7 @@ import AdminFaqPage from './pages/AdminFaqPage';
 import AdminShopPage from './pages/AdminShopPage';
 import AdminHoursPage from './pages/AdminHoursPage';
 import AdminGameSalesPage from './pages/AdminGameSalesPage';
+import AdminPasswordResetPage from './pages/AdminPasswordResetPage';
 import GameSalesPage from './pages/GameSalesPage';
 import QRCodePrintPage from './pages/QRCodePrintPage';
 import AboutPage from './pages/AboutPage';
@@ -63,6 +64,11 @@ function App() {
                   <Route path="/admin/hours" element={
                     <ProtectedRoute>
                       <AdminHoursPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/password-reset" element={
+                    <ProtectedRoute>
+                      <AdminPasswordResetPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/admin/sales" element={

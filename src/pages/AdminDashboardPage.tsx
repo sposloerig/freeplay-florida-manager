@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign } from 'lucide-react';
+import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key } from 'lucide-react';
 
 const AdminDashboardPage: React.FC = () => {
   const adminFeatures = [
@@ -53,6 +53,15 @@ const AdminDashboardPage: React.FC = () => {
       links: [
         { to: '/admin/shop', text: 'Manage Products', icon: Tag },
         { to: '/admin/shop', text: 'Manage Gift Cards', icon: Gift }
+      ]
+    },
+    {
+      title: 'System Administration',
+      icon: Key,
+      description: 'Manage user accounts, reset passwords, and handle system-level administrative tasks.',
+      links: [
+        { to: '/admin/password-reset', text: 'Reset Passwords', icon: Key },
+        { to: '/admin/hours', text: 'Manage Hours', icon: Settings }
       ]
     }
   ];
