@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart } from 'lucide-react';
+import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info } from 'lucide-react';
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -215,6 +215,24 @@ const GameSalesPage: React.FC = () => {
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Browse our collection of arcade and pinball machines available for purchase. All games in our collection are potentially available for sale.
         </p>
+      </div>
+
+      {/* Important Disclaimer */}
+      <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <div className="flex items-start">
+          <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              Important Notice
+            </h3>
+            <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
+              All purchase offers and sale listings are subject to acceptance at the sole discretion of Replay Museum. 
+              While we showcase our collection for collectors to review and potentially purchase, we reserve the right 
+              to decline any offer or remove any item from sale at any time. This listing serves as a casual catalog 
+              for interested collectors and does not constitute a binding commitment to sell.
+            </p>
+          </div>
+        </div>
       </div>
 
       {error && (
