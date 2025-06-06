@@ -98,15 +98,20 @@ const AdminGameSalesPage: React.FC = () => {
     if (!editingGame) return;
 
     try {
+      // Prepare the update data, explicitly handling null values for asking_price
+      const updateData = {
+        asking_price: editForm.asking_price || null, // Convert undefined/empty to null
+        for_sale: editForm.for_sale,
+        sale_condition_notes: editForm.sale_condition_notes || null,
+        missing_parts: editForm.missing_parts || null,
+        sale_notes: editForm.sale_notes || null
+      };
+
+      console.log('Updating game with data:', updateData); // Debug log
+
       const { error } = await supabase
         .from('games')
-        .update({
-          asking_price: editForm.asking_price,
-          for_sale: editForm.for_sale,
-          sale_condition_notes: editForm.sale_condition_notes,
-          missing_parts: editForm.missing_parts,
-          sale_notes: editForm.sale_notes
-        })
+        .update(updateData)
         .eq('id', editingGame);
 
       if (error) throw error;
@@ -165,6 +170,19 @@ const AdminGameSalesPage: React.FC = () => {
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
+    }
+  };
+
+  const handlePriceChange = (value: string) => {
+    // Handle empty string or invalid input
+    if (value === '' || value === null || value === undefined) {
+      setEditForm({ ...editForm, asking_price: undefined });
+    } else {
+      const numValue = parseFloat(value);
+      setEditForm({ 
+        ...editForm, 
+        asking_price: isNaN(numValue) ? undefined : numValue 
+      });
     }
   };
 
@@ -276,10 +294,13 @@ const AdminGameSalesPage: React.FC = () => {
                         type="number"
                         step="0.01"
                         value={editForm.asking_price || ''}
-                        onChange={(e) => setEditForm({ ...editForm, asking_price: parseFloat(e.target.value) || undefined })}
+                        onChange={(e) => handlePriceChange(e.target.value)}
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
                         placeholder="Leave empty for 'Make Offer'"
                       />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Clear this field to show "Make Offer" instead of a price
+                      </p>
                     </div>
                   </div>
 
