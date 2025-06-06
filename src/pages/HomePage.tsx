@@ -1,26 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock, ArrowRight, TowerControl as GameController } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 import NewsletterSignup from '../components/NewsletterSignup';
 import { useBusinessHours } from '../context/BusinessHoursContext';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'replay-museum-web'
-      }
-    }
-  }
-);
+import { supabase } from '../lib/supabase';
 
 interface Event {
   id: string;
@@ -74,10 +57,6 @@ const HomePage: React.FC = () => {
 
   const fetchUpcomingEvents = async () => {
     try {
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        throw new Error('Missing Supabase configuration');
-      }
-
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -88,15 +67,13 @@ const HomePage: React.FC = () => {
         .order('date', { ascending: true })
         .limit(2);
 
-      if (supabaseError) {
-        throw supabaseError;
-      }
+      if (supabaseError) throw supabaseError;
 
       setUpcomingEvents(data || []);
       setError(null);
     } catch (err) {
       console.error('Error fetching events:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load upcoming events');
+      setError('Failed to load upcoming events');
       setUpcomingEvents([]);
     } finally {
       setLoading(false);
