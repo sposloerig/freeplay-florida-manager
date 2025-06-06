@@ -453,6 +453,17 @@ const GameSalesPage: React.FC = () => {
               {inquiryType === 'purchase' ? 'Purchase Request' : 'Make Offer'} for {selectedGame.name}
             </h3>
 
+            {/* Modal Disclaimer */}
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+              <div className="flex items-start">
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-blue-800 dark:text-blue-200">
+                  All offers are subject to acceptance at Replay Museum's discretion. 
+                  We reserve the right to decline any offer or remove items from sale.
+                </p>
+              </div>
+            </div>
+
             {inquiryType === 'purchase' && selectedGame.asking_price && (
               <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
                 <p className="text-sm text-green-800 dark:text-green-200">
