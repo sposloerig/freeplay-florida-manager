@@ -68,7 +68,7 @@ const AdminPasswordResetPage: React.FC = () => {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          email: 'test@example.com',
+          email: 'onboarding@resend.dev',
           resetUrl: `${window.location.origin}/reset-password?test=true`
         }),
       });
