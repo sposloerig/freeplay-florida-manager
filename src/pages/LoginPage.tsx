@@ -46,11 +46,16 @@ const LoginPage: React.FC = () => {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('rate limit') || error.status === 429) {
+          throw new Error('Too many password reset requests. Please wait a few minutes before trying again.');
+        }
+        throw error;
+      }
       
       setResetSent(true);
-    } catch (err) {
-      setError('Failed to send password reset email. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to send password reset email. Please try again.');
     } finally {
       setLoading(false);
     }
