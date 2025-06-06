@@ -186,7 +186,7 @@ const AdminGameSalesPage: React.FC = () => {
           Manage Game Sales
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">
-          Configure games for sale and manage buyer inquiries
+          Configure pricing and sales details for games, and manage buyer inquiries
         </p>
       </div>
 
@@ -202,7 +202,7 @@ const AdminGameSalesPage: React.FC = () => {
                   : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
               }`}
             >
-              Games ({games.filter(g => g.for_sale).length} for sale)
+              Games ({games.length} total)
             </button>
             <button
               onClick={() => setActiveTab('inquiries')}
@@ -220,6 +220,12 @@ const AdminGameSalesPage: React.FC = () => {
 
       {activeTab === 'games' && (
         <div className="space-y-4">
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Note:</strong> All games are available for sale by default. Use this interface to set specific pricing, add condition notes, or temporarily remove games from sale.
+            </p>
+          </div>
+
           {games.map(game => (
             <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
               {editingGame === game.id ? (
@@ -249,7 +255,7 @@ const AdminGameSalesPage: React.FC = () => {
                       <label className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          checked={editForm.for_sale || false}
+                          checked={editForm.for_sale !== false} // Default to true
                           onChange={(e) => setEditForm({ ...editForm, for_sale: e.target.checked })}
                           className="rounded"
                         />
@@ -257,6 +263,9 @@ const AdminGameSalesPage: React.FC = () => {
                           Available for Sale
                         </span>
                       </label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Uncheck to temporarily remove from sales page
+                      </p>
                     </div>
 
                     <div>
@@ -347,9 +356,9 @@ const AdminGameSalesPage: React.FC = () => {
                       <p>{game.type} • {game.location} • {game.status}</p>
                       <p>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          game.for_sale ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          game.for_sale !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {game.for_sale ? (
+                          {game.for_sale !== false ? (
                             <>
                               <Eye size={12} className="mr-1" />
                               For Sale
@@ -361,7 +370,7 @@ const AdminGameSalesPage: React.FC = () => {
                             </>
                           )}
                         </span>
-                        {game.for_sale && (
+                        {game.for_sale !== false && (
                           <span className="ml-2 font-medium">
                             {game.asking_price ? `$${game.asking_price.toLocaleString()}` : 'Make Offer'}
                           </span>

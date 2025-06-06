@@ -40,7 +40,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
         images: game.image_url ? [game.image_url] : [],
-        conditionNotes: game.condition_notes || ''
+        conditionNotes: game.condition_notes || '',
+        // Sales fields
+        askingPrice: game.asking_price,
+        forSale: game.for_sale !== false, // Default to true
+        saleConditionNotes: game.sale_condition_notes,
+        missingParts: game.missing_parts || [],
+        saleNotes: game.sale_notes
       })));
       setError(null);
     } catch (err) {
@@ -67,7 +73,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           location_other: newGame.otherLocation,
           status: newGame.status,
           condition_notes: newGame.conditionNotes,
-          image_url: newGame.images[0] || null
+          image_url: newGame.images[0] || null,
+          // Sales fields - all games are for sale by default
+          for_sale: true,
+          asking_price: newGame.askingPrice,
+          sale_condition_notes: newGame.saleConditionNotes,
+          missing_parts: newGame.missingParts,
+          sale_notes: newGame.saleNotes
         }])
         .select()
         .single();
@@ -94,7 +106,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           location_other: updatedGame.otherLocation,
           status: updatedGame.status,
           condition_notes: updatedGame.conditionNotes,
-          image_url: updatedGame.images?.[0] || null
+          image_url: updatedGame.images?.[0] || null,
+          // Sales fields
+          asking_price: updatedGame.askingPrice,
+          for_sale: updatedGame.forSale,
+          sale_condition_notes: updatedGame.saleConditionNotes,
+          missing_parts: updatedGame.missingParts,
+          sale_notes: updatedGame.saleNotes
         })
         .eq('id', id);
 

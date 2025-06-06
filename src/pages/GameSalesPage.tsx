@@ -62,10 +62,10 @@ const GameSalesPage: React.FC = () => {
 
   const fetchGames = async () => {
     try {
+      // Fetch all games since they're all for sale by default now
       const { data, error } = await supabase
         .from('games')
         .select('*')
-        .eq('for_sale', true)
         .order('name');
 
       if (error) throw error;
@@ -196,7 +196,7 @@ const GameSalesPage: React.FC = () => {
           Games For Sale
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Browse our collection of arcade and pinball machines available for purchase.
+          Browse our collection of arcade and pinball machines available for purchase. All games in our collection are potentially available for sale.
         </p>
       </div>
 
