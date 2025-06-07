@@ -11,18 +11,26 @@ import {
   Calendar,
   CheckCircle,
   AlertTriangle,
-  Filter
+  Filter,
+  Eye,
+  EyeOff,
+  User
 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 
+interface RepairWithUser extends Repair {
+  resolvedByEmail?: string;
+}
+
 const RepairDashboardPage: React.FC = () => {
-  const [repairs, setRepairs] = useState<Repair[]>([]);
+  const [repairs, setRepairs] = useState<RepairWithUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'resolved'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'game'>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
+  const [hideResolved, setHideResolved] = useState(false);
 
   useEffect(() => {
     fetchRepairs();
@@ -37,7 +45,8 @@ const RepairDashboardPage: React.FC = () => {
           game:games(
             id,
             name
-          )
+          ),
+          resolved_by_user:resolved_by(email)
         `)
         .order('resolved', { ascending: true })
         .order('created_at', { ascending: false });
@@ -45,7 +54,7 @@ const RepairDashboardPage: React.FC = () => {
       if (error) throw error;
 
       // Transform the data to match our interface
-      const transformedRepairs: Repair[] = (data || []).map(repair => ({
+      const transformedRepairs: RepairWithUser[] = (data || []).map(repair => ({
         id: repair.id,
         gameId: repair.game_id,
         comment: repair.comment,
@@ -53,7 +62,8 @@ const RepairDashboardPage: React.FC = () => {
         resolvedAt: repair.resolved_at,
         createdAt: repair.created_at,
         updatedAt: repair.updated_at,
-        game: repair.game
+        game: repair.game,
+        resolvedByEmail: repair.resolved_by_user?.email
       }));
 
       setRepairs(transformedRepairs);
@@ -97,8 +107,10 @@ const RepairDashboardPage: React.FC = () => {
         statusFilter === 'all' ||
         (statusFilter === 'open' && !repair.resolved) ||
         (statusFilter === 'resolved' && repair.resolved);
+
+      const matchesResolvedFilter = !hideResolved || !repair.resolved;
       
-      return matchesSearch && matchesStatus;
+      return matchesSearch && matchesStatus && matchesResolvedFilter;
     })
     .sort((a, b) => {
       if (sortBy === 'date') {
@@ -114,7 +126,7 @@ const RepairDashboardPage: React.FC = () => {
       }
     });
 
-  const getGameUrl = (repair: Repair) => {
+  const getGameUrl = (repair: RepairWithUser) => {
     if (!repair.game?.name) return '#';
     const slug = `${repair.game.name}-Replay`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return `/game/${slug}`;
@@ -122,6 +134,7 @@ const RepairDashboardPage: React.FC = () => {
 
   const openRepairsCount = repairs.filter(r => !r.resolved).length;
   const resolvedRepairsCount = repairs.filter(r => r.resolved).length;
+  const visibleRepairsCount = filteredAndSortedRepairs.length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,6 +178,22 @@ const RepairDashboardPage: React.FC = () => {
               className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
             />
           </div>
+          
+          {/* Hide Resolved Toggle */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setHideResolved(!hideResolved)}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                hideResolved
+                  ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              {hideResolved ? <EyeOff size={16} className="mr-2" /> : <Eye size={16} className="mr-2" />}
+              {hideResolved ? 'Show Resolved' : 'Hide Resolved'}
+            </button>
+          </div>
+
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center"
@@ -220,6 +249,12 @@ const RepairDashboardPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Results count */}
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          Showing {visibleRepairsCount} of {repairs.length} repairs
+          {hideResolved && ` (${resolvedRepairsCount} resolved repairs hidden)`}
+        </div>
       </div>
 
       {loading ? (
@@ -230,7 +265,7 @@ const RepairDashboardPage: React.FC = () => {
         <div className="text-center py-12">
           <MessageSquare size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
           <p className="text-gray-500 dark:text-gray-400">
-            {search || statusFilter !== 'all' ? 'No repairs found matching your criteria' : 'No repairs have been logged yet'}
+            {search || statusFilter !== 'all' || hideResolved ? 'No repairs found matching your criteria' : 'No repairs have been logged yet'}
           </p>
         </div>
       ) : (
@@ -271,13 +306,23 @@ const RepairDashboardPage: React.FC = () => {
                         ? 'bg-green-50 dark:bg-green-900/20' 
                         : 'bg-yellow-50 dark:bg-yellow-900/20'
                     }`}>
-                      <p className="text-gray-700 dark:text-gray-300 line-clamp-3">
+                      <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
                         {repair.comment}
                       </p>
                     </div>
-                    {repair.resolved && repair.resolvedAt && (
-                      <div className="mt-2 text-sm text-green-600 dark:text-green-400">
-                        Resolved: {formatDate(repair.resolvedAt)}
+                    {repair.resolved && (
+                      <div className="mt-2 space-y-1">
+                        {repair.resolvedAt && (
+                          <div className="text-sm text-green-600 dark:text-green-400">
+                            Resolved: {formatDate(repair.resolvedAt)}
+                          </div>
+                        )}
+                        {repair.resolvedByEmail && (
+                          <div className="flex items-center text-sm text-green-600 dark:text-green-400">
+                            <User size={14} className="mr-1" />
+                            Resolved by: {repair.resolvedByEmail}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -35,6 +35,7 @@ export interface Repair {
   comment: string;
   resolved: boolean;
   resolvedAt?: string;
+  resolvedBy?: string; // User ID who resolved the repair
   createdAt: string;
   updatedAt: string;
   game?: {
