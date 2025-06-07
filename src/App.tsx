@@ -13,6 +13,7 @@ import AddGamePage from './pages/AddGamePage';
 import EditGamePage from './pages/EditGamePage';
 import StatsPage from './pages/StatsPage';
 import AddRepairPage from './pages/AddRepairPage';
+import PublicRepairPage from './pages/PublicRepairPage';
 import RepairDashboardPage from './pages/RepairDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminEventsPage from './pages/AdminEventsPage';
@@ -52,6 +53,9 @@ function App() {
                   <Route path="/sell-donate" element={<SellDonatePage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  
+                  {/* Public repair reporting - no authentication required */}
+                  <Route path="/report-issue" element={<PublicRepairPage />} />
                   
                   {/* LLM/SEO Information Page */}
                   <Route path="/museum-info" element={<LLMInfoPage />} />

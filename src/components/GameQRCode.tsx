@@ -8,7 +8,7 @@ interface GameQRCodeProps {
 
 const GameQRCode: React.FC<GameQRCodeProps> = ({ gameId, gameName }) => {
   const baseUrl = window.location.origin;
-  const repairUrl = `${baseUrl}/repairs/new?gameId=${gameId}`;
+  const repairUrl = `${baseUrl}/report-issue?gameId=${gameId}`;
 
   return (
     <div className="flex flex-col items-center">
