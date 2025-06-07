@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube, Mail, UserPlus } from 'lucide-react';
+import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube, Mail, UserPlus, Users, RefreshCw } from 'lucide-react';
 
 const MANAGER_EMAILS = [
   'amy@straylite.com',
@@ -9,6 +9,12 @@ const MANAGER_EMAILS = [
   'play@replaymuseum.com',
   'brian@replaymuseum.com'
 ];
+
+interface AccountStatus {
+  email: string;
+  exists: boolean;
+  loading: boolean;
+}
 
 const AdminPasswordResetPage: React.FC = () => {
   const { user, isManager } = useAuth();
@@ -19,6 +25,8 @@ const AdminPasswordResetPage: React.FC = () => {
   const [testingEmail, setTestingEmail] = useState(false);
   const [testingPasswordEmail, setTestingPasswordEmail] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
+  const [checkingAccounts, setCheckingAccounts] = useState(false);
+  const [accountStatuses, setAccountStatuses] = useState<AccountStatus[]>([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -26,6 +34,46 @@ const AdminPasswordResetPage: React.FC = () => {
   if (!user || !isManager) {
     return <Navigate to="/login" replace />;
   }
+
+  // Check which accounts exist
+  const checkAccountStatuses = async () => {
+    setCheckingAccounts(true);
+    const statuses: AccountStatus[] = [];
+
+    for (const email of MANAGER_EMAILS) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-user-exists`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+        statuses.push({
+          email,
+          exists: response.ok && data.exists,
+          loading: false
+        });
+      } catch (err) {
+        statuses.push({
+          email,
+          exists: false,
+          loading: false
+        });
+      }
+    }
+
+    setAccountStatuses(statuses);
+    setCheckingAccounts(false);
+  };
+
+  // Check account statuses on component mount
+  useEffect(() => {
+    checkAccountStatuses();
+  }, []);
 
   const testEmailSystem = async () => {
     setTestingEmail(true);
@@ -132,6 +180,9 @@ const AdminPasswordResetPage: React.FC = () => {
       setSuccess(`User account created successfully for ${selectedEmail}. A confirmation email has been sent.`);
       setSelectedEmail('');
       setNewPassword('');
+      
+      // Refresh account statuses after creating an account
+      checkAccountStatuses();
     } catch (err) {
       console.error('Error creating user account:', err);
       
@@ -212,6 +263,14 @@ const AdminPasswordResetPage: React.FC = () => {
       return;
     }
 
+    // Check if account exists before attempting reset
+    const accountStatus = accountStatuses.find(status => status.email === selectedEmail);
+    if (accountStatus && !accountStatus.exists) {
+      setError(`User account for ${selectedEmail} does not exist. Use the "Create Account" button below to create it first.`);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-password-reset`, {
         method: 'POST',
@@ -238,6 +297,9 @@ const AdminPasswordResetPage: React.FC = () => {
       setSuccess(`Password successfully reset for ${selectedEmail}. A confirmation email has been sent.`);
       setSelectedEmail('');
       setNewPassword('');
+      
+      // Refresh account statuses after successful reset
+      checkAccountStatuses();
     } catch (err) {
       console.error('Error resetting password:', err);
       setError(err instanceof Error ? err.message : 'Failed to reset password');
@@ -245,6 +307,12 @@ const AdminPasswordResetPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const getSelectedAccountStatus = () => {
+    return accountStatuses.find(status => status.email === selectedEmail);
+  };
+
+  const selectedAccountStatus = getSelectedAccountStatus();
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -261,6 +329,54 @@ const AdminPasswordResetPage: React.FC = () => {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        {/* Account Status Overview */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+              <Users size={20} className="mr-2" />
+              Manager Account Status
+            </h3>
+            <button
+              onClick={checkAccountStatuses}
+              disabled={checkingAccounts}
+              className="flex items-center px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={`mr-1 ${checkingAccounts ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {MANAGER_EMAILS.map(email => {
+              const status = accountStatuses.find(s => s.email === email);
+              return (
+                <div
+                  key={email}
+                  className={`p-3 rounded-lg border ${
+                    status?.exists
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                      : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {email}
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      checkingAccounts
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                        : status?.exists
+                        ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200'
+                        : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200'
+                    }`}>
+                      {checkingAccounts ? 'Checking...' : status?.exists ? 'Exists' : 'Not Created'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Email System Tests */}
         <div className="mb-6 space-y-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -321,11 +437,30 @@ const AdminPasswordResetPage: React.FC = () => {
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
               required
             >
-              <option value="">Choose an account to reset...</option>
-              {MANAGER_EMAILS.map(email => (
-                <option key={email} value={email}>{email}</option>
-              ))}
+              <option value="">Choose an account...</option>
+              {MANAGER_EMAILS.map(email => {
+                const status = accountStatuses.find(s => s.email === email);
+                return (
+                  <option key={email} value={email}>
+                    {email} {status?.exists ? '(Account exists)' : '(Needs to be created)'}
+                  </option>
+                );
+              })}
             </select>
+            
+            {/* Show account status for selected email */}
+            {selectedAccountStatus && (
+              <div className={`mt-2 p-2 rounded-md text-sm ${
+                selectedAccountStatus.exists
+                  ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                  : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
+              }`}>
+                {selectedAccountStatus.exists
+                  ? '✓ This account exists and can have its password reset'
+                  : '⚠ This account needs to be created first using the "Create Account" button below'
+                }
+              </div>
+            )}
           </div>
 
           <div>
@@ -411,28 +546,62 @@ const AdminPasswordResetPage: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                loading ? 'opacity-75 cursor-not-allowed' : ''
-              }`}
-            >
-              <Lock className="w-4 h-4 mr-2" />
-              {loading ? 'Resetting Password...' : 'Reset Password'}
-            </button>
+            {/* Reset Password Button - only show if account exists */}
+            {selectedAccountStatus?.exists && (
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  loading ? 'opacity-75 cursor-not-allowed' : ''
+                }`}
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                {loading ? 'Resetting Password...' : 'Reset Password'}
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={createUserAccount}
-              disabled={creatingUser || !selectedEmail || !newPassword}
-              className={`w-full flex justify-center py-3 px-4 border border-green-600 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-800 dark:text-green-400 dark:border-green-400 dark:hover:bg-gray-700 ${
-                creatingUser || !selectedEmail || !newPassword ? 'opacity-75 cursor-not-allowed' : ''
-              }`}
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              {creatingUser ? 'Creating Account...' : 'Create New Account'}
-            </button>
+            {/* Create Account Button - only show if account doesn't exist */}
+            {selectedAccountStatus && !selectedAccountStatus.exists && (
+              <button
+                type="button"
+                onClick={createUserAccount}
+                disabled={creatingUser || !selectedEmail || !newPassword}
+                className={`w-full flex justify-center py-3 px-4 border border-green-600 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-800 dark:text-green-400 dark:border-green-400 dark:hover:bg-gray-700 ${
+                  creatingUser || !selectedEmail || !newPassword ? 'opacity-75 cursor-not-allowed' : ''
+                }`}
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                {creatingUser ? 'Creating Account...' : 'Create New Account'}
+              </button>
+            )}
+
+            {/* Show both buttons if no account is selected or status is unknown */}
+            {!selectedAccountStatus && selectedEmail && (
+              <>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                    loading ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Lock className="w-4 h-4 mr-2" />
+                  {loading ? 'Resetting Password...' : 'Reset Password'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={createUserAccount}
+                  disabled={creatingUser || !selectedEmail || !newPassword}
+                  className={`w-full flex justify-center py-3 px-4 border border-green-600 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-800 dark:text-green-400 dark:border-green-400 dark:hover:bg-gray-700 ${
+                    creatingUser || !selectedEmail || !newPassword ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  {creatingUser ? 'Creating Account...' : 'Create New Account'}
+                </button>
+              </>
+            )}
           </div>
         </form>
 
