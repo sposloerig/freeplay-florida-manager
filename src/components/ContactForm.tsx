@@ -9,7 +9,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
     message: '',
   });
 
@@ -24,7 +23,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -45,7 +44,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          subject: 'Contact Form Submission' // Default subject since it's still expected by the backend
+        }),
       });
 
       const data = await response.json();
@@ -59,7 +61,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
       setFormData({
         name: '',
         email: '',
-        subject: '',
         message: '',
       });
     } catch (error) {
@@ -128,27 +129,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ className = '' }) => {
             className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
             placeholder="your.email@example.com"
           />
-        </div>
-
-        <div>
-          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Subject
-          </label>
-          <select
-            id="subject"
-            name="subject"
-            required
-            value={formData.subject}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">Select a subject</option>
-            <option value="General Inquiry">General Inquiry</option>
-            <option value="Group Booking">Group Booking</option>
-            <option value="Private Event">Private Event</option>
-            <option value="Technical Support">Technical Support</option>
-            <option value="Other">Other</option>
-          </select>
         </div>
 
         <div>
