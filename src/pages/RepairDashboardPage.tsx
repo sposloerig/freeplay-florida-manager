@@ -45,8 +45,7 @@ const RepairDashboardPage: React.FC = () => {
           game:games(
             id,
             name
-          ),
-          resolved_by_user:resolved_by(email)
+          )
         `)
         .order('resolved', { ascending: true })
         .order('created_at', { ascending: false });
@@ -63,7 +62,7 @@ const RepairDashboardPage: React.FC = () => {
         createdAt: repair.created_at,
         updatedAt: repair.updated_at,
         game: repair.game,
-        resolvedByEmail: repair.resolved_by_user?.email
+        resolvedByEmail: undefined // We'll fetch this separately if needed
       }));
 
       setRepairs(transformedRepairs);
@@ -310,19 +309,11 @@ const RepairDashboardPage: React.FC = () => {
                         {repair.comment}
                       </p>
                     </div>
-                    {repair.resolved && (
-                      <div className="mt-2 space-y-1">
-                        {repair.resolvedAt && (
-                          <div className="text-sm text-green-600 dark:text-green-400">
-                            Resolved: {formatDate(repair.resolvedAt)}
-                          </div>
-                        )}
-                        {repair.resolvedByEmail && (
-                          <div className="flex items-center text-sm text-green-600 dark:text-green-400">
-                            <User size={14} className="mr-1" />
-                            Resolved by: {repair.resolvedByEmail}
-                          </div>
-                        )}
+                    {repair.resolved && repair.resolvedAt && (
+                      <div className="mt-2">
+                        <div className="text-sm text-green-600 dark:text-green-400">
+                          Resolved: {formatDate(repair.resolvedAt)}
+                        </div>
                       </div>
                     )}
                   </div>

@@ -45,9 +45,24 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
   const handleResolve = async (repairId: string, currentResolved: boolean) => {
     setResolvingRepair(repairId);
     try {
+      // Get current user for resolved_by field
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const updateData: any = { 
+        resolved: !currentResolved 
+      };
+
+      // If marking as resolved, set resolved_by to current user
+      // If reopening, clear resolved_by
+      if (!currentResolved && user) {
+        updateData.resolved_by = user.id;
+      } else if (currentResolved) {
+        updateData.resolved_by = null;
+      }
+
       const { error } = await supabase
         .from('repairs')
-        .update({ resolved: !currentResolved })
+        .update(updateData)
         .eq('id', repairId);
 
       if (error) throw error;
