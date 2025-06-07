@@ -6,12 +6,6 @@ export type GameLocation = 'Replay' | 'Warehouse' | 'Other';
 
 export type GameStatus = 'Operational' | 'In Repair' | 'Awaiting Parts';
 
-export type RepairStatus = 'Open' | 'In Progress' | 'Completed' | 'On Hold' | 'Waiting for Parts';
-
-export type RepairPriority = 'Low' | 'Medium' | 'High' | 'Critical';
-
-export type PartStatus = 'Needed' | 'Ordered' | 'Received' | 'Installed';
-
 export interface Game {
   id: string;
   name: string;
@@ -38,39 +32,13 @@ export interface Game {
 export interface Repair {
   id: string;
   gameId: string;
-  requestDescription: string;
-  repairNotes?: string;
-  loggedBy: string;
-  status: RepairStatus;
-  priority: RepairPriority;
-  repairDate?: Date;
-  repairStartDate?: Date;
-  repairCompletionDate?: Date;
-  estimatedCompletionDate?: Date;
-  imageUrl?: string;
+  comment: string;
   createdAt: string;
   updatedAt: string;
-  parts?: Part[];
-}
-
-export interface Part {
-  id: string;
-  repairId: string;
-  name: string;
-  estimatedCost: number;
-  vendorId?: string;
-  status: PartStatus;
-  createdAt: Date;
-  updatedAt: Date;
-  vendor?: Vendor;
-}
-
-export interface Vendor {
-  id: string;
-  name: string;
-  contactInfo?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  game?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface BuyerInquiry {

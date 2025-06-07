@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { RepairStatus, RepairPriority } from '../types';
 import { AlertTriangle } from 'lucide-react';
 
 interface RepairFormProps {
@@ -10,12 +9,7 @@ interface RepairFormProps {
 
 const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    description: '',
-    status: 'Open' as RepairStatus,
-    priority: 'Medium' as RepairPriority,
-    estimatedCompletionDate: ''
-  });
+  const [comment, setComment] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,18 +39,14 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
         .from('repairs')
         .insert({
           game_id: gameId,
-          request_description: formData.description,
-          status: formData.status,
-          priority: formData.priority,
-          estimated_completion_date: formData.estimatedCompletionDate || null,
-          logged_by: user.id
+          comment: comment.trim()
         })
         .select()
         .single();
 
       if (repairError) throw repairError;
 
-      // Update game status
+      // Update game status to "In Repair"
       const { error: gameUpdateError } = await supabase
         .from('games')
         .update({ status: 'In Repair' })
@@ -65,7 +55,7 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
       if (gameUpdateError) throw gameUpdateError;
 
       // Create URL-friendly slug from game name
-      const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const slug = `${game.name}-Replay`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       navigate(`/game/${slug}`);
     } catch (err) {
       console.error('Error creating repair:', err);
@@ -85,70 +75,21 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
       )}
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Issue Description*
+        <label htmlFor="comment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Repair Comment *
         </label>
         <textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          rows={4}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-          placeholder="Describe the issue that needs repair..."
+          id="comment"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={6}
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+          placeholder="Describe the issue or repair needed for this game..."
           required
         />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Status*
-          </label>
-          <select
-            id="status"
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value as RepairStatus })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-            required
-          >
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Waiting for Parts">Waiting for Parts</option>
-            <option value="On Hold">On Hold</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Priority*
-          </label>
-          <select
-            id="priority"
-            value={formData.priority}
-            onChange={(e) => setFormData({ ...formData, priority: e.target.value as RepairPriority })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-            required
-          >
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Critical">Critical</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="estimatedCompletionDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Estimated Completion Date
-        </label>
-        <input
-          type="date"
-          id="estimatedCompletionDate"
-          value={formData.estimatedCompletionDate}
-          onChange={(e) => setFormData({ ...formData, estimatedCompletionDate: e.target.value })}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-        />
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Please provide details about what needs to be repaired or any issues you've noticed.
+        </p>
       </div>
 
       <div className="flex justify-end space-x-4 pt-4">
@@ -161,9 +102,9 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
         </button>
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !comment.trim()}
           className={`px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-            isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+            isSubmitting || !comment.trim() ? 'opacity-70 cursor-not-allowed' : ''
           }`}
         >
           {isSubmitting ? 'Saving...' : 'Log Repair'}

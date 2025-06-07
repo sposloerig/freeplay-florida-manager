@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ImageModal from '../components/ImageModal';
 import RepairHistory from '../components/RepairHistory';
 import GameQRCode from '../components/GameQRCode';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { 
   Calendar, 
   MapPin, 
@@ -24,11 +24,6 @@ import {
   ImageOff
 } from 'lucide-react';
 import { Game, Repair } from '../types';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const GameDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -80,9 +75,9 @@ const GameDetailPage: React.FC = () => {
         .from('repairs')
         .select(`
           *,
-          parts (
-            *,
-            vendor:vendors(*)
+          game:games(
+            id,
+            name
           )
         `)
         .eq('game_id', game.id)

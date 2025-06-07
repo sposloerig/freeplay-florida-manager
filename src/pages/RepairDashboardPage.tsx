@@ -1,32 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
-import { Repair, RepairStatus } from '../types';
+import { Repair } from '../types';
 import { 
   Wrench, 
-  AlertTriangle, 
-  Clock, 
-  CheckCircle, 
-  Filter,
   Search,
   SortAsc,
-  SortDesc
+  SortDesc,
+  MessageSquare,
+  Calendar
 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const RepairDashboardPage: React.FC = () => {
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<RepairStatus | 'All'>('All');
-  const [sortBy, setSortBy] = useState<'date' | 'status'>('date');
+  const [sortBy, setSortBy] = useState<'date' | 'game'>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     fetchRepairs();
@@ -54,41 +45,7 @@ const RepairDashboardPage: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: RepairStatus) => {
-    switch (status) {
-      case 'Open':
-        return <AlertTriangle className="text-red-500" size={18} />;
-      case 'In Progress':
-        return <Clock className="text-yellow-500" size={18} />;
-      case 'Completed':
-        return <CheckCircle className="text-green-500" size={18} />;
-      case 'On Hold':
-        return <Clock className="text-orange-500" size={18} />;
-      case 'Waiting for Parts':
-        return <Clock className="text-purple-500" size={18} />;
-      default:
-        return <Clock className="text-gray-500" size={18} />;
-    }
-  };
-
-  const getStatusColor = (status: RepairStatus) => {
-    switch (status) {
-      case 'Open':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
-      case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
-      case 'Completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
-      case 'On Hold':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300';
-      case 'Waiting for Parts':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
-    }
-  };
-
-  const toggleSort = (field: 'date' | 'status') => {
+  const toggleSort = (field: 'date' | 'game') => {
     if (sortBy === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -102,7 +59,7 @@ const RepairDashboardPage: React.FC = () => {
     try {
       const date = parseISO(dateString);
       if (!isValid(date)) return 'Invalid date';
-      return format(date, 'MMM d, yyyy');
+      return format(date, 'MMM d, yyyy h:mm a');
     } catch {
       return 'Invalid date';
     }
@@ -111,13 +68,12 @@ const RepairDashboardPage: React.FC = () => {
   const filteredAndSortedRepairs = repairs
     .filter(repair => {
       const gameName = repair.game?.name ?? '';
-      const requestDescription = repair.requestDescription ?? '';
+      const comment = repair.comment ?? '';
       
       const matchesSearch = 
-        requestDescription.toLowerCase().includes(search.toLowerCase()) ||
+        comment.toLowerCase().includes(search.toLowerCase()) ||
         gameName.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilter === 'All' || repair.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     })
     .sort((a, b) => {
       if (sortBy === 'date') {
@@ -125,15 +81,17 @@ const RepairDashboardPage: React.FC = () => {
           ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       } else {
+        const nameA = a.game?.name || '';
+        const nameB = b.game?.name || '';
         return sortDirection === 'asc'
-          ? a.status.localeCompare(b.status)
-          : b.status.localeCompare(a.status);
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
       }
     });
 
   const getGameUrl = (repair: Repair) => {
     if (!repair.game?.name) return '#';
-    const slug = repair.game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const slug = `${repair.game.name}-Replay`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return `/game/${slug}`;
   };
 
@@ -162,13 +120,6 @@ const RepairDashboardPage: React.FC = () => {
             className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
           />
         </div>
-        <button
-          onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="md:ml-auto flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-        >
-          <Filter size={16} className="mr-2" />
-          Filters
-        </button>
         <div className="flex space-x-2">
           <button
             onClick={() => toggleSort('date')}
@@ -184,42 +135,20 @@ const RepairDashboardPage: React.FC = () => {
             )}
           </button>
           <button
-            onClick={() => toggleSort('status')}
+            onClick={() => toggleSort('game')}
             className={`flex items-center px-3 py-2 rounded-md transition-colors ${
-              sortBy === 'status'
+              sortBy === 'game'
                 ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
-            Status
-            {sortBy === 'status' && (
+            Game
+            {sortBy === 'game' && (
               sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
             )}
           </button>
         </div>
       </div>
-
-      {isFilterOpen && (
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner animate-fadeIn">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Status
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as RepairStatus | 'All')}
-              className="w-full md:w-auto p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="All">All Statuses</option>
-              <option value="Open">Open</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-              <option value="On Hold">On Hold</option>
-              <option value="Waiting for Parts">Waiting for Parts</option>
-            </select>
-          </div>
-        </div>
-      )}
 
       {loading ? (
         <div className="flex justify-center items-center py-12">
@@ -227,7 +156,10 @@ const RepairDashboardPage: React.FC = () => {
         </div>
       ) : filteredAndSortedRepairs.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">No repairs found matching your criteria</p>
+          <MessageSquare size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">
+            {search ? 'No repairs found matching your search criteria' : 'No repairs have been logged yet'}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -237,26 +169,23 @@ const RepairDashboardPage: React.FC = () => {
               to={getGameUrl(repair)}
               className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
             >
-              <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {getStatusIcon(repair.status)}
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">
+              <div className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mr-4">
                         {repair.game?.name || 'Unknown Game'}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300 mt-1">
-                        {repair.requestDescription}
+                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <Calendar size={14} className="mr-1" />
+                        {formatDate(repair.createdAt)}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
+                      <p className="text-gray-700 dark:text-gray-300 line-clamp-3">
+                        {repair.comment}
                       </p>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(repair.status)}`}>
-                      {repair.status}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(repair.createdAt)}
-                    </span>
                   </div>
                 </div>
               </div>

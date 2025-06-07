@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
-import { Repair, RepairStatus, Part } from '../types';
-import { Wrench, AlertTriangle, Clock, CheckCircle, Plus, ChevronDown, ChevronUp, DollarSign, Trash2, PenTool as Tool, Calendar, Tag, Package } from 'lucide-react';
+import { Repair } from '../types';
+import { Wrench, Plus, Trash2, Calendar, AlertTriangle, MessageSquare } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface RepairHistoryProps {
   gameId: string;
@@ -17,91 +12,14 @@ interface RepairHistoryProps {
 }
 
 const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRepair }) => {
-  const [expandedRepairs, setExpandedRepairs] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-
-  const toggleRepair = (repairId: string) => {
-    setExpandedRepairs(prev => 
-      prev.includes(repairId)
-        ? prev.filter(id => id !== repairId)
-        : [...prev, repairId]
-    );
-  };
-
-  const getStatusIcon = (status: RepairStatus) => {
-    switch (status) {
-      case 'Open':
-        return <AlertTriangle className="text-red-500\" size={18} />;
-      case 'In Progress':
-        return <Clock className="text-yellow-500" size={18} />;
-      case 'Completed':
-        return <CheckCircle className="text-green-500" size={18} />;
-      case 'On Hold':
-        return <Clock className="text-orange-500" size={18} />;
-      case 'Waiting for Parts':
-        return <Package className="text-purple-500" size={18} />;
-      default:
-        return <Clock className="text-gray-500" size={18} />;
-    }
-  };
-
-  const getStatusColor = (status: RepairStatus) => {
-    switch (status) {
-      case 'Open':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
-      case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
-      case 'Completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
-      case 'On Hold':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300';
-      case 'Waiting for Parts':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'Critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
-      case 'High':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300';
-      case 'Medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
-      case 'Low':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
-    }
-  };
-
-  const getPartStatusColor = (status: string) => {
-    switch (status) {
-      case 'Needed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
-      case 'Ordered':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
-      case 'Received':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
-      case 'Installed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
-    }
-  };
-
-  const calculateTotalCost = (parts: Part[]) => {
-    return parts.reduce((total, part) => total + (part.estimatedCost ?? 0), 0);
-  };
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Not set';
     try {
       const date = parseISO(dateString);
       if (!isValid(date)) return 'Invalid date';
-      return format(date, 'MMM d, yyyy');
+      return format(date, 'MMM d, yyyy h:mm a');
     } catch {
       return 'Invalid date';
     }
@@ -140,7 +58,7 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
 
       {repairs.length === 0 ? (
         <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <Tool size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+          <MessageSquare size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
           <p className="text-gray-500 dark:text-gray-400">
             No repairs have been logged for this game yet.
           </p>
@@ -150,144 +68,33 @@ const RepairHistory: React.FC<RepairHistoryProps> = ({ gameId, repairs, onAddRep
           {repairs.map((repair) => (
             <div
               key={repair.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4"
             >
-              <div 
-                className="p-4 cursor-pointer"
-                onClick={() => toggleRepair(repair.id)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4">
-                    {getStatusIcon(repair.status)}
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(repair.status)}`}>
-                          {repair.status}
-                        </span>
-                        {repair.priority && (
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(repair.priority)}`}>
-                            {repair.priority} Priority
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                        {repair.requestDescription}
-                      </h3>
-                      <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-400">
-                        <span className="flex items-center">
-                          <Calendar size={14} className="mr-1" />
-                          Created: {formatDate(repair.createdAt)}
-                        </span>
-                        {repair.repairStartDate && (
-                          <span className="flex items-center">
-                            <Clock size={14} className="mr-1" />
-                            Started: {formatDate(repair.repairStartDate)}
-                          </span>
-                        )}
-                        {repair.estimatedCompletionDate && (
-                          <span className="flex items-center">
-                            <Calendar size={14} className="mr-1" />
-                            Est. Completion: {formatDate(repair.estimatedCompletionDate)}
-                          </span>
-                        )}
-                        {repair.repairCompletionDate && (
-                          <span className="flex items-center">
-                            <CheckCircle size={14} className="mr-1" />
-                            Completed: {formatDate(repair.repairCompletionDate)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteConfirm(repair.id);
-                      }}
-                      className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                      title="Delete repair"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                    {expandedRepairs.includes(repair.id) ? (
-                      <ChevronUp size={20} className="text-gray-400" />
-                    ) : (
-                      <ChevronDown size={20} className="text-gray-400" />
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <Calendar size={14} className="mr-1" />
+                    <span>Logged: {formatDate(repair.createdAt)}</span>
+                    {repair.createdAt !== repair.updatedAt && (
+                      <span className="ml-4">
+                        Updated: {formatDate(repair.updatedAt)}
+                      </span>
                     )}
                   </div>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
+                    <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                      {repair.comment}
+                    </p>
+                  </div>
                 </div>
+                <button
+                  onClick={() => setDeleteConfirm(repair.id)}
+                  className="ml-4 p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  title="Delete repair"
+                >
+                  <Trash2 size={18} />
+                </button>
               </div>
-
-              {expandedRepairs.includes(repair.id) && (
-                <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-700">
-                  {repair.repairNotes && (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Repair Notes
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
-                        {repair.repairNotes}
-                      </p>
-                    </div>
-                  )}
-
-                  {repair.parts && repair.parts.length > 0 && (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                        <Package size={16} className="mr-2" />
-                        Parts Required
-                      </h4>
-                      <div className="space-y-2">
-                        {repair.parts.map((part) => (
-                          <div 
-                            key={part.id}
-                            className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-3 rounded-md"
-                          >
-                            <div>
-                              <p className="font-medium text-gray-900 dark:text-white">
-                                {part.name}
-                              </p>
-                              {part.vendor && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                  Vendor: {part.vendor.name}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center space-x-4">
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPartStatusColor(part.status)}`}>
-                                {part.status}
-                              </span>
-                              <span className="flex items-center text-gray-900 dark:text-white font-medium">
-                                <DollarSign size={14} className="mr-1" />
-                                {part.estimatedCost.toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                        <div className="flex justify-end pt-2">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Total Cost: ${calculateTotalCost(repair.parts).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {repair.imageUrl && (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Repair Documentation
-                      </h4>
-                      <img
-                        src={repair.imageUrl}
-                        alt="Repair documentation"
-                        className="rounded-md max-h-64 object-cover"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           ))}
         </div>
