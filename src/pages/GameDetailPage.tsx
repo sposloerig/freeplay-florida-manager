@@ -32,7 +32,7 @@ const supabase = createClient(
 
 const GameDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { games, getGame } = useGameContext();
+  const { games, getGame, deleteGame } = useGameContext();
   const { user, isManager } = useAuth();
   const navigate = useNavigate();
   
@@ -50,6 +50,7 @@ const GameDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<number, boolean>>({});
   const [mainImageError, setMainImageError] = useState(!game?.images?.[0]);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -99,10 +100,20 @@ const GameDetailPage: React.FC = () => {
     }
   };
   
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!game) return;
-    deleteGame(game.id);
-    navigate('/');
+    
+    setDeleting(true);
+    try {
+      await deleteGame(game.id);
+      navigate('/collection');
+    } catch (error) {
+      console.error('Error deleting game:', error);
+      alert('Failed to delete game. Please try again.');
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
   
   const getStatusColor = (status: string) => {
@@ -377,28 +388,39 @@ const GameDetailPage: React.FC = () => {
       {/* Delete confirmation modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 m-4 animate-scaleIn">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full m-4 p-6 animate-scaleIn">
             <div className="flex items-center mb-4">
               <AlertTriangle size={24} className="text-red-500 mr-2" />
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">Delete Game</h3>
             </div>
             <p className="mb-6 text-gray-600 dark:text-gray-300">
-              Are you sure you want to delete "{game.name}"? This action cannot be undone.
+              Are you sure you want to delete "{game.name}"? This action cannot be undone and will also delete all associated repair records.
             </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 flex items-center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                disabled={deleting}
+                className="px-4 py-2 flex items-center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
                 <X size={18} className="mr-1" />
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 flex items-center text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                disabled={deleting}
+                className="px-4 py-2 flex items-center text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
               >
-                <Check size={18} className="mr-1" />
-                Delete
+                {deleting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Check size={18} className="mr-1" />
+                    Delete
+                  </>
+                )}
               </button>
             </div>
           </div>

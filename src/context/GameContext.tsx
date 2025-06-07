@@ -127,16 +127,47 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteGame = async (id: string) => {
     try {
-      const { error } = await supabase
+      console.log('Attempting to delete game with ID:', id);
+      
+      // First, delete any associated repairs (they should cascade, but let's be explicit)
+      const { error: repairsError } = await supabase
+        .from('repairs')
+        .delete()
+        .eq('game_id', id);
+
+      if (repairsError) {
+        console.warn('Error deleting repairs (may not exist):', repairsError);
+        // Don't throw here as repairs might not exist
+      }
+
+      // Delete any buyer inquiries
+      const { error: inquiriesError } = await supabase
+        .from('buyer_inquiries')
+        .delete()
+        .eq('game_id', id);
+
+      if (inquiriesError) {
+        console.warn('Error deleting buyer inquiries (may not exist):', inquiriesError);
+        // Don't throw here as inquiries might not exist
+      }
+
+      // Now delete the game
+      const { error: gameError } = await supabase
         .from('games')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (gameError) {
+        console.error('Error deleting game:', gameError);
+        throw gameError;
+      }
 
+      console.log('Game deleted successfully');
+      
+      // Refresh the games list
       await fetchGames();
     } catch (error) {
-      console.error('Error deleting game:', error);
+      console.error('Error in deleteGame function:', error);
       throw error;
     }
   };
