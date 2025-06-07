@@ -8,7 +8,10 @@ import {
   SortAsc,
   SortDesc,
   MessageSquare,
-  Calendar
+  Calendar,
+  CheckCircle,
+  AlertTriangle,
+  Filter
 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
 
@@ -16,8 +19,10 @@ const RepairDashboardPage: React.FC = () => {
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'resolved'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'game'>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetchRepairs();
@@ -34,10 +39,24 @@ const RepairDashboardPage: React.FC = () => {
             name
           )
         `)
+        .order('resolved', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setRepairs(data || []);
+
+      // Transform the data to match our interface
+      const transformedRepairs: Repair[] = (data || []).map(repair => ({
+        id: repair.id,
+        gameId: repair.game_id,
+        comment: repair.comment,
+        resolved: repair.resolved || false,
+        resolvedAt: repair.resolved_at,
+        createdAt: repair.created_at,
+        updatedAt: repair.updated_at,
+        game: repair.game
+      }));
+
+      setRepairs(transformedRepairs);
     } catch (error) {
       console.error('Error fetching repairs:', error);
     } finally {
@@ -73,7 +92,13 @@ const RepairDashboardPage: React.FC = () => {
       const matchesSearch = 
         comment.toLowerCase().includes(search.toLowerCase()) ||
         gameName.toLowerCase().includes(search.toLowerCase());
-      return matchesSearch;
+      
+      const matchesStatus = 
+        statusFilter === 'all' ||
+        (statusFilter === 'open' && !repair.resolved) ||
+        (statusFilter === 'resolved' && repair.resolved);
+      
+      return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       if (sortBy === 'date') {
@@ -95,6 +120,9 @@ const RepairDashboardPage: React.FC = () => {
     return `/game/${slug}`;
   };
 
+  const openRepairsCount = repairs.filter(r => !r.resolved).length;
+  const resolvedRepairsCount = repairs.filter(r => r.resolved).length;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="text-center mb-10">
@@ -107,47 +135,91 @@ const RepairDashboardPage: React.FC = () => {
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Track and manage all arcade game repairs in one place.
         </p>
+        
+        {/* Summary Stats */}
+        <div className="flex justify-center space-x-8 mt-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{openRepairsCount}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Open Repairs</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{resolvedRepairsCount}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Resolved</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">{repairs.length}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total</div>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-6 flex flex-col md:flex-row md:items-center gap-3">
-        <div className="relative flex-grow">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input
-            type="text"
-            placeholder="Search repairs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-          />
-        </div>
-        <div className="flex space-x-2">
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search repairs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+            />
+          </div>
           <button
-            onClick={() => toggleSort('date')}
-            className={`flex items-center px-3 py-2 rounded-md transition-colors ${
-              sortBy === 'date'
-                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
+            onClick={() => setShowFilters(!showFilters)}
+            className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center"
           >
-            Date
-            {sortBy === 'date' && (
-              sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
-            )}
+            <Filter size={16} className="mr-2" />
+            Filters
           </button>
-          <button
-            onClick={() => toggleSort('game')}
-            className={`flex items-center px-3 py-2 rounded-md transition-colors ${
-              sortBy === 'game'
-                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
-          >
-            Game
-            {sortBy === 'game' && (
-              sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
-            )}
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => toggleSort('date')}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                sortBy === 'date'
+                  ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Date
+              {sortBy === 'date' && (
+                sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
+              )}
+            </button>
+            <button
+              onClick={() => toggleSort('game')}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                sortBy === 'game'
+                  ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Game
+              {sortBy === 'game' && (
+                sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {showFilters && (
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Status
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'open' | 'resolved')}
+                className="w-full md:w-auto p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="all">All Repairs</option>
+                <option value="open">Open Repairs</option>
+                <option value="resolved">Resolved Repairs</option>
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -158,7 +230,7 @@ const RepairDashboardPage: React.FC = () => {
         <div className="text-center py-12">
           <MessageSquare size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
           <p className="text-gray-500 dark:text-gray-400">
-            {search ? 'No repairs found matching your search criteria' : 'No repairs have been logged yet'}
+            {search || statusFilter !== 'all' ? 'No repairs found matching your criteria' : 'No repairs have been logged yet'}
           </p>
         </div>
       ) : (
@@ -176,16 +248,38 @@ const RepairDashboardPage: React.FC = () => {
                       <h3 className="text-lg font-medium text-gray-900 dark:text-white mr-4">
                         {repair.game?.name || 'Unknown Game'}
                       </h3>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Calendar size={14} className="mr-1" />
-                        {formatDate(repair.createdAt)}
+                      <div className="flex items-center space-x-2">
+                        {repair.resolved ? (
+                          <span className="flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300">
+                            <CheckCircle size={12} className="mr-1" />
+                            Resolved
+                          </span>
+                        ) : (
+                          <span className="flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+                            <AlertTriangle size={12} className="mr-1" />
+                            Open
+                          </span>
+                        )}
+                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                          <Calendar size={14} className="mr-1" />
+                          {formatDate(repair.createdAt)}
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
+                    <div className={`rounded-md p-3 ${
+                      repair.resolved 
+                        ? 'bg-green-50 dark:bg-green-900/20' 
+                        : 'bg-yellow-50 dark:bg-yellow-900/20'
+                    }`}>
                       <p className="text-gray-700 dark:text-gray-300 line-clamp-3">
                         {repair.comment}
                       </p>
                     </div>
+                    {repair.resolved && repair.resolvedAt && (
+                      <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                        Resolved: {formatDate(repair.resolvedAt)}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -60,12 +60,12 @@ const GameDetailPage: React.FC = () => {
       return;
     }
 
-    if (isManager) {
+    if (user) {
       fetchRepairs();
     } else {
       setLoading(false);
     }
-  }, [slug, game, isManager]);
+  }, [slug, game, user]);
 
   const fetchRepairs = async () => {
     if (!game) return;
@@ -81,11 +81,24 @@ const GameDetailPage: React.FC = () => {
           )
         `)
         .eq('game_id', game.id)
+        .order('resolved', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (repairsError) throw repairsError;
 
-      setRepairs(data || []);
+      // Transform the data to match our interface
+      const transformedRepairs: Repair[] = (data || []).map(repair => ({
+        id: repair.id,
+        gameId: repair.game_id,
+        comment: repair.comment,
+        resolved: repair.resolved || false,
+        resolvedAt: repair.resolved_at,
+        createdAt: repair.created_at,
+        updatedAt: repair.updated_at,
+        game: repair.game
+      }));
+
+      setRepairs(transformedRepairs);
       setError(null);
     } catch (error) {
       console.error('Error fetching repairs:', error);
@@ -285,8 +298,8 @@ const GameDetailPage: React.FC = () => {
               )}
             </div>
 
-            {/* Condition Notes Section - Only visible to managers */}
-            {isManager && game.conditionNotes && (
+            {/* Condition Notes Section - Only visible to authenticated users */}
+            {user && game.conditionNotes && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-3">
                   <ClipboardList size={18} className="text-indigo-600 dark:text-indigo-400 mr-2" />
@@ -350,8 +363,8 @@ const GameDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Repair History - Only visible to managers */}
-        {isManager ? (
+        {/* Repair History - Only visible to authenticated users */}
+        {user ? (
           <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
             {loading ? (
               <div className="flex justify-center items-center py-8">
@@ -367,14 +380,15 @@ const GameDetailPage: React.FC = () => {
                 gameId={game.id}
                 repairs={repairs}
                 onAddRepair={handleAddRepair}
+                onRepairUpdated={fetchRepairs}
               />
             )}
           </div>
-        ) : user && (
+        ) : (
           <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700 text-center">
             <div className="flex items-center justify-center text-gray-500 dark:text-gray-400">
               <Lock size={18} className="mr-2" />
-              <p>Repair history is only visible to managers</p>
+              <p>Repair history is only visible to staff members</p>
             </div>
           </div>
         )}

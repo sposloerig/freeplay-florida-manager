@@ -33,6 +33,8 @@ export interface Repair {
   id: string;
   gameId: string;
   comment: string;
+  resolved: boolean;
+  resolvedAt?: string;
   createdAt: string;
   updatedAt: string;
   game?: {
