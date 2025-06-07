@@ -134,7 +134,14 @@ const AdminPasswordResetPage: React.FC = () => {
       setNewPassword('');
     } catch (err) {
       console.error('Error creating user account:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create user account');
+      
+      // Check if the error is about an existing user account
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create user account';
+      if (errorMessage.includes('User account already exists for this email')) {
+        setError(`User account for ${selectedEmail} already exists. Use the "Reset Password" button above instead to change their password.`);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setCreatingUser(false);
     }
