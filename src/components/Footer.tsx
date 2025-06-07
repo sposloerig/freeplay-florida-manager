@@ -90,6 +90,14 @@ const Footer: React.FC = () => {
           <p className="mt-2">
             Preserving gaming history for future generations.
           </p>
+          <div className="mt-4 flex justify-center space-x-4">
+            <Link 
+              to="/museum-info" 
+              className="text-gray-500 hover:text-indigo-400 transition-colors text-xs"
+            >
+              Museum Information
+            </Link>
+          </div>
         </div>
 
         {/* Employee Section */}
