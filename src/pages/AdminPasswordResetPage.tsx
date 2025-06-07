@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube, Mail } from 'lucide-react';
+import { Lock, AlertTriangle, CheckCircle, Eye, EyeOff, Key, TestTube, Mail, UserPlus } from 'lucide-react';
 
 const MANAGER_EMAILS = [
   'amy@straylite.com',
@@ -18,6 +18,7 @@ const AdminPasswordResetPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [testingEmail, setTestingEmail] = useState(false);
   const [testingPasswordEmail, setTestingPasswordEmail] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -85,6 +86,57 @@ const AdminPasswordResetPage: React.FC = () => {
       setError(`Password reset email test failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setTestingPasswordEmail(false);
+    }
+  };
+
+  const createUserAccount = async () => {
+    if (!selectedEmail) {
+      setError('Please select an email address first');
+      return;
+    }
+
+    if (!newPassword) {
+      setError('Please enter a password first');
+      return;
+    }
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    setCreatingUser(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-manager-account`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          email: selectedEmail,
+          password: newPassword
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create user account');
+      }
+
+      setSuccess(`User account created successfully for ${selectedEmail}. A confirmation email has been sent.`);
+      setSelectedEmail('');
+      setNewPassword('');
+    } catch (err) {
+      console.error('Error creating user account:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create user account');
+    } finally {
+      setCreatingUser(false);
     }
   };
 
@@ -169,6 +221,10 @@ const AdminPasswordResetPage: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        // If user doesn't exist, provide helpful guidance
+        if (data.error && data.error.includes('User not found')) {
+          throw new Error(`User account for ${selectedEmail} does not exist. Use the "Create Account" button below to create it first.`);
+        }
         throw new Error(data.error || 'Failed to reset password');
       }
 
@@ -193,7 +249,7 @@ const AdminPasswordResetPage: React.FC = () => {
           Admin Password Reset
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">
-          Reset passwords for manager accounts. A confirmation email will be sent to the user.
+          Reset passwords for manager accounts or create new accounts. A confirmation email will be sent to the user.
         </p>
       </div>
 
@@ -347,17 +403,46 @@ const AdminPasswordResetPage: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-              loading ? 'opacity-75 cursor-not-allowed' : ''
-            }`}
-          >
-            <Lock className="w-4 h-4 mr-2" />
-            {loading ? 'Resetting Password...' : 'Reset Password'}
-          </button>
+          <div className="space-y-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                loading ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              {loading ? 'Resetting Password...' : 'Reset Password'}
+            </button>
+
+            <button
+              type="button"
+              onClick={createUserAccount}
+              disabled={creatingUser || !selectedEmail || !newPassword}
+              className={`w-full flex justify-center py-3 px-4 border border-green-600 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-800 dark:text-green-400 dark:border-green-400 dark:hover:bg-gray-700 ${
+                creatingUser || !selectedEmail || !newPassword ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              {creatingUser ? 'Creating Account...' : 'Create New Account'}
+            </button>
+          </div>
         </form>
+
+        {/* Help Section */}
+        <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Troubleshooting:
+          </h4>
+          <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• If you get "User not found", use "Create New Account" first</li>
+            <li>• New accounts require email confirmation before first login</li>
+            <li>• Reset passwords expire after 1 hour for security</li>
+            <li>• Check spam folder if emails don't arrive</li>
+            <li>• Gmail users: check your Promotions tab</li>
+            <li>• Contact system administrator if issues persist</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
