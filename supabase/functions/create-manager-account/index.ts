@@ -138,9 +138,12 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error in create-manager-account function:', error);
     
+    // Include the actual error message in the response for better debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
     return new Response(
       JSON.stringify({ 
-        error: 'Internal server error occurred while creating user account' 
+        error: `Internal server error: ${errorMessage}` 
       }),
       { 
         status: 500, 
