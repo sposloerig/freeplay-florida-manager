@@ -32,7 +32,7 @@ const AdminPasswordResetPage: React.FC = () => {
 
   // If not authenticated or not a manager, redirect
   if (!user || !isManager) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login\" replace />;
   }
 
   // Check which accounts exist
