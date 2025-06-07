@@ -80,10 +80,23 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check if user already exists
-    const { data: existingUser } = await supabaseAdmin.auth.admin.getUserByEmail(email);
+    // Check if user already exists using listUsers with email filter
+    const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers({
+      filter: `email.eq.${email}`
+    });
     
-    if (existingUser.user) {
+    if (listError) {
+      console.error('Error checking for existing user:', listError);
+      return new Response(
+        JSON.stringify({ error: `Failed to check existing users: ${listError.message}` }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    if (existingUsers.users && existingUsers.users.length > 0) {
       return new Response(
         JSON.stringify({ error: 'User account already exists for this email' }),
         { 
