@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { AlertTriangle, CheckCircle, Wrench } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Wrench, Info, Clock, Users } from 'lucide-react';
 
 interface PublicRepairFormProps {
   gameId: string;
@@ -66,6 +66,24 @@ const PublicRepairForm: React.FC<PublicRepairFormProps> = ({ gameId, gameName })
             Your repair report for <strong>{gameName || 'this game'}</strong> has been submitted successfully. 
             Our maintenance team will be notified and will address the issue as soon as possible.
           </p>
+          
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
+              <div className="text-left">
+                <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                  What happens next?
+                </h3>
+                <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                  <li>• Our maintenance team has been notified</li>
+                  <li>• The game will be marked as "In Repair" if needed</li>
+                  <li>• We'll work to fix the issue as quickly as possible</li>
+                  <li>• The game will return to service once repaired</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-4">
             <button
               onClick={() => navigate('/collection')}
@@ -95,14 +113,51 @@ const PublicRepairForm: React.FC<PublicRepairFormProps> = ({ gameId, gameName })
           Report a Game Issue
         </h1>
         {gameName && (
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Game: <strong>{gameName}</strong>
-          </p>
+          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 mb-4">
+            <p className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">
+              Game: {gameName}
+            </p>
+          </div>
         )}
-        <p className="text-gray-600 dark:text-gray-300 mt-4">
+        <p className="text-gray-600 dark:text-gray-300">
           Help us keep our games in perfect condition! If you notice any issues with this game, 
           please let us know and our maintenance team will take care of it.
         </p>
+      </div>
+
+      {/* Instructions Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6">
+        <div className="flex items-start">
+          <Users className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-1" />
+          <div>
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
+              How to Report an Issue
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Common Issues:</h4>
+                <ul className="text-blue-700 dark:text-blue-300 space-y-1">
+                  <li>• Screen problems (flickering, dark, distorted)</li>
+                  <li>• Control issues (buttons, joysticks not working)</li>
+                  <li>• Audio problems (no sound, distorted sound)</li>
+                  <li>• Game not starting or freezing</li>
+                  <li>• Physical damage or loose parts</li>
+                  <li>• Coin mechanism issues</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Be Specific:</h4>
+                <ul className="text-blue-700 dark:text-blue-300 space-y-1">
+                  <li>• Describe exactly what's happening</li>
+                  <li>• Mention which buttons/controls aren't working</li>
+                  <li>• Note if the issue is intermittent or constant</li>
+                  <li>• Include any error messages you see</li>
+                  <li>• Mention if other players reported the same issue</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -124,26 +179,28 @@ const PublicRepairForm: React.FC<PublicRepairFormProps> = ({ gameId, gameName })
               onChange={(e) => setComment(e.target.value)}
               rows={6}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-              placeholder="Please describe the issue you're experiencing with this game. For example: 'Screen is flickering', 'Buttons not responding', 'Sound not working', etc."
+              placeholder="Please describe the issue you're experiencing with this game. For example: 'Player 1 joystick is stuck and won't move left', 'Screen keeps flickering during gameplay', 'No sound coming from speakers', etc."
               required
             />
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Please be as specific as possible to help our maintenance team fix the issue quickly.
+              The more details you provide, the faster our team can fix the issue!
             </p>
           </div>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
-            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-              Common Issues to Report:
-            </h3>
-            <ul className="text-sm text-blue-800 dark:text-blue-200 list-disc list-inside space-y-1">
-              <li>Screen problems (flickering, dark, distorted)</li>
-              <li>Control issues (buttons, joysticks not working)</li>
-              <li>Audio problems (no sound, distorted sound)</li>
-              <li>Game not starting or freezing</li>
-              <li>Physical damage or loose parts</li>
-              <li>Coin mechanism issues</li>
-            </ul>
+          {/* Response Time Info */}
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+            <div className="flex items-start">
+              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
+                  Response Time
+                </h3>
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  Our maintenance team typically addresses reported issues within 24-48 hours. 
+                  Critical issues that affect game safety are prioritized and handled immediately.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">
@@ -161,7 +218,7 @@ const PublicRepairForm: React.FC<PublicRepairFormProps> = ({ gameId, gameName })
                 isSubmitting || !comment.trim() ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Report'}
+              {isSubmitting ? 'Submitting Report...' : 'Submit Issue Report'}
             </button>
           </div>
         </form>
