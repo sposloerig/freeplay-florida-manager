@@ -16,35 +16,56 @@ const QRCodePrintPage: React.FC = () => {
       @media print {
         @page {
           size: letter;
-          margin: 0;
+          margin: 2in;
         }
         body {
           margin: 0;
           padding: 0;
+          font-family: Arial, sans-serif;
         }
-        .qr-grid {
-          page-break-inside: avoid;
-          break-inside: avoid;
+        .print-container {
+          display: block !important;
+          width: 100% !important;
+          max-width: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        .qr-item {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-align: center !important;
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+          margin: 0 0 1.5in 0 !important;
+          padding: 0.5in !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        .qr-item:last-child {
+          margin-bottom: 0 !important;
+        }
+        .qr-item h2 {
+          font-size: 24px !important;
+          font-weight: bold !important;
+          margin: 0 0 0.3in 0 !important;
+          color: #000 !important;
+          line-height: 1.2 !important;
+        }
+        .qr-item p {
+          font-size: 18px !important;
+          margin: 0 0 0.4in 0 !important;
+          color: #333 !important;
+          line-height: 1.3 !important;
         }
         .no-print {
           display: none !important;
         }
-        .print-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          padding: 0;
-        }
-        .qr-item {
-          margin: 0 auto 2rem auto;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          page-break-inside: avoid;
+        .qr-code-container {
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
         }
       }
     `;
@@ -103,7 +124,7 @@ const QRCodePrintPage: React.FC = () => {
           QR Code Labels
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Each QR code will be centered on the page for easy printing. Select specific games to print or print all labels.
+          Each QR code will be centered on the page with 2-inch margins for easy printing. Select specific games to print or print all labels.
         </p>
 
         <div className="space-y-4">
@@ -207,14 +228,14 @@ const QRCodePrintPage: React.FC = () => {
         {displayGames.map((game) => (
           <div
             key={game.id}
-            className="qr-item w-full max-w-md mx-auto mb-8"
+            className="qr-item"
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">{game.name}</h2>
-            <p className="text-lg text-gray-700 mb-6 leading-tight">
+            <h2>{game.name}</h2>
+            <p>
               Game Not Working?<br />
               Click this QR Code and tell us!
             </p>
-            <div className="flex justify-center">
+            <div className="qr-code-container">
               <GameQRCode gameId={game.id} gameName={game.name} />
             </div>
           </div>
