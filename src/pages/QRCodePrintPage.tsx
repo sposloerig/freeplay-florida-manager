@@ -16,7 +16,7 @@ const QRCodePrintPage: React.FC = () => {
       @media print {
         @page {
           size: letter;
-          margin: 0;
+          margin: 0.5in;
         }
         body {
           margin: 0;
@@ -24,6 +24,7 @@ const QRCodePrintPage: React.FC = () => {
         }
         .qr-grid {
           page-break-inside: avoid;
+          break-inside: avoid;
         }
         .no-print {
           display: none !important;
@@ -85,7 +86,7 @@ const QRCodePrintPage: React.FC = () => {
           QR Code Labels
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Each label is 6" × 3.25" with a dashed border for easy cutting. Select specific games to print or print all labels.
+          Each label is 6" × 3.25" centered on the page. Select specific games to print or print all labels.
         </p>
 
         <div className="space-y-4">
@@ -185,20 +186,21 @@ const QRCodePrintPage: React.FC = () => {
       </div>
 
       {/* QR Code Grid for Printing */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-8">
         {displayGames.map((game) => (
           <div
             key={game.id}
-            className="qr-grid w-[6in] h-[3.25in] bg-white border-2 border-gray-300 border-dashed rounded-lg p-4 flex items-center justify-center"
+            className="qr-grid w-[6in] h-[3.25in] bg-white flex flex-col items-center justify-center text-center p-6"
             style={{
               boxSizing: 'border-box',
             }}
           >
-            <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">{game.name}</h2>
-              <GameQRCode gameId={game.id} gameName={game.name} />
-              <p className="mt-4 text-gray-600">Scan here to report an issue with this game</p>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{game.name}</h2>
+            <p className="text-base text-gray-700 mb-4 leading-tight">
+              Game Not Working?<br />
+              Click this QR Code and tell us!
+            </p>
+            <GameQRCode gameId={game.id} gameName={game.name} />
           </div>
         ))}
       </div>
