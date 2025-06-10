@@ -5,7 +5,6 @@ import { Moon, Sun, Menu, X, Info, Calendar, HelpCircle, Phone, TowerControl as 
 const Header: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -17,33 +16,6 @@ const Header: React.FC = () => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     }
-
-    // Check if we're open
-    const checkIfOpen = () => {
-      const now = new Date();
-      const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-      const hour = now.getHours();
-      const minute = now.getMinutes();
-      const time = hour * 100 + minute; // Convert to 24-hour format (e.g., 1:30 PM = 1330)
-
-      const hours = {
-        0: { open: 1100, close: 1900 }, // Sunday
-        3: { open: 1100, close: 1900 }, // Wednesday
-        4: { open: 1100, close: 1900 }, // Thursday
-        5: { open: 1100, close: 2300 }, // Friday
-        6: { open: 1100, close: 2300 }, // Saturday
-      };
-
-      const todayHours = hours[day as keyof typeof hours];
-      const currentTime = time;
-
-      setIsOpen(todayHours ? currentTime >= todayHours.open && currentTime < todayHours.close : false);
-    };
-
-    checkIfOpen();
-    const interval = setInterval(checkIfOpen, 60000); // Check every minute
-
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -85,15 +57,6 @@ const Header: React.FC = () => {
               >
                 (727) 940-3928
               </a>
-              <span 
-                className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${
-                  isOpen 
-                    ? 'bg-green-500/20 text-green-100' 
-                    : 'bg-red-500/20 text-red-100'
-                }`}
-              >
-                {isOpen ? 'Open Now' : 'Closed'}
-              </span>
             </div>
 
             <Link 
@@ -153,15 +116,6 @@ const Header: React.FC = () => {
                 <Phone size={16} className="mr-1" />
                 <span className="sr-only">Call us</span>
               </a>
-              <span 
-                className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                  isOpen 
-                    ? 'bg-green-500/20 text-green-100' 
-                    : 'bg-red-500/20 text-red-100'
-                }`}
-              >
-                {isOpen ? 'Open' : 'Closed'}
-              </span>
             </div>
             <button
               onClick={toggleDarkMode}
