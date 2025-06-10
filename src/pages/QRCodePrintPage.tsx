@@ -16,7 +16,7 @@ const QRCodePrintPage: React.FC = () => {
       @media print {
         @page {
           size: letter;
-          margin: 0.5in;
+          margin: 0;
         }
         body {
           margin: 0;
@@ -28,6 +28,23 @@ const QRCodePrintPage: React.FC = () => {
         }
         .no-print {
           display: none !important;
+        }
+        .print-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          padding: 0;
+        }
+        .qr-item {
+          margin: 0 auto 2rem auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          page-break-inside: avoid;
         }
       }
     `;
@@ -86,7 +103,7 @@ const QRCodePrintPage: React.FC = () => {
           QR Code Labels
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Each label is 6" × 3.25" centered on the page. Select specific games to print or print all labels.
+          Each QR code will be centered on the page for easy printing. Select specific games to print or print all labels.
         </p>
 
         <div className="space-y-4">
@@ -186,21 +203,20 @@ const QRCodePrintPage: React.FC = () => {
       </div>
 
       {/* QR Code Grid for Printing */}
-      <div className="grid grid-cols-2 gap-8">
+      <div className="print-container">
         {displayGames.map((game) => (
           <div
             key={game.id}
-            className="qr-grid w-[6in] h-[3.25in] bg-white flex flex-col items-center justify-center text-center p-6"
-            style={{
-              boxSizing: 'border-box',
-            }}
+            className="qr-item w-full max-w-md mx-auto mb-8"
           >
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{game.name}</h2>
-            <p className="text-base text-gray-700 mb-4 leading-tight">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">{game.name}</h2>
+            <p className="text-lg text-gray-700 mb-6 leading-tight">
               Game Not Working?<br />
               Click this QR Code and tell us!
             </p>
-            <GameQRCode gameId={game.id} gameName={game.name} />
+            <div className="flex justify-center">
+              <GameQRCode gameId={game.id} gameName={game.name} />
+            </div>
           </div>
         ))}
       </div>
