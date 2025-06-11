@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock } from 'lucide-react';
+import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock, MessageSquare } from 'lucide-react';
 
 const AdminDashboardPage: React.FC = () => {
   const adminFeatures = [
@@ -55,6 +55,14 @@ const AdminDashboardPage: React.FC = () => {
       links: [
         { to: '/admin/shop', text: 'Manage Products', icon: Tag },
         { to: '/admin/shop', text: 'Manage Gift Cards', icon: Gift }
+      ]
+    },
+    {
+      title: 'Chatbot Settings',
+      icon: MessageSquare,
+      description: 'Configure the AI chatbot, enable or disable it, and manage chatbot settings for visitor interactions.',
+      links: [
+        { to: '/admin/chatbot', text: 'Chatbot Settings', icon: MessageSquare }
       ]
     },
     {
