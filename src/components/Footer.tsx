@@ -115,37 +115,37 @@ const Footer: React.FC = () => {
                 </Link>
                 <button
                   onClick={() => signOut()}
-            <Link 
-              to="/games-for-sale"
-              className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-            >
-              <DollarSign size={16} className="mr-1" />
-              Games for Sale
-            </Link>
                   className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
                 >
                   <LogOut size={16} className="mr-1" />
                   Sign Out
                 </button>
+                <Link 
+                  to="/games-for-sale"
+                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
+                >
+                  <DollarSign size={16} className="mr-1" />
+                  Games for Sale
+                </Link>
               </div>
             ) : (
-              <Link 
-                to="/login"
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link 
-              to="/games-for-sale"
-              className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-            >
-              <DollarSign size={16} className="mr-1" />
-              Games for Sale
-            </Link>
-                className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
-              >
-                <Lock size={16} className="mr-1" />
-                Employee Login
-              </Link>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link 
+                  to="/login"
+                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
+                >
+                  <Lock size={16} className="mr-1" />
+                  Employee Login
+                </Link>
+                <Link 
+                  to="/games-for-sale"
+                  className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors"
+                >
+                  <DollarSign size={16} className="mr-1" />
+                  Games for Sale
+                </Link>
+              </div>
             )}
-          </div>
           </div>
         </div>
       </div>
