@@ -75,7 +75,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           condition_notes: newGame.conditionNotes,
           image_url: newGame.images[0] || null,
           // Sales fields - all games are for sale by default
-          for_sale: true,
+          for_sale: false,
           asking_price: newGame.askingPrice,
           sale_condition_notes: newGame.saleConditionNotes,
           missing_parts: newGame.missingParts,
