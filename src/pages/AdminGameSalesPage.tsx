@@ -84,7 +84,8 @@ const AdminGameSalesPage: React.FC = () => {
     setEditingGame(game.id);
     setEditForm({
       ...game,
-      missing_parts: game.missing_parts || []
+      missing_parts: game.missing_parts || [],
+      for_sale: game.for_sale ?? false
     });
   };
 
