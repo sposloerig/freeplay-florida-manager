@@ -98,16 +98,15 @@ const AdminGameSalesPage: React.FC = () => {
     if (!editingGame) return;
 
     try {
-      // Prepare the update data, explicitly handling null values for asking_price
       const updateData = {
-        asking_price: editForm.asking_price || null, // Convert undefined/empty to null
+        asking_price: editForm.asking_price || null,
         for_sale: editForm.for_sale,
         sale_condition_notes: editForm.sale_condition_notes || null,
         missing_parts: editForm.missing_parts || null,
         sale_notes: editForm.sale_notes || null
       };
 
-      console.log('Updating game with data:', updateData); // Debug log
+      console.log('Updating game with data:', updateData);
 
       const { error } = await supabase
         .from('games')
@@ -174,7 +173,6 @@ const AdminGameSalesPage: React.FC = () => {
   };
 
   const handlePriceChange = (value: string) => {
-    // Handle empty string or invalid input
     if (value === '' || value === null || value === undefined) {
       setEditForm({ ...editForm, asking_price: undefined });
     } else {
@@ -208,7 +206,6 @@ const AdminGameSalesPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="mb-6">
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8">
@@ -273,7 +270,7 @@ const AdminGameSalesPage: React.FC = () => {
                       <label className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          checked={editForm.for_sale !== false} // Default to true
+                          checked={editForm.for_sale !== false}
                           onChange={(e) => setEditForm({ ...editForm, for_sale: e.target.checked })}
                           className="rounded"
                         />
@@ -388,14 +385,9 @@ const AdminGameSalesPage: React.FC = () => {
                             <>
                               <EyeOff size={12} className="mr-1" />
                               Not For Sale
-                            Available for Sale
+                            </>
                           )}
                         </span>
-                        {game.for_sale !== false && (
-                          <span className="ml-2 font-medium">
-                            Not Available for Sale
-                          </span>
-                        )}
                       </p>
                     </div>
                   </div>
