@@ -63,10 +63,11 @@ const GameSalesPage: React.FC = () => {
 
   const fetchGames = async () => {
     try {
-      // Fetch all games since they're all for sale by default now
+      // Fetch only games that are explicitly marked for sale
       const { data, error } = await supabase
         .from('games')
         .select('*')
+        .eq('for_sale', true)
         .order('name');
 
       if (error) throw error;
@@ -212,28 +213,35 @@ const GameSalesPage: React.FC = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Games For Sale
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Browse our collection of arcade and pinball machines available for purchase. All games in our collection are potentially available for sale.
-        </p>
-      </div>
-
-      {/* Important Disclaimer */}
-      <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-        <div className="flex items-start">
-          <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-              Important Notice
-            </h3>
-            <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
-              All purchase offers and sale listings are subject to acceptance at the sole discretion of Replay Museum. 
-              While we showcase our collection for collectors to review and potentially purchase, we reserve the right 
-              to decline any offer or remove any item from sale at any time. This listing serves as a casual catalog 
-              for interested collectors and does not constitute a binding commitment to sell.
-            </p>
-          </div>
+        <div className="max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
+            Browse our collection of arcade and pinball machines currently available for purchase.
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Don't see what you're looking for? <a href="/about#contact" className="text-indigo-600 dark:text-indigo-400 hover:underline">Contact us</a> - we may have additional games available or coming soon.
+          </p>
         </div>
       </div>
+
+      {filteredGames.length > 0 && (
+        <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+          <div className="flex items-start">
+            <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                Purchase Information
+              </h3>
+              <div className="text-blue-800 dark:text-blue-200 leading-relaxed space-y-2">
+                <p>All sales are subject to availability and acceptance. Games are sold as-is with detailed condition notes provided.</p>
+                <p>We offer professional pickup and transportation services. Contact us for viewing appointments and additional details.</p>
+                <p className="text-sm">
+                  <strong>Note:</strong> This listing shows only games currently marked for sale. We may have additional games available - contact us for inquiries.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-200 flex items-center">
@@ -439,9 +447,26 @@ const GameSalesPage: React.FC = () => {
 
       {filteredGames.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">
-            No games found matching your criteria.
+          <DollarSign size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            {search || typeFilter !== 'All' || locationFilter !== 'All' || priceFilter !== 'All' 
+              ? 'No games found matching your criteria' 
+              : 'No games currently for sale'
+            }
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            {search || typeFilter !== 'All' || locationFilter !== 'All' || priceFilter !== 'All'
+              ? 'Try adjusting your search filters or check back later.'
+              : 'We periodically add games to our sales inventory. Check back soon or contact us about specific games you\'re interested in.'
+            }
           </p>
+          <a 
+            href="/about#contact" 
+            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          >
+            <MessageSquare size={16} className="mr-2" />
+            Contact Us About Games
+          </a>
         </div>
       )}
 
