@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info } from 'lucide-react';
+import ImageModal from '../components/ImageModal';
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -56,6 +57,8 @@ const GameSalesPage: React.FC = () => {
     message: ''
   });
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImageGame, setSelectedImageGame] = useState<GameForSale | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
     fetchGames();
@@ -129,6 +132,16 @@ const GameSalesPage: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const openImageModal = (game: GameForSale, imageIndex: number = 0) => {
+    setSelectedImageGame(game);
+    setActiveImageIndex(imageIndex);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImageGame(null);
+    setActiveImageIndex(0);
   };
 
   const filteredGames = games.filter(game => {
@@ -326,6 +339,15 @@ const GameSalesPage: React.FC = () => {
         )}
       </div>
 
+      {/* Image Modal */}
+      {selectedImageGame && (
+        <ImageModal
+          images={selectedImageGame.image_url ? [selectedImageGame.image_url] : []}
+          activeIndex={activeImageIndex}
+          onClose={closeImageModal}
+        />
+      )}
+
       {/* Games Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredGames.map(game => (
@@ -335,7 +357,8 @@ const GameSalesPage: React.FC = () => {
                 <img
                   src={game.thumbnail_url || game.image_url}
                   alt={game.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => openImageModal(game, 0)}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">
