@@ -9,7 +9,8 @@ import {
   LogOut,
   Phone,
   Clock,
-  Settings
+  Settings,
+  DollarSign
 } from 'lucide-react';
 
 const Footer: React.FC = () => {

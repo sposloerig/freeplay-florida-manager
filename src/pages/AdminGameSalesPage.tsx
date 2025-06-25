@@ -240,7 +240,7 @@ const AdminGameSalesPage: React.FC = () => {
         <div className="space-y-4">
           <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Note:</strong> All games are available for sale by default. Use this interface to set specific pricing, add condition notes, or temporarily remove games from sale.
+              <strong>Note:</strong> Use this interface to mark games for sale, set pricing, add condition notes, and manage sales status. Only games marked "Available for Sale" will appear on the public sales page.
             </p>
           </div>
 
@@ -388,12 +388,12 @@ const AdminGameSalesPage: React.FC = () => {
                             <>
                               <EyeOff size={12} className="mr-1" />
                               Not For Sale
-                            </>
+                            Available for Sale
                           )}
                         </span>
                         {game.for_sale !== false && (
                           <span className="ml-2 font-medium">
-                            {game.asking_price ? `$${game.asking_price.toLocaleString()}` : 'Make Offer'}
+                            Not Available for Sale
                           </span>
                         )}
                       </p>
