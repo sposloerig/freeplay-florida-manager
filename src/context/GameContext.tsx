@@ -63,6 +63,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addGame = async (newGame: Omit<Game, 'id' | 'dateAdded' | 'lastUpdated'>) => {
     try {
+      // Auto-mark for sale if there's a price
+      const autoForSale = newGame.askingPrice && newGame.askingPrice > 0;
+      
       const { data, error } = await supabase
         .from('games')
         .insert([{
@@ -75,7 +78,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           condition_notes: newGame.conditionNotes,
           image_url: newGame.images[0] || null,
           // Sales fields - all games are for sale by default
-          for_sale: false,
+          for_sale: autoForSale,
           asking_price: newGame.askingPrice,
           sale_condition_notes: newGame.saleConditionNotes,
           missing_parts: newGame.missingParts,
@@ -96,6 +99,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateGame = async (id: string, updatedGame: Partial<Game>) => {
     try {
+      // Auto-mark for sale if there's a price
+      const autoForSale = updatedGame.askingPrice && updatedGame.askingPrice > 0;
+      const finalForSale = autoForSale || updatedGame.forSale;
+      
       const { error } = await supabase
         .from('games')
         .update({
@@ -109,7 +116,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           image_url: updatedGame.images?.[0] || null,
           // Sales fields
           asking_price: updatedGame.askingPrice,
-          for_sale: updatedGame.forSale,
+          for_sale: finalForSale,
           sale_condition_notes: updatedGame.saleConditionNotes,
           missing_parts: updatedGame.missingParts,
           sale_notes: updatedGame.saleNotes

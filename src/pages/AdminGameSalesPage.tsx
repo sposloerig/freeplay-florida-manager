@@ -99,9 +99,13 @@ const AdminGameSalesPage: React.FC = () => {
     if (!editingGame) return;
 
     try {
+      // Auto-mark for sale if there's a price
+      const autoForSale = editForm.asking_price && editForm.asking_price > 0;
+      const finalForSale = autoForSale || editForm.for_sale;
+      
       const updateData = {
         asking_price: editForm.asking_price || null,
-        for_sale: editForm.for_sale,
+        for_sale: finalForSale,
         sale_condition_notes: editForm.sale_condition_notes || null,
         missing_parts: editForm.missing_parts || null,
         sale_notes: editForm.sale_notes || null

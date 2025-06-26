@@ -71,6 +71,7 @@ const GameSalesPage: React.FC = () => {
         .from('games')
         .select('*')
         .eq('for_sale', true)
+        .order('asking_price', { ascending: false, nullsLast: true })
         .order('name');
 
       if (error) throw error;
