@@ -247,7 +247,7 @@ const GameSalesPage: React.FC = () => {
               </h3>
               <div className="text-blue-800 dark:text-blue-200 leading-relaxed space-y-2">
                 <p>All sales are subject to availability and acceptance. Games are sold as-is with detailed condition notes provided.</p>
-                <p>We offer professional pickup and transportation services. Contact us for viewing appointments and additional details.</p>
+
                 <p className="text-sm">
                   <strong>Note:</strong> This listing shows only games currently marked for sale. We may have additional games available - contact us for inquiries.
                 </p>
