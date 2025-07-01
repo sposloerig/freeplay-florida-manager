@@ -100,7 +100,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
 
     try {
       setUploading(true);
-      setError({});
+      setErrors({});
       
       // Process all selected files
       const uploadPromises = newFiles.map(async (file) => {

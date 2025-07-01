@@ -21,7 +21,9 @@ import {
   QrCode,
   ClipboardList,
   Lock,
-  ImageOff
+  ImageOff,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import { Game, Repair } from '../types';
 

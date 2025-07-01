@@ -40,11 +40,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...game,
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
-        // Handle multiple images by checking for arrays in image_url
-        images: game.image_url ? 
-          (typeof game.image_url === 'string' ? [game.image_url] : 
-           Array.isArray(game.image_url) ? game.image_url : []) : 
-          [],
+        // Handle multiple images - prioritize all_images if it exists, fallback to image_url
+        images: game.all_images && Array.isArray(game.all_images) && game.all_images.length > 0 
+          ? game.all_images
+          : game.image_url 
+            ? (typeof game.image_url === 'string' ? [game.image_url] : 
+               Array.isArray(game.image_url) ? game.image_url : []) 
+            : [],
         conditionNotes: game.condition_notes || '',
         // Sales fields
         askingPrice: game.asking_price,
@@ -83,8 +85,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           condition_notes: newGame.conditionNotes?.trim() || null,
           // Store first image in image_url for backward compatibility
           image_url: newGame.images && newGame.images.length > 0 ? newGame.images[0] : null,
-          // Store all images in a separate column if we have multiple
-          all_images: newGame.images && newGame.images.length > 1 ? newGame.images : null,
+          // Store all images in all_images column
+          all_images: newGame.images && newGame.images.length > 0 ? newGame.images : null,
           // Sales fields - all games are for sale by default
           for_sale: autoForSale,
           asking_price: newGame.askingPrice,
@@ -123,8 +125,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           condition_notes: updatedGame.conditionNotes?.trim() || null,
           // Store first image in image_url for backward compatibility
           image_url: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images[0] : null,
-          // Store all images in a separate column if we have multiple
-          all_images: updatedGame.images && updatedGame.images.length > 1 ? updatedGame.images : null,
+          // Store all images in all_images column
+          all_images: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images : null,
           // Sales fields
           asking_price: updatedGame.askingPrice,
           for_sale: finalForSale,
