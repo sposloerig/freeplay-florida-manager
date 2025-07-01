@@ -12,6 +12,8 @@ const ChatbotWidget: React.FC = () => {
         // Create the chatbot element
         const chatbotElement = document.createElement('elevenlabs-convai');
         chatbotElement.setAttribute('agent-id', settings.agent_id);
+        chatbotElement.setAttribute('welcome-message', 'Hello! I\'m the Replay Museum virtual assistant. How can I help you today?');
+        chatbotElement.setAttribute('placeholder-text', 'Ask about hours, games, events, etc.');
         document.body.appendChild(chatbotElement);
 
         // Load the script
