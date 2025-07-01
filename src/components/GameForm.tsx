@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Game, GameType, GameLocation, GameStatus } from '../types';
 import { useGameContext } from '../context/GameContext';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, X, Upload, Loader2, Plus } from 'lucide-react';
+import { AlertTriangle, X, Upload, Loader2 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import imageCompression from 'browser-image-compression';
 
@@ -94,29 +94,38 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
 
-    const file = e.target.files[0];
     try {
       setUploading(true);
-      const compressedFile = await compressImage(file);
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { data, error } = await supabase.storage
-        .from('game-images')
-        .upload(filePath, compressedFile);
-
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('game-images')
-        .getPublicUrl(filePath);
       
-      // Add the new image to the array of images
+      // Process all selected files
+      const files = Array.from(e.target.files);
+      const uploadPromises = files.map(async (file) => {
+        const compressedFile = await compressImage(file);
+        
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+        
+        const { data, error } = await supabase.storage
+          .from('game-images')
+          .upload(filePath, compressedFile);
+          
+        if (error) throw error;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('game-images')
+          .getPublicUrl(filePath);
+          
+        return publicUrl;
+      });
+      
+      // Wait for all uploads to complete
+      const newImageUrls = await Promise.all(uploadPromises);
+      
+      // Add all new images to the existing array
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, publicUrl],
+        images: [...prev.images, ...newImageUrls],
       }));
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -415,21 +424,22 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
                 {uploading ? (
                   <div className="flex flex-col items-center">
                     <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Uploading image...</p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Uploading images...</p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
                     <Upload className="w-8 h-8 text-indigo-500" />
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to add another image</p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to upload images</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500">
                       {formData.images.length > 0 
                         ? `${formData.images.length} image${formData.images.length !== 1 ? 's' : ''} uploaded` 
-                        : 'No images uploaded yet'}
+                        : 'Select multiple files by holding Ctrl/Cmd'}
                     </p>
                   </div>
                 )}
                 <input
                   id="image-upload"
+                  multiple
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
