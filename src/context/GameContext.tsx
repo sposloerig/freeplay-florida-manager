@@ -69,14 +69,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase
         .from('games')
         .insert([{
-          name: newGame.name,
-          type: newGame.type,
-          type_other: newGame.otherType,
-          location: newGame.location,
-          location_other: newGame.otherLocation,
-          status: newGame.status,
-          condition_notes: newGame.conditionNotes,
-          image_url: newGame.images[0] || null,
+          name: newGame.name.trim(),
+          type: newGame.type.trim(),
+          type_other: newGame.otherType?.trim(),
+          location: newGame.location.trim(),
+          location_other: newGame.otherLocation?.trim(),
+          status: newGame.status.trim(),
+          condition_notes: newGame.conditionNotes?.trim(),
+          image_url: newGame.images.length > 0 ? newGame.images[0] : null,
           // Sales fields - all games are for sale by default
           for_sale: autoForSale,
           asking_price: newGame.askingPrice,
@@ -106,14 +106,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase
         .from('games')
         .update({
-          name: updatedGame.name,
-          type: updatedGame.type,
-          type_other: updatedGame.otherType,
-          location: updatedGame.location,
-          location_other: updatedGame.otherLocation,
-          status: updatedGame.status,
-          condition_notes: updatedGame.conditionNotes,
-          image_url: updatedGame.images?.[0] || null,
+          name: updatedGame.name?.trim(),
+          type: updatedGame.type?.trim(),
+          type_other: updatedGame.otherType?.trim(),
+          location: updatedGame.location?.trim(),
+          location_other: updatedGame.otherLocation?.trim(),
+          status: updatedGame.status?.trim(),
+          condition_notes: updatedGame.conditionNotes?.trim(),
+          image_url: updatedGame.images?.length > 0 ? updatedGame.images[0] : null,
           // Sales fields
           asking_price: updatedGame.askingPrice,
           for_sale: finalForSale,

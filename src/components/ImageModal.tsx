@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
+// Update the interface to include an optional onImageChange callback
 interface ImageModalProps {
   images: string[];
   activeIndex: number;
   onClose: () => void;
+  onImageChange?: (index: number) => void;
 }
 
-const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose }) => {
+const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, onImageChange }) => {
   const [currentIndex, setCurrentIndex] = useState(activeIndex);
 
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
+    const newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
+    if (onImageChange) onImageChange(newIndex);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
+    const newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
+    if (onImageChange) onImageChange(newIndex);
   };
 
   // Close the modal when clicking the backdrop
@@ -67,7 +73,9 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose })
           <button 
             onClick={handlePrevious}
             className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
-            aria-label="Previous image"
+            aria-label="Previous image" 
+            disabled={images.length <= 1}
+            style={{ opacity: images.length <= 1 ? 0.5 : 1 }}
           >
             <ChevronLeft size={24} />
           </button>
@@ -76,22 +84,29 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose })
             onClick={handleNext}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
             aria-label="Next image"
+            disabled={images.length <= 1}
+            style={{ opacity: images.length <= 1 ? 0.5 : 1 }}
           >
             <ChevronRight size={24} />
           </button>
         </div>
         
         <div className="mt-4 flex justify-center">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 mx-1 rounded-full transition-all ${
-                index === currentIndex ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/80'
-              }`}
-              aria-label={`Go to image ${index + 1}`}
-            />
-          ))}
+          {images.length > 1 && 
+            images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  if (onImageChange) onImageChange(index);
+                }}
+                className={`w-2 h-2 mx-1 rounded-full transition-all ${
+                  index === currentIndex ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/80'
+                }`}
+                aria-label={`Go to image ${index + 1}`}
+              />
+            ))
+          }
         </div>
         
         <div className="absolute bottom-6 left-0 right-0 text-center text-white text-sm">

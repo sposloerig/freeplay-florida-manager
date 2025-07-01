@@ -40,6 +40,7 @@ const GameDetailPage: React.FC = () => {
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [imageGalleryVisible, setImageGalleryVisible] = useState(false);
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -193,7 +194,7 @@ const GameDetailPage: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="md:flex">
           {/* Main image */}
-          <div className="md:w-1/2 h-64 md:h-auto relative">
+          <div className="md:w-1/2 h-64 md:h-auto relative cursor-pointer" onClick={() => game.images.length > 0 && setActiveImageIndex(0)}>
             {mainImageError ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700">
                 <ImageOff size={48} className="text-gray-400 dark:text-gray-500 mb-3" />
@@ -201,14 +202,20 @@ const GameDetailPage: React.FC = () => {
                   Game Image Coming Soon
                 </span>
               </div>
-            ) : (
+            ) : game.images && game.images.length > 0 ? (
               <img 
                 src={game.images[0]} 
                 alt={game.name}
                 className="w-full h-full object-cover"
                 onError={() => setMainImageError(true)}
-                onClick={() => !mainImageError && setActiveImageIndex(0)}
               />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700">
+                <ImageOff size={48} className="text-gray-400 dark:text-gray-500 mb-3" />
+                <span className="text-base font-medium text-gray-500 dark:text-gray-400 text-center px-4">
+                  No Images Available
+                </span>
+              </div>
             )}
             <div className="absolute bottom-4 left-4">
               <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(game.status)}`}>
@@ -332,36 +339,52 @@ const GameDetailPage: React.FC = () => {
         </div>
         
         {/* Image gallery */}
-        <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Game Images
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {game.images.map((image, index) => (
-              <div 
-                key={index}
-                className="relative h-48 overflow-hidden rounded-md cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-                onClick={() => setActiveImageIndex(index)}
+        {game.images && game.images.length > 0 && (
+          <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Game Images ({game.images.length})
+              </h2>
+              <button
+                onClick={() => setImageGalleryVisible(!imageGalleryVisible)}
+                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
               >
-                {imageLoadErrors[index] ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
-                    <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">
-                      Game Image Coming Soon
-                    </span>
+                {imageGalleryVisible ? 'Hide Gallery' : 'Show All Images'}
+              </button>
+            </div>
+            
+            {imageGalleryVisible && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {game.images.map((image, index) => (
+                  <div 
+                    key={index}
+                    className="relative h-48 overflow-hidden rounded-md cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+                    onClick={() => setActiveImageIndex(index)}
+                  >
+                    {imageLoadErrors[index] ? (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
+                        <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">
+                          Image Failed to Load
+                        </span>
+                      </div>
+                    ) : (
+                      <img
+                        src={image}
+                        alt={`${game.name} - Image ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                        onError={() => handleImageError(index)}
+                      />
+                    )}
+                    <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                      Image {index + 1}
+                    </div>
                   </div>
-                ) : (
-                  <img
-                    src={image}
-                    alt={`${game.name} - Image ${index + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    onError={() => handleImageError(index)}
-                  />
-                )}
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        </div>
+        )}
 
         {/* Repair History - Only visible to authenticated users */}
         {user ? (

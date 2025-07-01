@@ -11,6 +11,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // Get the best available image URL
+  const imageUrl = game.thumbnailUrl || game.images?.[0];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Operational':
@@ -26,9 +29,6 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
   // Create URL-friendly slug from game name and location
   const slug = `${game.name}-${game.location}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-
-  // Get the best available image URL
-  const imageUrl = game.thumbnailUrl || game.images?.[0];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">

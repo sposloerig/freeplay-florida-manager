@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Game, GameType, GameLocation, GameStatus } from '../types';
 import { useGameContext } from '../context/GameContext';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, X, Upload, Loader2 } from 'lucide-react';
+import { AlertTriangle, X, Upload, Loader2, Plus } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import imageCompression from 'browser-image-compression';
 
@@ -94,9 +94,9 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
 
+    const file = e.target.files[0];
     try {
       setUploading(true);
-      const file = e.target.files[0];
       const compressedFile = await compressImage(file);
 
       const fileExt = file.name.split('.').pop();
@@ -112,7 +112,8 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
       const { data: { publicUrl } } = supabase.storage
         .from('game-images')
         .getPublicUrl(filePath);
-
+      
+      // Add the new image to the array of images
       setFormData(prev => ({
         ...prev,
         images: [...prev.images, publicUrl],
@@ -190,7 +191,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
         updateGame(gameId, {
           ...formData,
         });
-        navigate(`/game/${formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`);
+        navigate(`/game/${formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${formData.location.toLowerCase()}`);
       } else {
         addGame({
           ...formData,
@@ -405,7 +406,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
             <div className="flex items-center justify-center w-full">
               <label
                 htmlFor="image-upload"
-                className={`w-full h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
+                className={`w-full h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer mb-4
                   ${uploading 
                     ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700' 
                     : 'border-indigo-300 hover:border-indigo-400 dark:border-indigo-600 dark:hover:border-indigo-500'
@@ -414,12 +415,17 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
                 {uploading ? (
                   <div className="flex flex-col items-center">
                     <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Uploading...</p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Uploading image...</p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
                     <Upload className="w-8 h-8 text-indigo-500" />
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to upload an image</p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to add another image</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      {formData.images.length > 0 
+                        ? `${formData.images.length} image${formData.images.length !== 1 ? 's' : ''} uploaded` 
+                        : 'No images uploaded yet'}
+                    </p>
                   </div>
                 )}
                 <input
@@ -437,21 +443,24 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
               <p className="text-sm text-red-600 dark:text-red-400">{errors.upload}</p>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
               {formData.images.map((imageUrl, index) => (
                 <div key={index} className="relative">
                   <img
                     src={imageUrl}
                     alt={`Game image ${index + 1}`}
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-48 object-cover rounded-lg shadow-sm"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-sm"
                   >
                     <X size={16} />
                   </button>
+                  <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                    Image {index + 1}
+                  </div>
                 </div>
               ))}
             </div>
