@@ -40,7 +40,7 @@ const GameDetailPage: React.FC = () => {
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
-  const [imageGalleryVisible, setImageGalleryVisible] = useState(false);
+  const [imageGalleryVisible, setImageGalleryVisible] = useState(true);
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -341,15 +341,16 @@ const GameDetailPage: React.FC = () => {
         {/* Image gallery */}
         {game.images && game.images.length > 0 && (
           <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Game Images ({game.images.length})
               </h2>
               <button
                 onClick={() => setImageGalleryVisible(!imageGalleryVisible)}
-                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                className="flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-3 py-1 border border-indigo-200 dark:border-indigo-800 rounded-md"
               >
-                {imageGalleryVisible ? 'Hide Gallery' : 'Show All Images'}
+                {imageGalleryVisible ? 'Hide Gallery' : 'Show All Images'} 
+                {imageGalleryVisible ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />}
               </button>
             </div>
             
@@ -361,7 +362,7 @@ const GameDetailPage: React.FC = () => {
                     className="relative h-48 overflow-hidden rounded-md cursor-pointer shadow-sm hover:shadow-md transition-shadow"
                     onClick={() => setActiveImageIndex(index)}
                   >
-                    {imageLoadErrors[index] ? (
+                    {imageLoadErrors[index] || !image ? (
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
                         <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">

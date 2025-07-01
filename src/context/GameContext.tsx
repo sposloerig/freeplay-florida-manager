@@ -31,7 +31,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase
         .from('games')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(500);
 
       if (error) throw error;
 
@@ -39,7 +40,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...game,
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
-        images: game.image_url ? [game.image_url] : [],
+        // Handle multiple images by checking for arrays in image_url
+        images: game.image_url ? 
+          (typeof game.image_url === 'string' ? [game.image_url] : 
+           Array.isArray(game.image_url) ? game.image_url : []) : 
+          [],
         conditionNotes: game.condition_notes || '',
         // Sales fields
         askingPrice: game.asking_price,
@@ -69,14 +74,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase
         .from('games')
         .insert([{
-          name: newGame.name.trim(),
-          type: newGame.type.trim(),
-          type_other: newGame.otherType?.trim(),
-          location: newGame.location.trim(),
-          location_other: newGame.otherLocation?.trim(),
-          status: newGame.status.trim(),
-          condition_notes: newGame.conditionNotes?.trim(),
-          image_url: newGame.images.length > 0 ? newGame.images[0] : null,
+          name: newGame.name?.trim() || '',
+          type: newGame.type?.trim() || 'Arcade',
+          type_other: newGame.otherType?.trim() || null,
+          location: newGame.location?.trim() || 'Replay',
+          location_other: newGame.otherLocation?.trim() || null,
+          status: newGame.status?.trim() || 'Operational',
+          condition_notes: newGame.conditionNotes?.trim() || null,
+          // Store first image in image_url for backward compatibility
+          image_url: newGame.images && newGame.images.length > 0 ? newGame.images[0] : null,
+          // Store all images in a separate column if we have multiple
+          all_images: newGame.images && newGame.images.length > 1 ? newGame.images : null,
           // Sales fields - all games are for sale by default
           for_sale: autoForSale,
           asking_price: newGame.askingPrice,
@@ -106,14 +114,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase
         .from('games')
         .update({
-          name: updatedGame.name?.trim(),
-          type: updatedGame.type?.trim(),
-          type_other: updatedGame.otherType?.trim(),
-          location: updatedGame.location?.trim(),
-          location_other: updatedGame.otherLocation?.trim(),
-          status: updatedGame.status?.trim(),
-          condition_notes: updatedGame.conditionNotes?.trim(),
-          image_url: updatedGame.images?.length > 0 ? updatedGame.images[0] : null,
+          name: updatedGame.name?.trim() || '',
+          type: updatedGame.type?.trim() || 'Arcade',
+          type_other: updatedGame.otherType?.trim() || null,
+          location: updatedGame.location?.trim() || 'Replay',
+          location_other: updatedGame.otherLocation?.trim() || null,
+          status: updatedGame.status?.trim() || 'Operational',
+          condition_notes: updatedGame.conditionNotes?.trim() || null,
+          // Store first image in image_url for backward compatibility
+          image_url: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images[0] : null,
+          // Store all images in a separate column if we have multiple
+          all_images: updatedGame.images && updatedGame.images.length > 1 ? updatedGame.images : null,
           // Sales fields
           asking_price: updatedGame.askingPrice,
           for_sale: finalForSale,

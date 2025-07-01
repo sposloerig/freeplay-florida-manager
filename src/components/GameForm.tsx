@@ -94,12 +94,16 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
 
+    const newFiles = Array.from(e.target.files);
+    const totalFiles = newFiles.length;
+    let completedUploads = 0;
+
     try {
       setUploading(true);
+      setError({});
       
       // Process all selected files
-      const files = Array.from(e.target.files);
-      const uploadPromises = files.map(async (file) => {
+      const uploadPromises = newFiles.map(async (file) => {
         const compressedFile = await compressImage(file);
         
         const fileExt = file.name.split('.').pop();
@@ -115,7 +119,9 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
         const { data: { publicUrl } } = supabase.storage
           .from('game-images')
           .getPublicUrl(filePath);
-          
+        
+        completedUploads++;
+        
         return publicUrl;
       });
       
@@ -131,7 +137,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
       console.error('Error uploading image:', error);
       setErrors(prev => ({
         ...prev,
-        upload: 'Failed to upload image. Please try again.',
+        upload: 'Failed to upload one or more images. Please try again.',
       }));
     } finally {
       setUploading(false);
@@ -432,7 +438,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
                     <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to upload images</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500">
                       {formData.images.length > 0 
-                        ? `${formData.images.length} image${formData.images.length !== 1 ? 's' : ''} uploaded` 
+                        ? `${formData.images.length} image${formData.images.length !== 1 ? 's' : ''} selected` 
                         : 'Select multiple files by holding Ctrl/Cmd'}
                     </p>
                   </div>
@@ -454,7 +460,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-              {formData.images.map((imageUrl, index) => (
+              {formData.images && formData.images.length > 0 ? formData.images.map((imageUrl, index) => (
                 <div key={index} className="relative">
                   <img
                     src={imageUrl}
@@ -472,7 +478,11 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
                     Image {index + 1}
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="col-span-3 text-center py-4 text-gray-500 dark:text-gray-400">
+                  No images uploaded yet
+                </div>
+              )}
             </div>
           </div>
         </div>
