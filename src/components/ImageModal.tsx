@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Update the interface to include an optional onImageChange callback
@@ -11,6 +11,8 @@ interface ImageModalProps {
 
 const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, onImageChange }) => {
   const [currentIndex, setCurrentIndex] = useState(activeIndex);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const handlePrevious = () => {
     const newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
@@ -29,6 +31,39 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, o
     if (e.target === e.currentTarget) {
       onClose();
     }
+  };
+
+  // Handle touch events for swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+
+    const touch = e.changedTouches[0];
+    const deltaX = touchStartX.current - touch.clientX;
+    const deltaY = touchStartY.current - touch.clientY;
+
+    // Minimum swipe distance (in pixels)
+    const minSwipeDistance = 50;
+    
+    // Check if horizontal swipe is more significant than vertical swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      if (deltaX > 0) {
+        // Swiped left, show next image
+        handleNext();
+      } else {
+        // Swiped right, show previous image
+        handlePrevious();
+      }
+    }
+
+    // Reset touch coordinates
+    touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   // Handle keyboard navigation
@@ -63,11 +98,15 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, o
           <X size={20} />
         </button>
         
-        <div className="relative">
+        <div 
+          className="relative"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <img 
             src={images[currentIndex]} 
             alt={`Game image ${currentIndex + 1}`} 
-            className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+            className="w-full h-auto max-h-[80vh] object-contain rounded-lg select-none"
           />
           
           <button 
@@ -110,7 +149,12 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, o
         </div>
         
         <div className="absolute bottom-6 left-0 right-0 text-center text-white text-sm">
-          {currentIndex + 1} / {images.length}
+          <div>{currentIndex + 1} / {images.length}</div>
+          {images.length > 1 && (
+            <div className="text-xs text-white/70 mt-1 md:hidden">
+              Swipe left or right to navigate
+            </div>
+          )}
         </div>
       </div>
     </div>
