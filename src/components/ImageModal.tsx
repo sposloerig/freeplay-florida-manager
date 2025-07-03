@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Update the interface to include an optional onImageChange callback
@@ -14,17 +14,17 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, o
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     const newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
     if (onImageChange) onImageChange(newIndex);
-  };
+  }, [currentIndex, images.length, onImageChange]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
     if (onImageChange) onImageChange(newIndex);
-  };
+  }, [currentIndex, images.length, onImageChange]);
 
   // Close the modal when clicking the backdrop
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -82,7 +82,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ images, activeIndex, onClose, o
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose, handlePrevious, handleNext]);
 
   return (
     <div 

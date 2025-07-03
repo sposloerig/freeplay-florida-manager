@@ -21,7 +21,7 @@ interface GameForSale {
   sale_condition_notes?: string;
   missing_parts?: string[];
   sale_notes?: string;
-  images?: string[];
+  all_images?: string[];
   image_url?: string;
   thumbnail_url?: string;
   created_at: string;
@@ -344,7 +344,7 @@ const GameSalesPage: React.FC = () => {
       {/* Image Modal */}
       {selectedImageGame && (
         <ImageModal
-          images={selectedImageGame.images || (selectedImageGame.image_url ? [selectedImageGame.image_url] : [])}
+          images={selectedImageGame.all_images || (selectedImageGame.image_url ? [selectedImageGame.image_url] : [])}
           activeIndex={activeImageIndex}
           onClose={closeImageModal}
         />
@@ -355,9 +355,9 @@ const GameSalesPage: React.FC = () => {
         {filteredGames.map(game => (
           <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
-              {(game.images && game.images.length > 0) || game.thumbnail_url || game.image_url ? (
+              {(game.all_images && game.all_images.length > 0) || game.thumbnail_url || game.image_url ? (
                 <img
-                  src={game.thumbnail_url || (game.images && game.images[0]) || game.image_url}
+                  src={game.thumbnail_url || (game.all_images && game.all_images[0]) || game.image_url}
                   alt={game.name}
                   className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => openImageModal(game, 0)}
@@ -372,9 +372,9 @@ const GameSalesPage: React.FC = () => {
                   {game.status}
                 </span>
               </div>
-              {game.images && game.images.length > 1 && (
+              {game.all_images && game.all_images.length > 1 && (
                 <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                  {game.images.length} photos
+                  {game.all_images.length} photos
                 </div>
               )}
             </div>
