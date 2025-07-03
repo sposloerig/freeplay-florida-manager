@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info, ExternalLink } from 'lucide-react';
 import ImageModal from '../components/ImageModal';
 
 const supabase = createClient(
@@ -352,127 +353,153 @@ const GameSalesPage: React.FC = () => {
 
       {/* Games Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredGames.map(game => (
-          <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-            <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
-              {(game.all_images && game.all_images.length > 0) || game.thumbnail_url || game.image_url ? (
-                <img
-                  src={game.thumbnail_url || (game.all_images && game.all_images[0]) || game.image_url}
-                  alt={game.name}
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => openImageModal(game, 0)}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <span className="text-gray-400">No Image</span>
+        {filteredGames.map(game => {
+          // Create URL-friendly slug from game name and location (same as GameCard)
+          const slug = `${game.name}-${game.location === 'Other' ? game.location_other : game.location}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          
+          return (
+            <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
+                {(game.all_images && game.all_images.length > 0) || game.thumbnail_url || game.image_url ? (
+                  <img
+                    src={game.thumbnail_url || (game.all_images && game.all_images[0]) || game.image_url}
+                    alt={game.name}
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openImageModal(game, 0);
+                    }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-gray-400">No Image</span>
+                  </div>
+                )}
+                <div className="absolute top-2 right-2">
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(game.status)}`}>
+                    {game.status}
+                  </span>
                 </div>
-              )}
-              <div className="absolute top-2 right-2">
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(game.status)}`}>
-                  {game.status}
-                </span>
-              </div>
-              {game.all_images && game.all_images.length > 1 && (
-                <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                  {game.all_images.length} photos
-                </div>
-              )}
-            </div>
-
-            <div className="p-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                {game.name}
-              </h3>
-
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300 mb-4">
-                <div className="flex items-center">
-                  <Tag size={14} className="mr-2" />
-                  {game.type === 'Other' ? game.type_other : game.type}
-                </div>
-                <div className="flex items-center">
-                  <MapPin size={14} className="mr-2" />
-                  {game.location === 'Other' ? game.location_other : game.location}
-                </div>
-                <div className="flex items-center">
-                  <Calendar size={14} className="mr-2" />
-                  Added {new Date(game.created_at).toLocaleDateString()}
-                </div>
+                {game.all_images && game.all_images.length > 1 && (
+                  <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                    {game.all_images.length} photos
+                  </div>
+                )}
               </div>
 
-              {game.sale_condition_notes && (
-                <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                    Condition Notes
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {game.sale_condition_notes}
-                  </p>
-                </div>
-              )}
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  {game.name}
+                </h3>
 
-              {game.missing_parts && game.missing_parts.length > 0 && (
-                <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                  <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
-                    Missing Parts
-                  </h4>
-                  <ul className="text-sm text-yellow-700 dark:text-yellow-300 list-disc list-inside">
-                    {game.missing_parts.map((part, index) => (
-                      <li key={index}>{part}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {game.sale_notes && (
-                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                  <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-                    Additional Notes
-                  </h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    {game.sale_notes}
-                  </p>
-                </div>
-              )}
-
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">
-                    {formatPrice(game.asking_price)}
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  <div className="flex items-center">
+                    <Tag size={14} className="mr-2" />
+                    {game.type === 'Other' ? game.type_other : game.type}
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin size={14} className="mr-2" />
+                    {game.location === 'Other' ? game.location_other : game.location}
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar size={14} className="mr-2" />
+                    Added {new Date(game.created_at).toLocaleDateString()}
                   </div>
                 </div>
-                
-                <div className="space-y-2">
-                  {game.asking_price ? (
-                    <>
+
+                {game.sale_condition_notes && (
+                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                      Condition Notes
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {game.sale_condition_notes}
+                    </p>
+                  </div>
+                )}
+
+                {game.missing_parts && game.missing_parts.length > 0 && (
+                  <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+                    <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                      Missing Parts
+                    </h4>
+                    <ul className="text-sm text-yellow-700 dark:text-yellow-300 list-disc list-inside">
+                      {game.missing_parts.map((part, index) => (
+                        <li key={index}>{part}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {game.sale_notes && (
+                  <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                    <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                      Additional Notes
+                    </h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      {game.sale_notes}
+                    </p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">
+                      {formatPrice(game.asking_price)}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {game.asking_price ? (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePurchase(game);
+                          }}
+                          className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+                        >
+                          <ShoppingCart size={16} className="mr-2" />
+                          Purchase (${game.asking_price.toLocaleString()})
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMakeOffer(game);
+                          }}
+                          className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                        >
+                          <MessageSquare size={16} className="mr-2" />
+                          Make Offer
+                        </button>
+                      </>
+                    ) : (
                       <button
-                        onClick={() => handlePurchase(game)}
-                        className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
-                      >
-                        <ShoppingCart size={16} className="mr-2" />
-                        Purchase (${game.asking_price.toLocaleString()})
-                      </button>
-                      <button
-                        onClick={() => handleMakeOffer(game)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMakeOffer(game);
+                        }}
                         className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
                       >
                         <MessageSquare size={16} className="mr-2" />
                         Make Offer
                       </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleMakeOffer(game)}
-                      className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                    )}
+                    
+                    {/* View Details Link */}
+                    <Link 
+                      to={`/game/${slug}`}
+                      className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
                     >
-                      <MessageSquare size={16} className="mr-2" />
-                      Make Offer
-                    </button>
-                  )}
+                      <ExternalLink size={16} className="mr-2" />
+                      View Full Details
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredGames.length === 0 && (
