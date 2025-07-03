@@ -22,7 +22,6 @@ import AdminEventsPage from './pages/AdminEventsPage';
 import AdminFaqPage from './pages/AdminFaqPage';
 import AdminShopPage from './pages/AdminShopPage';
 import AdminHoursPage from './pages/AdminHoursPage';
-import AdminGameSalesPage from './pages/AdminGameSalesPage';
 import AdminPasswordResetPage from './pages/AdminPasswordResetPage';
 import AdminChatbotPage from './pages/AdminChatbotPage';
 import GameSalesPage from './pages/GameSalesPage';
@@ -86,11 +85,6 @@ function App() {
                     <Route path="/admin/password-reset" element={
                       <ProtectedRoute>
                         <AdminPasswordResetPage />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/admin/sales" element={
-                      <ProtectedRoute>
-                        <AdminGameSalesPage />
                       </ProtectedRoute>
                     } />
                     <Route path="/add" element={
