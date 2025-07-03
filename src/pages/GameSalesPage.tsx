@@ -21,6 +21,7 @@ interface GameForSale {
   sale_condition_notes?: string;
   missing_parts?: string[];
   sale_notes?: string;
+  images?: string[];
   image_url?: string;
   thumbnail_url?: string;
   created_at: string;
@@ -71,7 +72,7 @@ const GameSalesPage: React.FC = () => {
         .from('games')
         .select('*')
         .eq('for_sale', true)
-        .order('asking_price', { ascending: false, nullsLast: true })
+        .order('asking_price', { ascending: false, nullsFirst: false })
         .order('name');
 
       if (error) throw error;
@@ -157,11 +158,11 @@ const GameSalesPage: React.FC = () => {
       if (priceFilter === 'NFS') {
         matchesPrice = !game.asking_price;
       } else if (priceFilter === 'Under $500') {
-        matchesPrice = game.asking_price && game.asking_price < 500;
+        matchesPrice = !!game.asking_price && game.asking_price < 500;
       } else if (priceFilter === '$500-$1000') {
-        matchesPrice = game.asking_price && game.asking_price >= 500 && game.asking_price <= 1000;
+        matchesPrice = !!game.asking_price && game.asking_price >= 500 && game.asking_price <= 1000;
       } else if (priceFilter === 'Over $1000') {
-        matchesPrice = game.asking_price && game.asking_price > 1000;
+        matchesPrice = !!game.asking_price && game.asking_price > 1000;
       }
     }
 
@@ -343,7 +344,7 @@ const GameSalesPage: React.FC = () => {
       {/* Image Modal */}
       {selectedImageGame && (
         <ImageModal
-          images={selectedImageGame.image_url ? [selectedImageGame.image_url] : []}
+          images={selectedImageGame.images || (selectedImageGame.image_url ? [selectedImageGame.image_url] : [])}
           activeIndex={activeImageIndex}
           onClose={closeImageModal}
         />
@@ -354,9 +355,9 @@ const GameSalesPage: React.FC = () => {
         {filteredGames.map(game => (
           <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
-              {game.thumbnail_url || game.image_url ? (
+              {(game.images && game.images.length > 0) || game.thumbnail_url || game.image_url ? (
                 <img
-                  src={game.thumbnail_url || game.image_url}
+                  src={game.thumbnail_url || (game.images && game.images[0]) || game.image_url}
                   alt={game.name}
                   className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => openImageModal(game, 0)}
@@ -371,6 +372,11 @@ const GameSalesPage: React.FC = () => {
                   {game.status}
                 </span>
               </div>
+              {game.images && game.images.length > 1 && (
+                <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                  {game.images.length} photos
+                </div>
+              )}
             </div>
 
             <div className="p-4">

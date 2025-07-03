@@ -13,12 +13,12 @@ const GameList: React.FC = () => {
   const [sortBy, setSortBy] = useState<'name' | 'yearMade' | 'dateAdded'>('dateAdded');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [showWarehouse, setShowWarehouse] = useState(false);
+  const [showAllLocations, setShowAllLocations] = useState(true);
 
   const filteredGames = games.filter((game) => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'All' || game.type === typeFilter;
-    const matchesLocation = showWarehouse ? true : game.location === locationFilter;
+    const matchesLocation = showAllLocations ? true : game.location === locationFilter;
     const matchesStatus = statusFilter === 'All' || game.status === statusFilter;
     
     return matchesSearch && matchesType && matchesLocation && matchesStatus;
@@ -106,11 +106,11 @@ const GameList: React.FC = () => {
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={showWarehouse}
-                onChange={(e) => setShowWarehouse(e.target.checked)}
+                checked={showAllLocations}
+                onChange={(e) => setShowAllLocations(e.target.checked)}
                 className="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Show Warehouse</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Search All Locations</span>
             </label>
 
             <button
