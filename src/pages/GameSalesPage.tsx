@@ -70,11 +70,11 @@ const GameSalesPage: React.FC = () => {
 
   const fetchGames = async () => {
     try {
-      // Fetch games that are explicitly marked for sale
+      // Fetch games that are for sale (either explicitly marked or have a price)
       const { data: forSaleData, error: forSaleError } = await supabase
         .from('games')
         .select('*')
-        .eq('for_sale', true)
+        .or('for_sale.eq.true,asking_price.gt.0')
         .order('asking_price', { ascending: false, nullsFirst: false })
         .order('name');
 
