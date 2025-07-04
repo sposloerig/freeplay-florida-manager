@@ -409,7 +409,7 @@ const GameSalesPage: React.FC = () => {
           const slug = `${game.name}-${game.location === 'Other' ? game.location_other : game.location}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
           
           return (
-            <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+            <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
               <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
                 {(game.all_images && game.all_images.length > 0) || game.thumbnail_url || game.image_url ? (
                   <img
@@ -444,7 +444,7 @@ const GameSalesPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="p-4">
+              <div className="p-4 flex-1 flex flex-col">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                   {game.name}
                 </h3>
@@ -464,42 +464,46 @@ const GameSalesPage: React.FC = () => {
                   </div>
                 </div>
 
-                {game.sale_condition_notes && (
-                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                      Condition Notes
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {game.sale_condition_notes}
-                    </p>
-                  </div>
-                )}
+                {/* Variable content section - grows to fill available space */}
+                <div className="flex-1 mb-4">
+                  {game.sale_condition_notes && (
+                    <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                        Condition Notes
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {game.sale_condition_notes}
+                      </p>
+                    </div>
+                  )}
 
-                {game.missing_parts && game.missing_parts.length > 0 && (
-                  <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                    <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
-                      Missing Parts
-                    </h4>
-                    <ul className="text-sm text-yellow-700 dark:text-yellow-300 list-disc list-inside">
-                      {game.missing_parts.map((part, index) => (
-                        <li key={index}>{part}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                  {game.missing_parts && game.missing_parts.length > 0 && (
+                    <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+                      <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                        Missing Parts
+                      </h4>
+                      <ul className="text-sm text-yellow-700 dark:text-yellow-300 list-disc list-inside">
+                        {game.missing_parts.map((part, index) => (
+                          <li key={index}>{part}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                {game.sale_notes && (
-                  <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                    <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-                      Additional Notes
-                    </h4>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      {game.sale_notes}
-                    </p>
-                  </div>
-                )}
+                  {game.sale_notes && (
+                    <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                      <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                        Additional Notes
+                      </h4>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        {game.sale_notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
 
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                {/* Fixed footer section - always at bottom */}
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">
                       {formatPrice(game.asking_price)}
