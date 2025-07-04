@@ -13,7 +13,7 @@ const GameList: React.FC = () => {
   const [sortBy, setSortBy] = useState<'name' | 'yearMade' | 'dateAdded'>('dateAdded');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [showAllLocations, setShowAllLocations] = useState(true);
+  const [showAllLocations, setShowAllLocations] = useState(false);
 
   const filteredGames = games.filter((game) => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
