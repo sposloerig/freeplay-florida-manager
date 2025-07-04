@@ -45,7 +45,7 @@ const GameSalesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('All');
-  const [locationFilter, setLocationFilter] = useState<string>('Replay');
+  const [locationFilter, setLocationFilter] = useState<string>('All');
   const [priceFilter, setPriceFilter] = useState<string>('All');
   const [showFilters, setShowFilters] = useState(false);
   const [showAllGames, setShowAllGames] = useState(false);
