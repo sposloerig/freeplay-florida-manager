@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
-import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info, ExternalLink } from 'lucide-react';
+import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import ImageModal from '../components/ImageModal';
 
 const supabase = createClient(
@@ -40,13 +40,15 @@ interface BuyerInquiry {
 
 const GameSalesPage: React.FC = () => {
   const [games, setGames] = useState<GameForSale[]>([]);
+  const [allGames, setAllGames] = useState<GameForSale[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('All');
-  const [locationFilter, setLocationFilter] = useState<string>('All');
+  const [locationFilter, setLocationFilter] = useState<string>('Replay');
   const [priceFilter, setPriceFilter] = useState<string>('All');
   const [showFilters, setShowFilters] = useState(false);
+  const [showAllGames, setShowAllGames] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameForSale | null>(null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [inquiryType, setInquiryType] = useState<'purchase' | 'offer'>('offer');
@@ -68,19 +70,29 @@ const GameSalesPage: React.FC = () => {
 
   const fetchGames = async () => {
     try {
-      // Fetch only games that are explicitly marked for sale
-      const { data, error } = await supabase
+      // Fetch games that are explicitly marked for sale
+      const { data: forSaleData, error: forSaleError } = await supabase
         .from('games')
         .select('*')
         .eq('for_sale', true)
         .order('asking_price', { ascending: false, nullsFirst: false })
         .order('name');
 
-      if (error) throw error;
-      setGames(data || []);
+      if (forSaleError) throw forSaleError;
+
+      // Fetch all games for the "make offer on any game" section
+      const { data: allGamesData, error: allGamesError } = await supabase
+        .from('games')
+        .select('*')
+        .order('name');
+
+      if (allGamesError) throw allGamesError;
+
+      setGames(forSaleData || []);
+      setAllGames(allGamesData || []);
     } catch (err) {
       console.error('Error fetching games:', err);
-      setError('Failed to load games for sale');
+      setError('Failed to load games');
     } finally {
       setLoading(false);
     }
@@ -109,7 +121,9 @@ const GameSalesPage: React.FC = () => {
       buyer_email: '',
       buyer_phone: '',
       offer_amount: undefined,
-      message: ''
+      message: game.for_sale && game.asking_price 
+        ? `I would like to make an offer on ${game.name}. The asking price is $${game.asking_price?.toLocaleString()}.`
+        : `I would like to make an offer on ${game.name}. Everything is for sale at the right price!`
     });
     setShowInquiryForm(true);
   };
@@ -147,7 +161,10 @@ const GameSalesPage: React.FC = () => {
     setActiveImageIndex(0);
   };
 
-  const filteredGames = games.filter(game => {
+  // Get the appropriate games to display
+  const gamesToDisplay = showAllGames ? allGames : games;
+
+  const filteredGames = gamesToDisplay.filter(game => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'All' || game.type === typeFilter || 
                        (game.type === 'Other' && game.type_other === typeFilter);
@@ -172,7 +189,7 @@ const GameSalesPage: React.FC = () => {
 
   const getUniqueTypes = () => {
     const types = new Set<string>();
-    games.forEach(game => {
+    gamesToDisplay.forEach(game => {
       if (game.type === 'Other' && game.type_other) {
         types.add(game.type_other);
       } else {
@@ -184,7 +201,7 @@ const GameSalesPage: React.FC = () => {
 
   const getUniqueLocations = () => {
     const locations = new Set<string>();
-    games.forEach(game => {
+    gamesToDisplay.forEach(game => {
       if (game.location === 'Other' && game.location_other) {
         locations.add(game.location_other);
       } else {
@@ -239,7 +256,23 @@ const GameSalesPage: React.FC = () => {
         </div>
       </div>
 
-      {filteredGames.length > 0 && (
+      {/* Show All Games Toggle */}
+      <div className="mb-6 flex justify-center">
+        <button
+          onClick={() => setShowAllGames(!showAllGames)}
+          className={`flex items-center px-6 py-3 rounded-lg font-medium transition-colors ${
+            showAllGames
+              ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+        >
+          {showAllGames ? <EyeOff size={20} className="mr-2" /> : <Eye size={20} className="mr-2" />}
+          {showAllGames ? 'Show Only Games For Sale' : 'Show All Games (Make Offers)'}
+        </button>
+      </div>
+
+      {/* Information boxes */}
+      {!showAllGames && filteredGames.length > 0 && (
         <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
           <div className="flex items-start">
             <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
@@ -249,9 +282,27 @@ const GameSalesPage: React.FC = () => {
               </h3>
               <div className="text-blue-800 dark:text-blue-200 leading-relaxed space-y-2">
                 <p>All sales are subject to availability and acceptance. Games are sold as-is with detailed condition notes provided.</p>
-
                 <p className="text-sm">
-                  <strong>Note:</strong> This listing shows only games currently marked for sale. We may have additional games available - contact us for inquiries.
+                  <strong>Note:</strong> This listing shows only games currently marked for sale. Click "Show All Games" above to browse our entire collection and make offers.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAllGames && (
+        <div className="mb-8 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6">
+          <div className="flex items-start">
+            <MessageSquare className="w-6 h-6 text-orange-600 dark:text-orange-400 mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-100 mb-2">
+                Make an Offer on Any Game
+              </h3>
+              <div className="text-orange-800 dark:text-orange-200 leading-relaxed space-y-2">
+                <p><strong>Everything is for sale at the right price!</strong> Browse our entire collection and make an offer on any game that interests you.</p>
+                <p className="text-sm">
+                  <strong>Please note:</strong> We can't guarantee acceptance of any offer, but we'll consider all serious inquiries. Games marked with prices are our current asking prices, but we're open to negotiation.
                 </p>
               </div>
             </div>
@@ -385,6 +436,12 @@ const GameSalesPage: React.FC = () => {
                     {game.all_images.length} photos
                   </div>
                 )}
+                {/* Show sale status indicator */}
+                {!game.for_sale && showAllGames && (
+                  <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                    Make Offer
+                  </div>
+                )}
               </div>
 
               <div className="p-4">
@@ -450,7 +507,7 @@ const GameSalesPage: React.FC = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    {game.asking_price ? (
+                    {game.for_sale && game.asking_price ? (
                       <>
                         <button
                           onClick={(e) => {
@@ -508,22 +565,37 @@ const GameSalesPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {search || typeFilter !== 'All' || locationFilter !== 'All' || priceFilter !== 'All' 
               ? 'No games found matching your criteria' 
-              : 'No games currently for sale'
+              : showAllGames 
+                ? 'No games in collection'
+                : 'No games currently for sale'
             }
           </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-4">
             {search || typeFilter !== 'All' || locationFilter !== 'All' || priceFilter !== 'All'
               ? 'Try adjusting your search filters or check back later.'
-              : 'We periodically add games to our sales inventory. Check back soon or contact us about specific games you\'re interested in.'
+              : showAllGames
+                ? 'There are no games in the collection matching your criteria.'
+                : 'We periodically add games to our sales inventory. Check back soon or contact us about specific games you\'re interested in.'
             }
           </p>
-          <a 
-            href="/about#contact" 
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-          >
-            <MessageSquare size={16} className="mr-2" />
-            Contact Us About Games
-          </a>
+          {!showAllGames && (
+            <div className="space-y-3">
+              <button
+                onClick={() => setShowAllGames(true)}
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors mr-4"
+              >
+                <Eye size={16} className="mr-2" />
+                Browse All Games
+              </button>
+              <a 
+                href="/about#contact" 
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+              >
+                <MessageSquare size={16} className="mr-2" />
+                Contact Us About Games
+              </a>
+            </div>
+          )}
         </div>
       )}
 
