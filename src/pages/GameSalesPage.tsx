@@ -133,11 +133,40 @@ const GameSalesPage: React.FC = () => {
     setSubmitting(true);
 
     try {
+      // First, save the inquiry to the database
       const { error } = await supabase
         .from('buyer_inquiries')
         .insert([inquiryForm]);
 
       if (error) throw error;
+
+      // Then send email notification to managers
+      try {
+        const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/buyer-inquiry-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            game_id: inquiryForm.game_id,
+            game_name: selectedGame?.name || 'Unknown Game',
+            buyer_name: inquiryForm.buyer_name,
+            buyer_email: inquiryForm.buyer_email,
+            buyer_phone: inquiryForm.buyer_phone,
+            offer_amount: inquiryForm.offer_amount,
+            message: inquiryForm.message,
+            inquiry_type: inquiryType,
+          }),
+        });
+
+        if (!emailResponse.ok) {
+          console.warn('Failed to send email notification, but inquiry was saved');
+        }
+      } catch (emailError) {
+        console.warn('Email notification failed:', emailError);
+        // Don't throw here - the inquiry was saved successfully
+      }
 
       const actionText = inquiryType === 'purchase' ? 'purchase request' : 'offer';
       alert(`Your ${actionText} has been submitted successfully! We will contact you soon.`);
