@@ -14,7 +14,11 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Edit3,
+  Save,
+  X,
+  FileText
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -32,6 +36,7 @@ interface BuyerInquiry {
   offer_amount?: number;
   message: string;
   status: 'pending' | 'responded' | 'accepted' | 'declined';
+  manager_notes?: string;
   created_at: string;
   updated_at: string;
   game?: {
@@ -47,6 +52,9 @@ const AdminBuyerInquiriesPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [editingNotes, setEditingNotes] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
 
   useEffect(() => {
     fetchInquiries();
@@ -90,12 +98,44 @@ const AdminBuyerInquiriesPage: React.FC = () => {
     }
   };
 
+  const startEditingNotes = (inquiryId: string, currentNotes: string = '') => {
+    setEditingNotes(inquiryId);
+    setNoteText(currentNotes);
+  };
+
+  const cancelEditingNotes = () => {
+    setEditingNotes(null);
+    setNoteText('');
+  };
+
+  const saveNotes = async (inquiryId: string) => {
+    setSavingNote(true);
+    try {
+      const { error } = await supabase
+        .from('buyer_inquiries')
+        .update({ manager_notes: noteText.trim() || null })
+        .eq('id', inquiryId);
+
+      if (error) throw error;
+      
+      setEditingNotes(null);
+      setNoteText('');
+      await fetchInquiries();
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      alert('Failed to save notes');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
   const filteredInquiries = inquiries.filter(inquiry => {
     const matchesSearch = 
       inquiry.buyer_name.toLowerCase().includes(search.toLowerCase()) ||
       inquiry.buyer_email.toLowerCase().includes(search.toLowerCase()) ||
       inquiry.game?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      inquiry.message.toLowerCase().includes(search.toLowerCase());
+      inquiry.message.toLowerCase().includes(search.toLowerCase()) ||
+      (inquiry.manager_notes && inquiry.manager_notes.toLowerCase().includes(search.toLowerCase()));
     
     const matchesStatus = statusFilter === 'all' || inquiry.status === statusFilter;
     
@@ -201,7 +241,7 @@ const AdminBuyerInquiriesPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
-              placeholder="Search by buyer name, email, game name, or message..."
+              placeholder="Search by buyer name, email, game name, message, or notes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
@@ -319,11 +359,72 @@ const AdminBuyerInquiriesPage: React.FC = () => {
                   </div>
 
                   {/* Message */}
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-md p-3">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-md p-3 mb-4">
                     <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Message:</h4>
                     <p className="text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap">
                       {inquiry.message}
                     </p>
+                  </div>
+
+                  {/* Manager Notes Section */}
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-md p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-indigo-900 dark:text-indigo-100 flex items-center">
+                        <FileText size={16} className="mr-2" />
+                        Private Notes (Manager Only)
+                      </h4>
+                      {editingNotes !== inquiry.id && (
+                        <button
+                          onClick={() => startEditingNotes(inquiry.id, inquiry.manager_notes)}
+                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 p-1"
+                          title={inquiry.manager_notes ? "Edit notes" : "Add notes"}
+                        >
+                          <Edit3 size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    {editingNotes === inquiry.id ? (
+                      <div className="space-y-2">
+                        <textarea
+                          value={noteText}
+                          onChange={(e) => setNoteText(e.target.value)}
+                          placeholder="Add private notes for internal tracking..."
+                          rows={3}
+                          className="w-full p-2 border border-indigo-200 dark:border-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white text-sm"
+                        />
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => saveNotes(inquiry.id)}
+                            disabled={savingNote}
+                            className={`flex items-center px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm ${
+                              savingNote ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                          >
+                            <Save size={14} className="mr-1" />
+                            {savingNote ? 'Saving...' : 'Save'}
+                          </button>
+                          <button
+                            onClick={cancelEditingNotes}
+                            disabled={savingNote}
+                            className="flex items-center px-3 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors text-sm"
+                          >
+                            <X size={14} className="mr-1" />
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-indigo-800 dark:text-indigo-200 text-sm">
+                        {inquiry.manager_notes ? (
+                          <p className="whitespace-pre-wrap">{inquiry.manager_notes}</p>
+                        ) : (
+                          <p className="text-indigo-600 dark:text-indigo-400 italic">
+                            No notes added yet. Click the edit icon to add private tracking notes.
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
