@@ -24,6 +24,7 @@ import AdminShopPage from './pages/AdminShopPage';
 import AdminHoursPage from './pages/AdminHoursPage';
 import AdminPasswordResetPage from './pages/AdminPasswordResetPage';
 import AdminChatbotPage from './pages/AdminChatbotPage';
+import AdminBuyerInquiriesPage from './pages/AdminBuyerInquiriesPage';
 import GameSalesPage from './pages/GameSalesPage';
 import QRCodePrintPage from './pages/QRCodePrintPage';
 import AboutPage from './pages/AboutPage';
@@ -80,6 +81,11 @@ function App() {
                     <Route path="/admin/chatbot" element={
                       <ProtectedRoute>
                         <AdminChatbotPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/admin/buyer-inquiries" element={
+                      <ProtectedRoute>
+                        <AdminBuyerInquiriesPage />
                       </ProtectedRoute>
                     } />
                     <Route path="/admin/password-reset" element={
