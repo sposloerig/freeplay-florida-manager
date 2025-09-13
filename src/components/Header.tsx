@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Menu, X, Info, Calendar, HelpCircle, Phone, TowerControl as GameController, Gift } from 'lucide-react';
+import { Moon, Sun, Menu, X, TowerControl as GameController, Plus, DollarSign, Phone, Gamepad2 } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -40,24 +40,17 @@ const Header: React.FC = () => {
         <div className="flex justify-between h-16 md:h-20">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2 md:space-x-4 hover:opacity-90 transition-opacity">
-              <img 
-                src="https://d9hhrg4mnvzow.cloudfront.net/www.replaymuseum.com/16zjl0p-replay2_100000009905r000000028.png"
-                alt="Replay Museum"
-                className="h-10 md:h-16 w-auto"
-              />
+              <div className="flex items-center">
+                <Gamepad2 className="w-8 h-8 md:w-10 md:h-10 text-white mr-3" />
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold text-white">Free Play Florida</h1>
+                  <p className="text-xs md:text-sm text-indigo-200 hidden md:block">Arcade & Pinball Community</p>
+                </div>
+              </div>
             </Link>
           </div>
           
           <nav className="hidden md:flex items-center space-x-6">
-            <div className="flex items-center space-x-2 border-r border-white/20 pr-6">
-              <Phone size={16} className="text-indigo-200" />
-              <a 
-                href="tel:+17279403928" 
-                className="text-indigo-100 hover:text-white transition-colors"
-              >
-                (727) 940-3928
-              </a>
-            </div>
 
             <Link 
               to="/collection" 
@@ -68,36 +61,20 @@ const Header: React.FC = () => {
               Games
             </Link>
             <Link 
-              to="/events" 
+              to="/submit-game" 
               className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
-                location.pathname === '/events' ? 'border-b-2 border-white font-medium' : ''
+                location.pathname === '/submit-game' ? 'border-b-2 border-white font-medium' : ''
               }`}>
-              <Calendar size={16} className="mr-1" />
-              Events
+              <Plus size={16} className="mr-1" />
+              Submit Game
             </Link>
             <Link 
-              to="/about" 
+              to="/marketplace" 
               className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
-                location.pathname === '/about' ? 'border-b-2 border-white font-medium' : ''
+                location.pathname === '/marketplace' ? 'border-b-2 border-white font-medium' : ''
               }`}>
-              <Info size={16} className="mr-1" />
-              About
-            </Link>
-            <Link 
-              to="/faq" 
-              className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
-                location.pathname === '/faq' ? 'border-b-2 border-white font-medium' : ''
-              }`}>
-              <HelpCircle size={16} className="mr-1" />
-              FAQ
-            </Link>
-            <Link 
-              to="/sell-donate" 
-              className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
-                location.pathname === '/sell-donate' ? 'border-b-2 border-white font-medium' : ''
-              }`}>
-              <Gift size={16} className="mr-1" />
-              Sell/Donate
+              <DollarSign size={16} className="mr-1" />
+              Marketplace
             </Link>
             <button 
               onClick={toggleDarkMode} 
@@ -147,44 +124,24 @@ const Header: React.FC = () => {
               Games
             </Link>
             <Link 
-              to="/events" 
+              to="/submit-game" 
               className={`block px-3 py-2 rounded-md flex items-center ${
-                location.pathname === '/events' 
+                location.pathname === '/submit-game' 
                   ? 'bg-indigo-900 text-white font-medium' 
                   : 'text-indigo-100 hover:bg-indigo-700'
               }`}>
-              <Calendar size={16} className="mr-1" />
-              Events
+              <Plus size={16} className="mr-1" />
+              Submit Game
             </Link>
             <Link 
-              to="/about" 
+              to="/marketplace" 
               className={`block px-3 py-2 rounded-md flex items-center ${
-                location.pathname === '/about' 
+                location.pathname === '/marketplace' 
                   ? 'bg-indigo-900 text-white font-medium' 
                   : 'text-indigo-100 hover:bg-indigo-700'
               }`}>
-              <Info size={16} className="mr-1" />
-              About
-            </Link>
-            <Link 
-              to="/faq" 
-              className={`block px-3 py-2 rounded-md flex items-center ${
-                location.pathname === '/faq' 
-                  ? 'bg-indigo-900 text-white font-medium' 
-                  : 'text-indigo-100 hover:bg-indigo-700'
-              }`}>
-              <HelpCircle size={16} className="mr-1" />
-              FAQ
-            </Link>
-            <Link 
-              to="/sell-donate" 
-              className={`block px-3 py-2 rounded-md flex items-center ${
-                location.pathname === '/sell-donate' 
-                  ? 'bg-indigo-900 text-white font-medium' 
-                  : 'text-indigo-100 hover:bg-indigo-700'
-              }`}>
-              <Gift size={16} className="mr-1" />
-              Sell/Donate
+              <DollarSign size={16} className="mr-1" />
+              Marketplace
             </Link>
           </nav>
         </div>

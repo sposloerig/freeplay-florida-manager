@@ -43,7 +43,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
     name: '',
     type: 'Arcade' as GameType,
     otherType: '',
-    location: 'Replay' as GameLocation,
+    location: 'Main Hall' as GameLocation,
     otherLocation: '',
     status: 'Operational' as GameStatus,
     conditionNotes: '',

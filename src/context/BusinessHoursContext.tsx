@@ -1,331 +1,38 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from './AuthContext';
-import { MANAGER_EMAILS } from '../types';
+import React, { createContext, useContext, ReactNode } from 'react';
 
-interface BusinessHours {
+interface BusinessHour {
+  id: string;
   dayOfWeek: number;
-  openTime: string;
-  closeTime: string;
-  isClosed: boolean;
-}
-
-interface SpecialHours {
-  date: string;
   openTime: string | null;
   closeTime: string | null;
   isClosed: boolean;
-  reason: string | null;
 }
 
 interface Announcement {
   id: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  startDate: Date;
-  endDate: Date;
+  title: string;
+  content: string;
   isActive: boolean;
 }
 
 interface BusinessHoursContextType {
-  isOpen: boolean;
-  regularHours: BusinessHours[];
-  specialHours: SpecialHours[];
+  businessHours: BusinessHour[];
   announcements: Announcement[];
-  currentAnnouncement: Announcement | null;
   loading: boolean;
-  error: string | null;
-  updateBusinessHours: (hours: BusinessHours[]) => Promise<void>;
-  addSpecialHours: (hours: Omit<SpecialHours, 'id'>) => Promise<void>;
-  removeSpecialHours: (date: string) => Promise<void>;
-  addAnnouncement: (announcement: Omit<Announcement, 'id'>) => Promise<void>;
-  removeAnnouncement: (id: string) => Promise<void>;
 }
 
 const BusinessHoursContext = createContext<BusinessHoursContextType | undefined>(undefined);
 
-export const BusinessHoursProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [regularHours, setRegularHours] = useState<BusinessHours[]>([]);
-  const [specialHours, setSpecialHours] = useState<SpecialHours[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [currentAnnouncement, setCurrentAnnouncement] = useState<Announcement | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { user, isManager } = useAuth();
-
-  useEffect(() => {
-    fetchBusinessHours();
-    const interval = setInterval(checkOpenStatus, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchBusinessHours = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Fetch regular hours
-      const { data: regularData, error: regularError } = await supabase
-        .from('business_hours')
-        .select('*')
-        .order('day_of_week');
-
-      if (regularError) throw regularError;
-
-      // Transform the data to match our interface
-      const transformedHours: BusinessHours[] = (regularData || []).map(hour => ({
-        dayOfWeek: hour.day_of_week,
-        openTime: hour.open_time,
-        closeTime: hour.close_time,
-        isClosed: hour.is_closed
-      }));
-
-      // Sort by day of week to ensure correct order
-      transformedHours.sort((a, b) => a.dayOfWeek - b.dayOfWeek);
-
-      // Fetch special hours
-      const { data: specialData, error: specialError } = await supabase
-        .from('special_hours')
-        .select('*')
-        .gte('date', new Date().toISOString().split('T')[0])
-        .order('date');
-
-      if (specialError) throw specialError;
-
-      // Fetch announcements
-      const { data: announcementData, error: announcementError } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('is_active', true)
-        .lte('start_date', new Date().toISOString())
-        .gte('end_date', new Date().toISOString())
-        .order('start_date');
-
-      if (announcementError) throw announcementError;
-
-      // Transform announcement data to convert date strings to Date objects
-      const transformedAnnouncements: Announcement[] = (announcementData || []).map(announcement => ({
-        id: announcement.id,
-        message: announcement.message,
-        type: announcement.type,
-        startDate: new Date(announcement.start_date),
-        endDate: new Date(announcement.end_date),
-        isActive: announcement.is_active
-      }));
-
-      setRegularHours(transformedHours);
-      setSpecialHours(specialData || []);
-      setAnnouncements(transformedAnnouncements);
-      setCurrentAnnouncement(transformedAnnouncements?.[0] || null);
-      
-      checkOpenStatus();
-    } catch (err) {
-      console.error('Error fetching business hours:', err);
-      setError('Failed to load business hours');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkOpenStatus = () => {
-    const now = new Date();
-    const today = now.toISOString().split('T')[0];
-    
-    // Check for special hours first
-    const specialHoursToday = specialHours.find(h => h.date === today);
-    
-    if (specialHoursToday) {
-      if (specialHoursToday.isClosed) {
-        setIsOpen(false);
-        return;
-      }
-      
-      if (specialHoursToday.openTime && specialHoursToday.closeTime) {
-        const [openHour, openMinute] = specialHoursToday.openTime.split(':');
-        const [closeHour, closeMinute] = specialHoursToday.closeTime.split(':');
-        
-        const openTime = new Date(now);
-        openTime.setHours(parseInt(openHour), parseInt(openMinute), 0);
-        
-        const closeTime = new Date(now);
-        closeTime.setHours(parseInt(closeHour), parseInt(closeMinute), 0);
-        
-        setIsOpen(now >= openTime && now < closeTime);
-        return;
-      }
-    }
-    
-    // Check regular hours
-    const dayOfWeek = now.getDay();
-    const regularHoursToday = regularHours.find(h => h.dayOfWeek === dayOfWeek);
-    
-    if (regularHoursToday) {
-      if (regularHoursToday.isClosed) {
-        setIsOpen(false);
-        return;
-      }
-      
-      const [openHour, openMinute] = regularHoursToday.openTime.split(':');
-      const [closeHour, closeMinute] = regularHoursToday.closeTime.split(':');
-      
-      const openTime = new Date(now);
-      openTime.setHours(parseInt(openHour), parseInt(openMinute), 0);
-      
-      const closeTime = new Date(now);
-      closeTime.setHours(parseInt(closeHour), parseInt(closeMinute), 0);
-      
-      setIsOpen(now >= openTime && now < closeTime);
-    } else {
-      setIsOpen(false);
-    }
-  };
-
-  const updateBusinessHours = async (hours: BusinessHours[]) => {
-    if (!user || !isManager) {
-      throw new Error('Unauthorized');
-    }
-    
-    try {
-      // Get the user's email from the session
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-
-      if (!currentUser?.email) {
-        throw new Error('User email not found');
-      }
-
-      // Check if the user's email is in the allowed list using MANAGER_EMAILS
-      if (!MANAGER_EMAILS.includes(currentUser.email)) {
-        throw new Error('User not authorized to update business hours');
-      }
-
-      const { error } = await supabase
-        .from('business_hours')
-        .upsert(
-          hours.map(h => ({
-            day_of_week: h.dayOfWeek,
-            open_time: h.openTime,
-            close_time: h.closeTime,
-            is_closed: h.isClosed
-          })),
-          {
-            onConflict: 'day_of_week',
-            ignoreDuplicates: false
-          }
-        );
-
-      if (error) throw error;
-      await fetchBusinessHours();
-    } catch (error) {
-      console.error('Error updating business hours:', error);
-      throw error;
-    }
-  };
-
-  const addSpecialHours = async (hours: Omit<SpecialHours, 'id'>) => {
-    if (!user || !isManager) {
-      throw new Error('Unauthorized');
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('special_hours')
-        .upsert({
-          date: hours.date,
-          open_time: hours.openTime,
-          close_time: hours.closeTime,
-          is_closed: hours.isClosed,
-          reason: hours.reason
-        });
-
-      if (error) throw error;
-      await fetchBusinessHours();
-    } catch (error) {
-      console.error('Error adding special hours:', error);
-      throw error;
-    }
-  };
-
-  const removeSpecialHours = async (date: string) => {
-    if (!user || !isManager) {
-      throw new Error('Unauthorized');
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('special_hours')
-        .delete()
-        .eq('date', date);
-
-      if (error) throw error;
-      await fetchBusinessHours();
-    } catch (error) {
-      console.error('Error removing special hours:', error);
-      throw error;
-    }
-  };
-
-  const addAnnouncement = async (announcement: Omit<Announcement, 'id'>) => {
-    if (!user || !isManager) {
-      throw new Error('Unauthorized');
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('announcements')
-        .insert({
-          message: announcement.message,
-          type: announcement.type,
-          start_date: announcement.startDate.toISOString(),
-          end_date: announcement.endDate.toISOString(),
-          is_active: announcement.isActive
-        });
-
-      if (error) throw error;
-      await fetchBusinessHours();
-    } catch (error) {
-      console.error('Error adding announcement:', error);
-      throw error;
-    }
-  };
-
-  const removeAnnouncement = async (id: string) => {
-    if (!user || !isManager) {
-      throw new Error('Unauthorized');
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('announcements')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      await fetchBusinessHours();
-    } catch (error) {
-      console.error('Error removing announcement:', error);
-      throw error;
-    }
+export const BusinessHoursProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Placeholder implementation - returns empty data
+  const value: BusinessHoursContextType = {
+    businessHours: [],
+    announcements: [],
+    loading: false,
   };
 
   return (
-    <BusinessHoursContext.Provider
-      value={{
-        isOpen,
-        regularHours,
-        specialHours,
-        announcements,
-        currentAnnouncement,
-        loading,
-        error,
-        updateBusinessHours,
-        addSpecialHours,
-        removeSpecialHours,
-        addAnnouncement,
-        removeAnnouncement
-      }}
-    >
+    <BusinessHoursContext.Provider value={value}>
       {children}
     </BusinessHoursContext.Provider>
   );

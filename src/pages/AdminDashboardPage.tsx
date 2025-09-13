@@ -24,14 +24,6 @@ const AdminDashboardPage: React.FC = () => {
       ]
     },
     {
-      title: 'Event Management',
-      icon: Calendar,
-      description: 'Create and manage tournaments, special events, and promotions. Set up registration, pricing, and event details.',
-      links: [
-        { to: '/admin/events', text: 'Manage Events', icon: Trophy }
-      ]
-    },
-    {
       title: 'Content Management',
       icon: HelpCircle,
       description: 'Update frequently asked questions, manage business hours, and handle announcements.',
