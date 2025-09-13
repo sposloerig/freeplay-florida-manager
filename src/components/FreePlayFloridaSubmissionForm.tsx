@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { GameType } from '../types';
-import { Upload, AlertTriangle, CheckCircle, Phone, Mail, User, Gamepad2, DollarSign, Settings, Building, Star, Plus, Trash2 } from 'lucide-react';
+import { Upload, AlertTriangle, CheckCircle, Phone, Mail, User, Gamepad2, DollarSign, Settings, Building, Star, Plus, Trash2, Camera, X } from 'lucide-react';
 
 interface GameSubmission {
   name: string;
@@ -12,6 +12,8 @@ interface GameSubmission {
   askingPrice?: string;
   acceptOffers?: boolean;
   saleNotes?: string;
+  images: File[];
+  imageUrls: string[];
 }
 
 const GAME_MAKERS = [
@@ -47,7 +49,9 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
       forSale: false,
       askingPrice: '',
       acceptOffers: false,
-      saleNotes: ''
+      saleNotes: '',
+      images: [],
+      imageUrls: []
     }] as GameSubmission[]
   });
 
@@ -87,7 +91,9 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           forSale: false,
           askingPrice: '',
           acceptOffers: false,
-          saleNotes: ''
+          saleNotes: '',
+          images: [],
+          imageUrls: []
         }]
       }));
     }
@@ -100,6 +106,92 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
         games: prev.games.filter((_, index) => index !== gameIndex)
       }));
     }
+  };
+
+  const handleImageUpload = (gameIndex: number, files: FileList | null) => {
+    if (!files) return;
+    
+    const newFiles = Array.from(files);
+    const currentGame = formData.games[gameIndex];
+    
+    // Limit to 3 images per game
+    const totalImages = currentGame.images.length + newFiles.length;
+    if (totalImages > 3) {
+      setErrors(prev => ({ ...prev, [`game${gameIndex}Images`]: 'Maximum 3 images per game' }));
+      return;
+    }
+    
+    // Validate file types and sizes
+    const validFiles = newFiles.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB limit
+      return isValidType && isValidSize;
+    });
+    
+    if (validFiles.length !== newFiles.length) {
+      setErrors(prev => ({ ...prev, [`game${gameIndex}Images`]: 'Only image files under 5MB are allowed' }));
+      return;
+    }
+    
+    // Create preview URLs
+    const newImageUrls = validFiles.map(file => URL.createObjectURL(file));
+    
+    setFormData(prev => ({
+      ...prev,
+      games: prev.games.map((game, index) => 
+        index === gameIndex ? {
+          ...game,
+          images: [...game.images, ...validFiles],
+          imageUrls: [...game.imageUrls, ...newImageUrls]
+        } : game
+      )
+    }));
+    
+    // Clear any previous errors
+    if (errors[`game${gameIndex}Images`]) {
+      setErrors(prev => ({ ...prev, [`game${gameIndex}Images`]: '' }));
+    }
+  };
+
+  const removeImage = (gameIndex: number, imageIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      games: prev.games.map((game, index) => 
+        index === gameIndex ? {
+          ...game,
+          images: game.images.filter((_, idx) => idx !== imageIndex),
+          imageUrls: game.imageUrls.filter((_, idx) => idx !== imageIndex)
+        } : game
+      )
+    }));
+  };
+
+  const uploadGameImages = async (gameId: string, images: File[]): Promise<string[]> => {
+    const uploadedUrls: string[] = [];
+    
+    for (let i = 0; i < images.length; i++) {
+      const file = images[i];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${gameId}_${i + 1}.${fileExt}`;
+      const filePath = `game-images/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('game-images')
+        .upload(filePath, file);
+      
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        continue;
+      }
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('game-images')
+        .getPublicUrl(filePath);
+      
+      uploadedUrls.push(publicUrl);
+    }
+    
+    return uploadedUrls;
   };
 
   const validateForm = () => {
@@ -148,6 +240,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
       const validGames = formData.games.filter(game => game.name.trim());
       
       for (const game of validGames) {
+        // First, insert the game to get an ID
         const gameData = {
           name: game.name.trim(),
           type: game.type,
@@ -178,12 +271,30 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           images: [],
         };
 
-        const { error } = await supabase
+        const { data: insertedGame, error: insertError } = await supabase
           .from('games')
-          .insert([gameData]);
+          .insert([gameData])
+          .select('id')
+          .single();
 
-        if (error) {
-          throw error;
+        if (insertError) {
+          throw insertError;
+        }
+
+        // Upload images if any
+        if (game.images.length > 0) {
+          const imageUrls = await uploadGameImages(insertedGame.id, game.images);
+          
+          // Update the game with image URLs
+          const { error: updateError } = await supabase
+            .from('games')
+            .update({ images: imageUrls })
+            .eq('id', insertedGame.id);
+
+          if (updateError) {
+            console.error('Error updating game with images:', updateError);
+            // Don't throw here - game is still submitted, just without images
+          }
         }
       }
 
@@ -572,6 +683,71 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Image Upload Section */}
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-400">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      Game Photos ({game.images.length}/3)
+                    </h4>
+                    <Camera className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  
+                  {/* Image Upload */}
+                  <div className="mb-4">
+                    <label className="block">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(index, e.target.files)}
+                        className="hidden"
+                        disabled={game.images.length >= 3}
+                      />
+                      <div className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+                        game.images.length >= 3 
+                          ? 'border-gray-300 bg-gray-100 cursor-not-allowed' 
+                          : 'border-blue-300 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10'
+                      }`}>
+                        <Upload className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                        <p className="text-sm text-blue-600 dark:text-blue-400">
+                          {game.images.length >= 3 
+                            ? 'Maximum 3 images reached' 
+                            : 'Click to upload images (max 3, 5MB each)'
+                          }
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          JPG, PNG, GIF up to 5MB
+                        </p>
+                      </div>
+                    </label>
+                    {errors[`game${index}Images`] && (
+                      <p className="mt-2 text-sm text-red-600">{errors[`game${index}Images`]}</p>
+                    )}
+                  </div>
+
+                  {/* Image Previews */}
+                  {game.imageUrls.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {game.imageUrls.map((url, imgIndex) => (
+                        <div key={imgIndex} className="relative group">
+                          <img
+                            src={url}
+                            alt={`${game.name} preview ${imgIndex + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index, imgIndex)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
