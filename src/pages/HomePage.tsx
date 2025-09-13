@@ -2,33 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Eye, ShoppingCart, Users, Gamepad2, Wrench } from 'lucide-react';
 
-const heroImages = [
-  {
-    url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
-    alt: 'Arcade machines'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-    alt: 'Pinball machine'
-  }
-];
 
 const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-screen overflow-hidden">
-        {heroImages.map((image, index) => (
-          <div
-            key={index}
-            className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-            style={{ 
-              backgroundImage: `url(${image.url})`,
-              opacity: index === 0 ? 1 : 0
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
+      <div className="relative h-screen overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
