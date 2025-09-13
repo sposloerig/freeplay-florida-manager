@@ -14,6 +14,8 @@ interface GameSubmission {
   saleNotes?: string;
   images: File[];
   imageUrls: string[];
+  serviceNotes: string;
+  allowOthersToService: boolean;
 }
 
 const GAME_MAKERS = [
@@ -37,10 +39,6 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
     phone: '',
     notes: '',
     
-    // Service Preferences (your addition)
-    allowOthersToService: false,
-    serviceNotes: '',
-    
     // Games (start with 1, can add more)
     games: [{
       name: '',
@@ -51,7 +49,9 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
       acceptOffers: false,
       saleNotes: '',
       images: [],
-      imageUrls: []
+      imageUrls: [],
+      serviceNotes: '',
+      allowOthersToService: false
     }] as GameSubmission[]
   });
 
@@ -93,7 +93,9 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           acceptOffers: false,
           saleNotes: '',
           images: [],
-          imageUrls: []
+          imageUrls: [],
+          serviceNotes: '',
+          allowOthersToService: false
         }]
       }));
     }
@@ -256,8 +258,8 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
             ].filter(Boolean).join(' | '),
           
           // Service preferences
-          allow_others_to_service: formData.allowOthersToService,
-          service_notes: formData.serviceNotes.trim() || null,
+          allow_others_to_service: game.allowOthersToService,
+          service_notes: game.serviceNotes.trim() || null,
           
           // Sales information
           for_sale: game.forSale,
@@ -471,47 +473,6 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Service Preferences Section */}
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-          <div className="flex items-center mb-4">
-            <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Service Preferences</h2>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                name="allowOthersToService"
-                checked={formData.allowOthersToService}
-                onChange={handleInputChange}
-                className="mt-1 mr-3 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Allow others to service my games if issues arise
-                </label>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  If unchecked, we'll contact you first for any repairs needed during the event.
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Service Notes
-              </label>
-              <textarea
-                name="serviceNotes"
-                value={formData.serviceNotes}
-                onChange={handleInputChange}
-                rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                placeholder="Any specific service instructions, known quirks, or contact preferences?"
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Games Section */}
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
@@ -627,6 +588,48 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                         />
                         No
                       </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Service Preferences for this game */}
+                <div className="mt-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-400">
+                  <div className="flex items-center mb-3">
+                    <Settings className="w-4 h-4 text-orange-600 dark:text-orange-400 mr-2" />
+                    <h4 className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                      Service Preferences for {game.name || 'this game'}
+                    </h4>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-start">
+                      <input
+                        type="checkbox"
+                        checked={game.allowOthersToService}
+                        onChange={(e) => handleGameChange(index, 'allowOthersToService', e.target.checked)}
+                        className="mt-1 mr-3 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Allow others to service this game if issues arise
+                        </label>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          If unchecked, we'll contact you first for any repairs needed during the event.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Service Notes for this game
+                      </label>
+                      <textarea
+                        value={game.serviceNotes}
+                        onChange={(e) => handleGameChange(index, 'serviceNotes', e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                        placeholder="Any specific service instructions, known quirks, or special requirements for this game?"
+                      />
                     </div>
                   </div>
                 </div>
