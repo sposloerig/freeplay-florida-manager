@@ -16,6 +16,7 @@ import AddRepairPage from './pages/AddRepairPage';
 import PublicRepairPage from './pages/PublicRepairPage';
 import RepairDashboardPage from './pages/RepairDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminGameApprovalPage from './pages/AdminGameApprovalPage';
 import GameSalesPage from './pages/GameSalesPage';
 import QRCodePrintPage from './pages/QRCodePrintPage';
 import LoginPage from './pages/LoginPage';
@@ -51,6 +52,11 @@ function App() {
                     <Route path="/admin" element={
                       <ProtectedRoute>
                         <AdminDashboardPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/admin/game-approval" element={
+                      <ProtectedRoute>
+                        <AdminGameApprovalPage />
                       </ProtectedRoute>
                     } />
                     <Route path="/add" element={

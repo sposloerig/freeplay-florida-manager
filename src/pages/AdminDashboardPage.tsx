@@ -9,6 +9,7 @@ const AdminDashboardPage: React.FC = () => {
       icon: GameController,
       description: 'Add, edit, or remove arcade and pinball machines from the collection. Track game status, location, maintenance history, manage sales pricing, and handle buyer inquiries.',
       links: [
+        { to: '/admin/game-approval', text: 'Approve Submitted Games', icon: Clock },
         { to: '/add', text: 'Add New Game', icon: Plus },
         { to: '/collection', text: 'View & Edit Collection', icon: GameController },
         { to: '/games-for-sale', text: 'View Sales Page', icon: Tag },
