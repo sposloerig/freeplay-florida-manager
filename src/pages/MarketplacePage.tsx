@@ -14,11 +14,35 @@ const MarketplacePage: React.FC = () => {
     game.approvalStatus === 'approved' && game.forSale
   );
 
-  const handleInquiry = async (game: Game) => {
-    // For now, just open email client
-    const subject = encodeURIComponent(`Inquiry about ${game.name}`);
-    const body = encodeURIComponent(`Hi ${game.ownerName},\n\nI'm interested in your ${game.name} that's listed for sale on Free Play Florida. Could you provide more details?\n\nThanks!`);
-    window.location.href = `mailto:${game.ownerEmail}?subject=${subject}&body=${body}`;
+  const handleInquiry = (game: Game) => {
+    // Check if contact information is available
+    if (!game.displayContactPublicly || !game.ownerEmail) {
+      alert(`Contact information for ${game.name} is not publicly available. Please check the game details page or contact Free Play Florida administrators for assistance.`);
+      return;
+    }
+
+    // Create pre-filled email
+    const subject = encodeURIComponent(`Inquiry about ${game.name} - Free Play Florida`);
+    const body = encodeURIComponent(`Hi ${game.ownerName},
+
+I'm interested in your ${game.name} that's listed for sale on Free Play Florida.
+
+${game.askingPrice ? `I see it's listed for $${game.askingPrice.toLocaleString()}.` : ''}
+
+Could you provide more details about the condition and availability?
+
+Thanks!
+
+Found on: https://freeplayflorida.netlify.app/marketplace`);
+
+    // Try to open email client
+    try {
+      window.location.href = `mailto:${game.ownerEmail}?subject=${subject}&body=${body}`;
+    } catch (error) {
+      // Fallback: copy email to clipboard or show it
+      console.error('Error opening email client:', error);
+      alert(`Please contact the owner directly at: ${game.ownerEmail}`);
+    }
   };
 
   const filteredGames = games.filter(game => {
@@ -238,10 +262,19 @@ const MarketplacePage: React.FC = () => {
                   </Link>
                   <button
                     onClick={() => handleInquiry(game)}
-                    className="flex-1 bg-fpf-purple-600 text-white py-2 px-4 rounded-md hover:bg-fpf-purple-700 transition-colors flex items-center justify-center text-sm"
+                    className={`flex-1 py-2 px-4 rounded-md transition-colors flex items-center justify-center text-sm ${
+                      game.displayContactPublicly && game.ownerEmail
+                        ? 'bg-fpf-purple-600 text-white hover:bg-fpf-purple-700'
+                        : 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-500'
+                    }`}
+                    title={
+                      game.displayContactPublicly && game.ownerEmail
+                        ? `Send email to ${game.ownerName}`
+                        : 'Contact information not available'
+                    }
                   >
                     <Mail className="w-4 h-4 mr-2" />
-                    Contact Owner
+                    {game.displayContactPublicly && game.ownerEmail ? 'Contact Owner' : 'Contact Unavailable'}
                   </button>
                 </div>
               </div>
