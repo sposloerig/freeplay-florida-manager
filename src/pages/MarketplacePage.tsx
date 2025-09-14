@@ -327,7 +327,9 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
           game={{
             id: selectedGameForInquiry.id,
             name: selectedGameForInquiry.name,
-            askingPrice: selectedGameForInquiry.askingPrice
+            askingPrice: selectedGameForInquiry.askingPrice,
+            ownerName: selectedGameForInquiry.ownerName,
+            ownerEmail: selectedGameForInquiry.ownerEmail
           }}
         />
       )}

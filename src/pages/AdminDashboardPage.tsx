@@ -26,7 +26,7 @@ const AdminDashboardPage: React.FC = () => {
     {
       title: 'Sales Management',
       icon: DollarSign,
-      description: 'Review buyer inquiries and manage sales-related communications. Access the public Marketplace to view games for sale.',
+      description: 'View buyer inquiry logs and access the public Marketplace. Inquiries are recorded for your reference only.',
       links: [
         { to: '/admin/buyer-inquiries', text: 'View Buyer Inquiries', icon: Mail },
         { to: '/marketplace', text: 'View Public Marketplace', icon: Tag }

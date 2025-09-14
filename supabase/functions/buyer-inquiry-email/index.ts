@@ -15,6 +15,8 @@ interface BuyerInquiryEmailRequest {
   offer_amount?: number;
   message: string;
   inquiry_type: 'purchase' | 'offer';
+  owner_name?: string;
+  owner_email?: string;
 }
 
 const MANAGER_EMAILS = [
@@ -103,12 +105,12 @@ Deno.serve(async (req) => {
           </div>
         </div>
         
-        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
-          <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px;">
-            <strong>Action Required:</strong> This inquiry is for a game where the owner has chosen to keep their contact information private.
+        <div style="background-color: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
+          <p style="margin: 0 0 10px 0; color: #155724; font-size: 14px;">
+            <strong>Next Steps:</strong> You can respond directly to the buyer using their contact information above.
           </p>
-          <p style="margin: 0; color: #856404; font-size: 14px;">
-            Please review this inquiry in your admin dashboard and facilitate the connection between the buyer and the game owner.
+          <p style="margin: 0; color: #155724; font-size: 14px;">
+            This inquiry has been logged with Free Play Florida for record-keeping purposes.
           </p>
         </div>
         
@@ -120,8 +122,29 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    // Send email to all managers
-    const emailPromises = MANAGER_EMAILS.map(async (email) => {
+    // Prepare recipient list: owner + admin for logging
+    const recipients = [];
+    
+    // Add owner email if provided
+    if (inquiryData.owner_email) {
+      recipients.push({
+        email: inquiryData.owner_email,
+        type: 'owner',
+        name: inquiryData.owner_name || 'Game Owner'
+      });
+    }
+    
+    // Add admin emails for logging
+    MANAGER_EMAILS.forEach(email => {
+      recipients.push({
+        email: email,
+        type: 'admin',
+        name: 'Free Play Florida Admin'
+      });
+    });
+
+    // Send emails to all recipients
+    const emailPromises = recipients.map(async (recipient) => {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -130,15 +153,15 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           from: 'Free Play Florida <noreply@freeplayflorida.com>',
-          to: email,
-          subject: subject,
+          to: recipient.email,
+          subject: recipient.type === 'owner' ? subject : `[ADMIN LOG] ${subject}`,
           html: emailHtml,
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Failed to send email to ${email}: ${errorText}`);
+        throw new Error(`Failed to send email to ${recipient.email}: ${errorText}`);
       }
 
       return response.json();

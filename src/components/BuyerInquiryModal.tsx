@@ -14,6 +14,8 @@ interface BuyerInquiryModalProps {
     id: string;
     name: string;
     askingPrice?: number;
+    ownerName?: string;
+    ownerEmail?: string;
   };
 }
 
@@ -79,6 +81,8 @@ const BuyerInquiryModal: React.FC<BuyerInquiryModalProps> = ({
             offer_amount: inquiryData.offer_amount,
             message: inquiryData.message,
             inquiry_type: inquiryType,
+            owner_name: game.ownerName,
+            owner_email: game.ownerEmail,
           }),
         });
 

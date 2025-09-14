@@ -12,7 +12,6 @@ const AdminBuyerInquiriesPage: React.FC = () => {
   const [inquiries, setInquiries] = useState<BuyerInquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchInquiries();
@@ -125,9 +124,7 @@ const AdminBuyerInquiriesPage: React.FC = () => {
     }
   };
 
-  const filteredInquiries = inquiries.filter(inquiry => 
-    statusFilter === 'all' || inquiry.status === statusFilter
-  );
+  const filteredInquiries = inquiries; // Show all inquiries
 
   if (loading) {
     return (
@@ -166,33 +163,21 @@ const AdminBuyerInquiriesPage: React.FC = () => {
           <Mail size={32} className="text-fpf-600 dark:text-fpf-400" />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          Buyer Inquiries
+          Buyer Inquiry Log
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">
-          Manage buyer inquiries and purchase requests from the marketplace
+          View buyer inquiries and purchase requests submitted through the marketplace
         </p>
       </div>
 
-      {/* Status Filter */}
-      <div className="mb-6 flex flex-wrap gap-2 justify-center">
-        {['all', 'pending', 'responded', 'accepted', 'declined'].map(status => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              statusFilter === status
-                ? 'bg-fpf-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-            }`}
-          >
-            {status === 'all' ? 'All Inquiries' : status.charAt(0).toUpperCase() + status.slice(1)}
-            {status !== 'all' && (
-              <span className="ml-2">
-                ({inquiries.filter(i => i.status === status).length})
-              </span>
-            )}
-          </button>
-        ))}
+      {/* Simple Info */}
+      <div className="mb-6 text-center">
+        <div className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-md">
+          <Mail className="w-4 h-4 mr-2 text-fpf-600" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Total Inquiries: {inquiries.length}
+          </span>
+        </div>
       </div>
 
       {/* Inquiries List */}
@@ -200,13 +185,10 @@ const AdminBuyerInquiriesPage: React.FC = () => {
         <div className="text-center py-12">
           <Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No {statusFilter !== 'all' ? statusFilter : ''} inquiries found
+            No inquiries found
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {statusFilter === 'all' 
-              ? 'Buyer inquiries will appear here when customers submit inquiries through the marketplace for games with private contact info.'
-              : `No ${statusFilter} inquiries at this time.`
-            }
+            Buyer inquiries will appear here when customers submit inquiries through the marketplace. These are logged for your records only.
           </p>
         </div>
       ) : (
@@ -227,29 +209,8 @@ const AdminBuyerInquiriesPage: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="flex space-x-2">
-                  {inquiry.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => updateInquiryStatus(inquiry.id, 'responded')}
-                        className="px-3 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        Mark Responded
-                      </button>
-                      <button
-                        onClick={() => updateInquiryStatus(inquiry.id, 'accepted')}
-                        className="px-3 py-1 bg-green-600 text-white text-xs rounded-md hover:bg-green-700 transition-colors"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => updateInquiryStatus(inquiry.id, 'declined')}
-                        className="px-3 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
-                      >
-                        Decline
-                      </button>
-                    </>
-                  )}
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Inquiry #{inquiry.id.slice(0, 8)}
                 </div>
               </div>
 
