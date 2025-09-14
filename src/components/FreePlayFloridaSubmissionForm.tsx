@@ -282,17 +282,22 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
 
         // Upload images if any
         if (game.images.length > 0) {
-          const imageUrls = await uploadGameImages(insertedGame.id, game.images);
-          
-          // Update the game with image URLs
-          const { error: updateError } = await supabase
-            .from('games')
-            .update({ images: imageUrls })
-            .eq('id', insertedGame.id);
+          try {
+            const imageUrls = await uploadGameImages(insertedGame.id, game.images);
+            
+            // Update the game with image URLs
+            const { error: updateError } = await supabase
+              .from('games')
+              .update({ images: imageUrls })
+              .eq('id', insertedGame.id);
 
-          if (updateError) {
-            console.error('Error updating game with images:', updateError);
-            // Don't throw here - game is still submitted, just without images
+            if (updateError) {
+              console.error('Error updating game with images:', updateError);
+              // Don't throw here - game is still submitted, just without images
+            }
+          } catch (imageError) {
+            console.error('Error uploading images for game:', game.name, imageError);
+            // Continue without images - don't fail the whole submission
           }
         }
       }
@@ -300,7 +305,15 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
       setSubmitSuccess(true);
     } catch (error) {
       console.error('Error submitting games:', error);
-      setErrors({ submit: 'An error occurred while submitting your games. Please try again.' });
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      
+      // More specific error messages
+      let errorMessage = 'An error occurred while submitting your games. Please try again.';
+      if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = `Submission failed: ${error.message}`;
+      }
+      
+      setErrors({ submit: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
