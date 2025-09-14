@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Game } from '../types';
-import { Calendar, MapPin, Trophy, Wrench, ImageOff } from 'lucide-react';
+import { Calendar, Trophy, Wrench, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface GameCardProps {
@@ -66,24 +66,20 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
       </div>
       <div className="p-4">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">{game.name}</h3>
-        <div className="flex items-center mt-2 text-gray-600 dark:text-gray-400 text-sm">
-          {game.yearMade && (
-            <span className="mr-3 flex items-center">
+        {game.yearMade && (
+          <div className="flex items-center mt-2 text-gray-600 dark:text-gray-400 text-sm">
+            <span className="flex items-center">
               <Calendar size={16} className="mr-1" />
               {game.yearMade}
             </span>
-          )}
-          <span className="flex items-center">
-            <MapPin size={16} className="mr-1" />
-            {game.location === 'Other' ? game.otherLocation : game.location}
-          </span>
-        </div>
+          </div>
+        )}
         
         {/* Zone Assignment Display */}
         {game.zone && (
           <div className="mt-2 flex items-center">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fpf-100 text-fpf-800 dark:bg-fpf-900/20 dark:text-fpf-200">
-              📍 {game.zone}
+              {game.zone}
             </span>
           </div>
         )}
