@@ -21,6 +21,7 @@ const AdminBuyerInquiriesPage: React.FC = () => {
   const fetchInquiries = async () => {
     try {
       setLoading(true);
+      console.log('Fetching buyer inquiries...');
       const { data, error } = await supabase
         .from('buyer_inquiries')
         .select(`
@@ -35,7 +36,13 @@ const AdminBuyerInquiriesPage: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Raw buyer inquiries data:', data);
+      console.log('Number of inquiries found:', data?.length || 0);
 
       const mappedInquiries = data.map(inquiry => ({
         id: inquiry.id,
@@ -57,6 +64,7 @@ const AdminBuyerInquiriesPage: React.FC = () => {
         } : undefined
       }));
 
+      console.log('Mapped inquiries:', mappedInquiries);
       setInquiries(mappedInquiries);
     } catch (err) {
       console.error('Error fetching buyer inquiries:', err);
