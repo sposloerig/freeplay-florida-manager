@@ -51,7 +51,7 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
               border: 2px solid #000; 
               padding: 20px; 
               margin: 20px auto; 
-              max-width: 300px;
+              max-width: ${forSale ? '400px' : '300px'};
               background: white;
             }
             .game-title { 
@@ -148,7 +148,7 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
             const qr = qrcode(0, 'H');
             qr.addData('${repairUrl}');
             qr.make();
-            document.getElementById('qr-code').innerHTML = qr.createImgTag(4, 8);
+            document.getElementById('qr-code').innerHTML = qr.createImgTag(${forSale ? '6' : '4'}, 8);
             setTimeout(() => window.print(), 500);
           </script>
         </body>
@@ -159,28 +159,28 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className="bg-white p-4 rounded-lg border-2 border-gray-200 shadow-sm">
+      <div className={`bg-white rounded-lg shadow-sm ${forSale ? 'p-6 border-4 border-blue-500' : 'p-4 border-2 border-gray-200'}`}>
         <div className="text-center mb-3">
           <h3 className="font-bold text-gray-900">{gameName}</h3>
           {zone && (
             <p className="text-sm text-fpf-600 font-semibold">📍 {zone}</p>
           )}
           {forSale && (
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-3 mb-3">
-              <div className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded mb-2 inline-block">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-3 border-blue-400 rounded-xl p-4 mt-4 mb-4 shadow-md">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-bold px-3 py-2 rounded-lg mb-3 inline-block shadow-sm">
                 🏷️ FOR SALE
               </div>
-              <div className="text-lg font-bold text-blue-600 mb-2">
+              <div className="text-2xl font-bold text-blue-700 mb-3">
                 {askingPrice ? `$${askingPrice.toLocaleString()}` : 'Price on request'}
               </div>
               {displayContactPublicly && (ownerEmail || ownerPhone) ? (
-                <div className="text-xs space-y-1">
-                  {ownerName && <div className="font-semibold">Owner: {ownerName}</div>}
-                  {ownerEmail && <div>📧 {ownerEmail}</div>}
-                  {ownerPhone && <div>📞 {ownerPhone}</div>}
+                <div className="text-sm space-y-1 bg-white rounded-lg p-3 border border-blue-200">
+                  {ownerName && <div className="font-bold text-gray-800">Owner: {ownerName}</div>}
+                  {ownerEmail && <div className="text-blue-600">📧 {ownerEmail}</div>}
+                  {ownerPhone && <div className="text-blue-600">📞 {ownerPhone}</div>}
                 </div>
               ) : (
-                <div className="text-xs text-blue-600 font-semibold">
+                <div className="text-sm text-blue-700 font-bold bg-white rounded-lg p-3 border border-blue-200">
                   Visit marketplace to make offer
                 </div>
               )}
@@ -189,7 +189,7 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
         </div>
         <QRCodeSVG
           value={repairUrl}
-          size={150}
+          size={forSale ? 200 : 150}
           level="H"
           includeMargin={true}
           fgColor="#000000"
