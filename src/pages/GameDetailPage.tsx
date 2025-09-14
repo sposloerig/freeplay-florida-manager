@@ -8,9 +8,7 @@ import GameQRCode from '../components/GameQRCode';
 import { supabase } from '../lib/supabase';
 import { 
   Calendar, 
-  MapPin, 
   Trophy, 
-  Clock, 
   Edit, 
   Trash2, 
   AlertTriangle,
@@ -274,15 +272,6 @@ const GameDetailPage: React.FC = () => {
                 </div>
               )}
               
-              <div className="flex items-center text-gray-600 dark:text-gray-300">
-                <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2 rounded-full mr-3">
-                  <MapPin size={18} className="text-indigo-600 dark:text-indigo-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
-                  <p>{game.location === 'Other' ? game.otherLocation : game.location}</p>
-                </div>
-              </div>
               
               <div className="flex items-center text-gray-600 dark:text-gray-300">
                 <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2 rounded-full mr-3">
@@ -322,15 +311,6 @@ const GameDetailPage: React.FC = () => {
               </div>
             )}
             
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center text-gray-600 dark:text-gray-300 text-sm">
-                <Clock size={16} className="mr-1" />
-                <span>Added: {formatDate(game.dateAdded)}</span>
-                {game.dateAdded.toString() !== game.lastUpdated.toString() && (
-                  <span className="ml-4">Updated: {formatDate(game.lastUpdated)}</span>
-                )}
-              </div>
-            </div>
 
             {showQRCode && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
