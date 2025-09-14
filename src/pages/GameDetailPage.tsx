@@ -441,6 +441,12 @@ const GameDetailPage: React.FC = () => {
                   gameName={game.name} 
                   zone={game.zone}
                   printable={isManager}
+                  forSale={game.forSale}
+                  askingPrice={game.askingPrice}
+                  ownerName={game.ownerName}
+                  ownerEmail={game.ownerEmail}
+                  ownerPhone={game.ownerPhone}
+                  displayContactPublicly={game.displayContactPublicly}
                 />
               </div>
             )}

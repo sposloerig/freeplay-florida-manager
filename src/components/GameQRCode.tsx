@@ -7,9 +7,27 @@ interface GameQRCodeProps {
   gameName: string;
   zone?: string;
   printable?: boolean;
+  // Sales information
+  forSale?: boolean;
+  askingPrice?: number;
+  ownerName?: string;
+  ownerEmail?: string;
+  ownerPhone?: string;
+  displayContactPublicly?: boolean;
 }
 
-const GameQRCode: React.FC<GameQRCodeProps> = ({ gameId, gameName, zone, printable = false }) => {
+const GameQRCode: React.FC<GameQRCodeProps> = ({ 
+  gameId, 
+  gameName, 
+  zone, 
+  printable = false,
+  forSale = false,
+  askingPrice,
+  ownerName,
+  ownerEmail,
+  ownerPhone,
+  displayContactPublicly = false
+}) => {
   const baseUrl = window.location.origin;
   const repairUrl = `${baseUrl}/report-issue?gameId=${gameId}`;
 
@@ -47,14 +65,53 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({ gameId, gameName, zone, printab
               margin-bottom: 15px;
               font-weight: bold;
             }
+            .sales-section {
+              background: #f0f9ff;
+              border: 2px solid #0ea5e9;
+              border-radius: 8px;
+              padding: 15px;
+              margin: 15px 0;
+            }
+            .for-sale-badge {
+              background: #0ea5e9;
+              color: white;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 12px;
+              font-weight: bold;
+              margin-bottom: 8px;
+            }
+            .price {
+              font-size: 20px;
+              font-weight: bold;
+              color: #0ea5e9;
+              margin-bottom: 10px;
+            }
+            .owner-name {
+              font-size: 14px;
+              font-weight: bold;
+              margin-bottom: 5px;
+            }
+            .contact-detail {
+              font-size: 12px;
+              margin: 2px 0;
+            }
+            .marketplace-info {
+              font-size: 11px;
+              color: #0ea5e9;
+              font-weight: bold;
+            }
             .instructions { 
               font-size: 12px; 
               margin-top: 15px; 
               color: #666;
+              border-top: 1px solid #ddd;
+              padding-top: 10px;
             }
             @media print {
               body { margin: 0; }
               .qr-container { border: 2px solid #000; }
+              .sales-section { border: 2px solid #0ea5e9; }
             }
           </style>
         </head>
@@ -62,9 +119,27 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({ gameId, gameName, zone, printab
           <div class="qr-container">
             <div class="game-title">${gameName}</div>
             ${zone ? `<div class="zone-info">📍 ${zone}</div>` : ''}
+            ${forSale ? `
+              <div class="sales-section">
+                <div class="for-sale-badge">🏷️ FOR SALE</div>
+                ${askingPrice ? `<div class="price">$${askingPrice.toLocaleString()}</div>` : '<div class="price">Price on request</div>'}
+                ${displayContactPublicly && (ownerEmail || ownerPhone) ? `
+                  <div class="contact-info">
+                    ${ownerName ? `<div class="owner-name">Owner: ${ownerName}</div>` : ''}
+                    ${ownerEmail ? `<div class="contact-detail">📧 ${ownerEmail}</div>` : ''}
+                    ${ownerPhone ? `<div class="contact-detail">📞 ${ownerPhone}</div>` : ''}
+                  </div>
+                ` : `
+                  <div class="marketplace-info">
+                    Visit freeplayflorida.netlify.app/marketplace<br/>
+                    to make an offer or purchase
+                  </div>
+                `}
+              </div>
+            ` : ''}
             <div id="qr-code"></div>
             <div class="instructions">
-              Scan to report issues<br/>
+              <strong>Primary:</strong> Scan to report issues<br/>
               Free Play Florida
             </div>
           </div>
@@ -90,6 +165,27 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({ gameId, gameName, zone, printab
           {zone && (
             <p className="text-sm text-fpf-600 font-semibold">📍 {zone}</p>
           )}
+          {forSale && (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-3 mb-3">
+              <div className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded mb-2 inline-block">
+                🏷️ FOR SALE
+              </div>
+              <div className="text-lg font-bold text-blue-600 mb-2">
+                {askingPrice ? `$${askingPrice.toLocaleString()}` : 'Price on request'}
+              </div>
+              {displayContactPublicly && (ownerEmail || ownerPhone) ? (
+                <div className="text-xs space-y-1">
+                  {ownerName && <div className="font-semibold">Owner: {ownerName}</div>}
+                  {ownerEmail && <div>📧 {ownerEmail}</div>}
+                  {ownerPhone && <div>📞 {ownerPhone}</div>}
+                </div>
+              ) : (
+                <div className="text-xs text-blue-600 font-semibold">
+                  Visit marketplace to make offer
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <QRCodeSVG
           value={repairUrl}
@@ -99,8 +195,8 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({ gameId, gameName, zone, printab
           fgColor="#000000"
           bgColor="#FFFFFF"
         />
-        <div className="text-xs text-gray-500 text-center mt-2">
-          Scan to report issues
+        <div className="text-xs text-gray-500 text-center mt-2 border-t border-gray-200 pt-2">
+          <strong>Primary:</strong> Scan to report issues
         </div>
       </div>
       
