@@ -8,21 +8,18 @@ const GameList: React.FC = () => {
   const { games } = useGameContext();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<GameType | 'All'>('All');
-  const [locationFilter, setLocationFilter] = useState<GameLocation>('Replay');
   const [statusFilter, setStatusFilter] = useState<GameStatus | 'All'>('All');
   const [sortBy, setSortBy] = useState<'name' | 'yearMade' | 'dateAdded'>('dateAdded');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [showAllLocations, setShowAllLocations] = useState(false);
 
   const filteredGames = games.filter((game) => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'All' || game.type === typeFilter;
-    const matchesLocation = showAllLocations ? true : game.location === locationFilter;
     const matchesStatus = statusFilter === 'All' || game.status === statusFilter;
     const isApproved = game.approvalStatus === 'approved';
     
-    return matchesSearch && matchesType && matchesLocation && matchesStatus && isApproved;
+    return matchesSearch && matchesType && matchesStatus && isApproved;
   });
 
   const sortedGames = [...filteredGames].sort((a, b) => {
@@ -104,16 +101,6 @@ const GameList: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={showAllLocations}
-                onChange={(e) => setShowAllLocations(e.target.checked)}
-                className="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Search All Locations</span>
-            </label>
-
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
