@@ -128,14 +128,14 @@ const AdminCheckInPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Game Check-In</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-white mb-2">Game Check-In</h1>
+        <p className="text-gray-300">
           Search for games by name or submitter email to verify receipt and assign zones.
         </p>
       </div>
 
       {/* Search Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6 mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
@@ -143,28 +143,28 @@ const AdminCheckInPage: React.FC = () => {
             placeholder="Search by game name, owner name, or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fpf-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-fpf-500 focus:border-transparent"
           />
         </div>
 
         {/* Search Results */}
         {searchResults.length > 0 && (
           <div className="mt-4 space-y-3">
-            <h3 className="font-semibold text-gray-900">Search Results ({searchResults.length})</h3>
+            <h3 className="font-semibold text-white">Search Results ({searchResults.length})</h3>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {searchResults.map((game) => (
                 <div
                   key={game.id}
                   onClick={() => handleGameSelect(game)}
-                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="p-4 border border-gray-600 rounded-lg bg-gray-700 hover:bg-gray-600 cursor-pointer transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{game.name}</h4>
-                      <p className="text-sm text-gray-600">
+                      <h4 className="font-semibold text-white">{game.name}</h4>
+                      <p className="text-sm text-gray-300">
                         Owner: {game.ownerName} ({game.ownerEmail})
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-400">
                         Type: {game.type} {game.zone && `• Zone: ${game.zone}`}
                       </p>
                     </div>
@@ -181,13 +181,13 @@ const AdminCheckInPage: React.FC = () => {
 
       {/* Check-In Form */}
       {selectedGame && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-bold text-white mb-2">
               Check In: {selectedGame.name}
             </h2>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="bg-gray-700 rounded-lg p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
                 <div>
                   <span className="font-medium">Owner:</span> {selectedGame.ownerName}
                 </div>
@@ -217,7 +217,7 @@ const AdminCheckInPage: React.FC = () => {
 
           {!selectedGame.checkedIn ? (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900">Verification Checklist</h3>
+              <h3 className="text-lg font-semibold text-white">Verification Checklist</h3>
               
               {/* Key Verification */}
               <div className="flex items-center space-x-3">
@@ -228,7 +228,7 @@ const AdminCheckInPage: React.FC = () => {
                   onChange={(e) => setCheckInForm(prev => ({ ...prev, hasKey: e.target.checked }))}
                   className="w-5 h-5 text-fpf-600 border-gray-300 rounded focus:ring-fpf-500"
                 />
-                <label htmlFor="hasKey" className="flex items-center text-gray-900">
+                <label htmlFor="hasKey" className="flex items-center text-white">
                   <Key size={18} className="mr-2 text-gray-600" />
                   Game has key/lock mechanism (if applicable)
                 </label>
@@ -243,7 +243,7 @@ const AdminCheckInPage: React.FC = () => {
                   onChange={(e) => setCheckInForm(prev => ({ ...prev, workingCondition: e.target.checked }))}
                   className="w-5 h-5 text-fpf-600 border-gray-300 rounded focus:ring-fpf-500"
                 />
-                <label htmlFor="workingCondition" className="flex items-center text-gray-900">
+                <label htmlFor="workingCondition" className="flex items-center text-white">
                   <Wrench size={18} className="mr-2 text-gray-600" />
                   Game is in working order and ready for play
                 </label>
@@ -251,14 +251,14 @@ const AdminCheckInPage: React.FC = () => {
 
               {/* Zone Assignment */}
               <div>
-                <label className="flex items-center text-gray-900 mb-2">
+                <label className="flex items-center text-white mb-2">
                   <MapPin size={18} className="mr-2 text-gray-600" />
                   Assign Zone
                 </label>
                 <select
                   value={checkInForm.zone}
                   onChange={(e) => setCheckInForm(prev => ({ ...prev, zone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fpf-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-fpf-500 focus:border-transparent"
                   required
                 >
                   <option value="">Select Zone...</option>
@@ -270,7 +270,7 @@ const AdminCheckInPage: React.FC = () => {
 
               {/* Check-In Notes */}
               <div>
-                <label htmlFor="checkInNotes" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="checkInNotes" className="block text-sm font-medium text-white mb-2">
                   Check-In Notes (Optional)
                 </label>
                 <textarea
@@ -278,7 +278,7 @@ const AdminCheckInPage: React.FC = () => {
                   value={checkInForm.checkInNotes}
                   onChange={(e) => setCheckInForm(prev => ({ ...prev, checkInNotes: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fpf-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-fpf-500 focus:border-transparent"
                   placeholder="Any additional notes about the game condition, setup, or special requirements..."
                 />
               </div>
@@ -296,7 +296,7 @@ const AdminCheckInPage: React.FC = () => {
                 
                 <button
                   onClick={() => setSelectedGame(null)}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
@@ -325,33 +325,26 @@ const AdminCheckInPage: React.FC = () => {
       )}
 
       {/* Stats Summary */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-fpf-600">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
+          <div className="text-2xl font-bold text-fpf-500">
             {games.filter(g => g.checkedIn).length}
           </div>
-          <div className="text-sm text-gray-600">Checked In</div>
+          <div className="text-sm text-gray-300">Checked In</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-blue-600">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
+          <div className="text-2xl font-bold text-blue-400">
             {games.filter(g => g.approvalStatus === 'approved' && !g.checkedIn).length}
           </div>
-          <div className="text-sm text-gray-600">Awaiting Check-In</div>
+          <div className="text-sm text-gray-300">Awaiting Check-In</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-yellow-600">
-            {games.filter(g => g.approvalStatus === 'pending').length}
-          </div>
-          <div className="text-sm text-gray-600">Pending Approval</div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-gray-600">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
+          <div className="text-2xl font-bold text-gray-400">
             {games.length}
           </div>
-          <div className="text-sm text-gray-600">Total Games</div>
+          <div className="text-sm text-gray-300">Total Games</div>
         </div>
       </div>
     </div>
