@@ -41,8 +41,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
         zone: game.zone,
-        // Handle multiple images - prioritize all_images if it exists, fallback to image_url
-        images: game.images || game.all_images || (game.image_url ? [game.image_url] : []),
+        // Handle multiple images - use images array, fallback to image_url
+        images: game.images || (game.image_url ? [game.image_url] : []),
         conditionNotes: game.condition_notes || '',
         // Sales fields
         askingPrice: game.asking_price ? Number(game.asking_price) : undefined,
@@ -137,8 +137,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           condition_notes: updatedGame.conditionNotes?.trim() || null,
           // Store first image in image_url for backward compatibility
           image_url: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images[0] : null,
-          // Store all images in all_images column
-          all_images: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images : null,
+          // Store all images in images column (text array)
+          images: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images : null,
           // Sales fields
           asking_price: updatedGame.askingPrice,
           for_sale: finalForSale,
