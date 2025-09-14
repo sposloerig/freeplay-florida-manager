@@ -39,7 +39,7 @@ const GameDetailPage: React.FC = () => {
   
   // Find game by slug (URL-friendly name) - Move this before any state that depends on it
   const game = games.find(g => {
-    const gameSlug = `${g.name}-${g.location}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const gameSlug = g.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return gameSlug === slug;
   });
   

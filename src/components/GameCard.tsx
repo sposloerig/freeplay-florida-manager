@@ -27,8 +27,8 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     }
   };
 
-  // Create URL-friendly slug from game name and location
-  const slug = `${game.name}-${game.location}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  // Create URL-friendly slug from game name only (single location event)
+  const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">

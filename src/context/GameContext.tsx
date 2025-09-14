@@ -45,7 +45,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         images: game.images || game.all_images || (game.image_url ? [game.image_url] : []),
         conditionNotes: game.condition_notes || '',
         // Sales fields
-        askingPrice: game.asking_price,
+        askingPrice: game.asking_price ? Number(game.asking_price) : undefined,
         forSale: game.for_sale !== false, // Default to true
         saleConditionNotes: game.sale_condition_notes,
         missingParts: game.missing_parts || [],

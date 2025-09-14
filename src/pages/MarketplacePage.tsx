@@ -1,39 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { useGameContext } from '../context/GameContext';
 import { Game } from '../types';
 import { DollarSign, Mail, Phone, MapPin, Calendar, Gamepad2, AlertTriangle, Search, ExternalLink } from 'lucide-react';
 
 const MarketplacePage: React.FC = () => {
-  const [games, setGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { games: allGames, loading, error } = useGameContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  useEffect(() => {
-    fetchGamesForSale();
-  }, []);
-
-  const fetchGamesForSale = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('games')
-        .select('*')
-        .eq('approval_status', 'approved')
-        .eq('for_sale', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setGames(data || []);
-    } catch (err) {
-      console.error('Error fetching games for sale:', err);
-      setError('Failed to load games for sale');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter games that are approved and for sale
+  const games = allGames.filter(game => 
+    game.approvalStatus === 'approved' && game.forSale
+  );
 
   const handleInquiry = async (game: Game) => {
     // For now, just open email client
@@ -131,8 +110,8 @@ const MarketplacePage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGames.map((game) => {
-            // Create URL-friendly slug from game name and location
-            const slug = `${game.name}-${game.location || 'unknown'}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            // Create URL-friendly slug from game name only (single location event)
+            const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
             return (
               <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
