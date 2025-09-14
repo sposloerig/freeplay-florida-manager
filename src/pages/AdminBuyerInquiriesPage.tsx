@@ -196,7 +196,7 @@ const AdminBuyerInquiriesPage: React.FC = () => {
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
             {statusFilter === 'all' 
-              ? 'Buyer inquiries will appear here when submitted through the marketplace.'
+              ? 'Buyer inquiries will appear here when customers submit inquiries through the marketplace for games with private contact info.'
               : `No ${statusFilter} inquiries at this time.`
             }
           </p>
