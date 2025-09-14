@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Game, GameType, GameLocation, GameStatus } from '../types';
+import { Game, GameType, GameStatus } from '../types';
 import { useGameContext } from '../context/GameContext';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, X, Upload, Loader2, DollarSign, Plus, Trash2, MessageSquare, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
@@ -43,8 +43,6 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
     name: '',
     type: 'Arcade' as GameType,
     otherType: '',
-    location: 'Main Hall' as GameLocation,
-    otherLocation: '',
     status: 'Operational' as GameStatus,
     zone: '',
     conditionNotes: '',
@@ -57,6 +55,12 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
     saleConditionNotes: '',
     missingParts: [] as string[],
     saleNotes: '',
+    // Owner fields (for admin editing)
+    ownerName: '',
+    ownerEmail: '',
+    ownerPhone: '',
+    ownerNotes: '',
+    displayContactPublicly: false,
   };
 
   const [formData, setFormData] = useState(defaultFormState);
@@ -71,8 +75,6 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
           name: game.name,
           type: game.type,
           otherType: game.otherType || '',
-          location: game.location,
-          otherLocation: game.otherLocation || '',
           status: game.status,
           conditionNotes: game.conditionNotes || '',
           highScore: game.highScore,
@@ -84,6 +86,12 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
           saleConditionNotes: game.saleConditionNotes || '',
           missingParts: game.missingParts || [],
           saleNotes: game.saleNotes || '',
+          // Owner fields
+          ownerName: game.ownerName || '',
+          ownerEmail: game.ownerEmail || '',
+          ownerPhone: game.ownerPhone || '',
+          ownerNotes: game.ownerNotes || '',
+          displayContactPublicly: game.displayContactPublicly || false,
         });
         // If there are sales details, expand the sales section
         if (game.askingPrice || game.forSale || game.saleConditionNotes || game.missingParts?.length || game.saleNotes) {
@@ -305,9 +313,6 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
       newErrors.otherType = 'Please specify the game type';
     }
 
-    if (formData.location === 'Other' && !formData.otherLocation.trim()) {
-      newErrors.otherLocation = 'Please specify the location';
-    }
 
     if (formData.yearMade && (formData.yearMade < 1900 || formData.yearMade > new Date().getFullYear())) {
       newErrors.yearMade = `Year must be between 1900 and ${new Date().getFullYear()}`;
@@ -331,7 +336,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
         await updateGame(gameId, {
           ...formData,
         });
-        navigate(`/game/${formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${formData.location.toLowerCase()}`);
+        navigate(`/game/${formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`);
       } else {
         await addGame({
           ...formData,
@@ -422,46 +427,6 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
             </div>
           )}
 
-          {/* Location */}
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Location*
-            </label>
-            <select
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-            >
-              <option value="Replay">Replay</option>
-              <option value="Warehouse">Warehouse</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          {/* Other Location (conditional) */}
-          {formData.location === 'Other' && (
-            <div>
-              <label htmlFor="otherLocation" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Specify Location*
-              </label>
-              <input
-                type="text"
-                id="otherLocation"
-                name="otherLocation"
-                value={formData.otherLocation}
-                onChange={handleChange}
-                placeholder="Specify location"
-                className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 ${
-                  errors.otherLocation ? 'border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20' : 'border-gray-300'
-                }`}
-              />
-              {errors.otherLocation && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.otherLocation}</p>
-              )}
-            </div>
-          )}
 
           {/* Status */}
           <div>
@@ -512,40 +477,6 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
             </p>
           </div>
 
-          {/* Year Made */}
-          <div>
-            <label htmlFor="yearMade" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Year Made
-            </label>
-            <input
-              type="number"
-              id="yearMade"
-              name="yearMade"
-              value={formData.yearMade || ''}
-              onChange={handleChange}
-              placeholder="e.g., 1985"
-              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 ${
-                errors.yearMade ? 'border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20' : 'border-gray-300'
-              }`}
-            />
-            {errors.yearMade && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.yearMade}</p>}
-          </div>
-
-          {/* High Score */}
-          <div>
-            <label htmlFor="highScore" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              High Score
-            </label>
-            <input
-              type="number"
-              id="highScore"
-              name="highScore"
-              value={formData.highScore || ''}
-              onChange={handleChange}
-              placeholder="e.g., 1000000"
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-            />
-          </div>
         </div>
 
         {/* Condition Notes */}
@@ -562,6 +493,97 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
             placeholder="Enter any notes about the game's condition..."
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
           />
+        </div>
+
+        {/* Owner Information Section */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-fpf-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+            Owner Information
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Owner Name */}
+            <div>
+              <label htmlFor="ownerName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Owner Name
+              </label>
+              <input
+                type="text"
+                id="ownerName"
+                name="ownerName"
+                value={formData.ownerName}
+                onChange={handleChange}
+                placeholder="Enter owner's full name"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+            </div>
+
+            {/* Owner Email */}
+            <div>
+              <label htmlFor="ownerEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Owner Email
+              </label>
+              <input
+                type="email"
+                id="ownerEmail"
+                name="ownerEmail"
+                value={formData.ownerEmail}
+                onChange={handleChange}
+                placeholder="owner@example.com"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+            </div>
+
+            {/* Owner Phone */}
+            <div>
+              <label htmlFor="ownerPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Owner Phone
+              </label>
+              <input
+                type="tel"
+                id="ownerPhone"
+                name="ownerPhone"
+                value={formData.ownerPhone}
+                onChange={handleChange}
+                placeholder="(555) 123-4567"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+            </div>
+
+            {/* Display Contact Publicly Checkbox */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="displayContactPublicly"
+                name="displayContactPublicly"
+                checked={formData.displayContactPublicly}
+                onChange={handleChange}
+                className="h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300 rounded"
+              />
+              <label htmlFor="displayContactPublicly" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                Display contact info publicly
+              </label>
+            </div>
+          </div>
+
+          {/* Owner Notes */}
+          <div className="mt-4">
+            <label htmlFor="ownerNotes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Owner Notes
+            </label>
+            <textarea
+              id="ownerNotes"
+              name="ownerNotes"
+              value={formData.ownerNotes}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Any additional notes about the owner or contact preferences..."
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            />
+          </div>
         </div>
 
         {/* Image Upload */}
