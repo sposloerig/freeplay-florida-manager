@@ -132,9 +132,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: updatedGame.name?.trim() || '',
           type: updatedGame.type?.trim() || 'Arcade',
           type_other: updatedGame.otherType?.trim() || null,
-          location: updatedGame.location?.trim() || 'Replay',
-          location_other: updatedGame.otherLocation?.trim() || null,
           status: updatedGame.status?.trim() || 'Operational',
+          zone: updatedGame.zone?.trim() || null,
           condition_notes: updatedGame.conditionNotes?.trim() || null,
           // Store first image in image_url for backward compatibility
           image_url: updatedGame.images && updatedGame.images.length > 0 ? updatedGame.images[0] : null,
@@ -145,7 +144,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           for_sale: finalForSale,
           sale_condition_notes: updatedGame.saleConditionNotes,
           missing_parts: updatedGame.missingParts,
-          sale_notes: updatedGame.saleNotes
+          sale_notes: updatedGame.saleNotes,
+          // Owner fields
+          owner_name: updatedGame.ownerName?.trim() || null,
+          owner_email: updatedGame.ownerEmail?.trim() || null,
+          owner_phone: updatedGame.ownerPhone?.trim() || null,
+          owner_notes: updatedGame.ownerNotes?.trim() || null,
+          display_contact_publicly: updatedGame.displayContactPublicly || false
         })
         .eq('id', id);
 
