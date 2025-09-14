@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ImageModal from '../components/ImageModal';
 import RepairHistory from '../components/RepairHistory';
 import GameQRCode from '../components/GameQRCode';
+import BuyerInquiryModal from '../components/BuyerInquiryModal';
 import { supabase } from '../lib/supabase';
 import { 
   Calendar, 
@@ -53,6 +54,7 @@ const GameDetailPage: React.FC = () => {
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<number, boolean>>({});
   const [mainImageError, setMainImageError] = useState(!game?.images?.[0]);
   const [deleting, setDeleting] = useState(false);
+  const [showBuyerInquiryModal, setShowBuyerInquiryModal] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -162,6 +164,43 @@ const GameDetailPage: React.FC = () => {
       ...prev,
       [index]: true
     }));
+  };
+
+  const handlePublicRepairReport = () => {
+    if (!game) return;
+    navigate(`/report-issue?gameId=${game.id}`);
+  };
+
+  const handleBuyerInquiry = () => {
+    if (!game) return;
+    
+    // Check if contact information is available publicly
+    if (game.displayContactPublicly && game.ownerEmail) {
+      // Contact info is public - use direct email
+      const subject = encodeURIComponent(`Inquiry about ${game.name} - Free Play Florida`);
+      const body = encodeURIComponent(`Hi ${game.ownerName},
+
+I'm interested in your ${game.name} that's listed for sale on Free Play Florida.
+
+${game.askingPrice ? `I see it's listed for $${game.askingPrice.toLocaleString()}.` : ''}
+
+Could you provide more details about the condition and availability?
+
+Thanks!
+
+Found on: https://freeplayflorida.netlify.app/game/${slug}`);
+
+      // Try to open email client
+      try {
+        window.location.href = `mailto:${game.ownerEmail}?subject=${subject}&body=${body}`;
+      } catch (error) {
+        console.error('Error opening email client:', error);
+        alert(`Please contact the owner directly at: ${game.ownerEmail}`);
+      }
+    } else {
+      // Use inquiry modal for private contact
+      setShowBuyerInquiryModal(true);
+    }
   };
 
   if (!slug || !game) {
@@ -432,7 +471,43 @@ const GameDetailPage: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
+            {/* Public Actions Section - Always visible to everyone */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center mb-4">
+                <Wrench size={18} className="text-fpf-600 dark:text-fpf-400 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Actions
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Report Repair Button - Always visible */}
+                <button
+                  onClick={handlePublicRepairReport}
+                  className="flex items-center justify-center px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                >
+                  <Wrench size={18} className="mr-2" />
+                  Report a Repair
+                </button>
+                
+                {/* Buying Inquiry Button - Only visible if game is for sale */}
+                {game.forSale && (
+                  <button
+                    onClick={handleBuyerInquiry}
+                    className="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                  >
+                    <Mail size={18} className="mr-2" />
+                    Send Buying Inquiry
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                {game.forSale 
+                  ? "Report issues with this game or inquire about purchasing it."
+                  : "Report any issues you encounter with this game during the event."
+                }
+              </p>
+            </div>
 
             {showQRCode && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -581,6 +656,20 @@ const GameDetailPage: React.FC = () => {
           images={game.images}
           activeIndex={activeImageIndex}
           onClose={() => setActiveImageIndex(null)}
+        />
+      )}
+
+      {/* Buyer Inquiry Modal */}
+      {showBuyerInquiryModal && (
+        <BuyerInquiryModal
+          game={{
+            id: game.id,
+            name: game.name,
+            askingPrice: game.askingPrice,
+            ownerName: game.ownerName,
+            ownerEmail: game.ownerEmail
+          }}
+          onClose={() => setShowBuyerInquiryModal(false)}
         />
       )}
     </div>
