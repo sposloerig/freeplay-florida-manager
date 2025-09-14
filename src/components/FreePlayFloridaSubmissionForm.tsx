@@ -252,10 +252,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           owner_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
           owner_email: formData.email.trim().toLowerCase(),
           owner_phone: formData.phone.trim(),
-            owner_notes: [
-              formData.notes ? `Notes: ${formData.notes}` : '',
-              `Maker: ${game.maker}`
-            ].filter(Boolean).join(' | '),
+            owner_notes: formData.notes ? `Notes: ${formData.notes}` : null,
           
           // Service preferences
           allow_others_to_service: game.allowOthersToService,
@@ -494,6 +491,26 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
               </button>
             )}
           </div>
+
+          {/* Important Reminders */}
+          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-400">
+            <div className="flex items-start">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                  Important: Please ensure your games are:
+                </h3>
+                <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+                  <li>• <strong>In good, clean working condition</strong></li>
+                  <li>• <strong>Set up for Free Play Mode</strong> (if possible)</li>
+                  <li>• <strong>Have locks and keys</strong> for security</li>
+                </ul>
+                <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
+                  Games that don't meet these requirements may not be accepted for the event.
+                </p>
+              </div>
+            </div>
+          </div>
           
           {errors.games && <p className="mb-4 text-sm text-red-600">{errors.games}</p>}
           
@@ -516,7 +533,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                   )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Game Name {index === 0 && '*'}
@@ -545,21 +562,6 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                       <option value="Computer">Computer</option>
                       <option value="Handheld">Handheld</option>
                       <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Maker
-                    </label>
-                    <select
-                      value={game.maker}
-                      onChange={(e) => handleGameChange(index, 'maker', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                    >
-                      {GAME_MAKERS.map(maker => (
-                        <option key={maker} value={maker}>{maker}</option>
-                      ))}
                     </select>
                   </div>
 
