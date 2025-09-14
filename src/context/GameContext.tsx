@@ -66,7 +66,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Service fields
         allowOthersToService: game.allow_others_to_service || false,
         serviceNotes: game.service_notes,
-        acceptOffers: game.accept_offers || false
+        acceptOffers: game.accept_offers || false,
+        // Check-in fields
+        checkedIn: game.checked_in || false,
+        checkedInAt: game.checked_in_at ? new Date(game.checked_in_at) : undefined,
+        checkedInBy: game.checked_in_by,
+        hasKey: game.has_key || false,
+        workingCondition: game.working_condition || false,
+        checkInNotes: game.check_in_notes
       })));
       setError(null);
     } catch (err) {
@@ -148,7 +155,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           owner_email: updatedGame.ownerEmail?.trim() || null,
           owner_phone: updatedGame.ownerPhone?.trim() || null,
           owner_notes: updatedGame.ownerNotes?.trim() || null,
-          display_contact_publicly: updatedGame.displayContactPublicly || false
+          display_contact_publicly: updatedGame.displayContactPublicly || false,
+          // Check-in fields
+          checked_in: updatedGame.checkedIn || false,
+          checked_in_at: updatedGame.checkedInAt ? updatedGame.checkedInAt.toISOString() : null,
+          checked_in_by: updatedGame.checkedInBy?.trim() || null,
+          has_key: updatedGame.hasKey || false,
+          working_condition: updatedGame.workingCondition || false,
+          check_in_notes: updatedGame.checkInNotes?.trim() || null
         })
         .eq('id', id);
 

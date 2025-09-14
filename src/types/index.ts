@@ -53,6 +53,14 @@ export interface Game {
   saleConditionNotes?: string;
   missingParts?: string[];
   saleNotes?: string;
+  
+  // Check-in information
+  checkedIn: boolean;
+  checkedInAt?: Date;
+  checkedInBy?: string;
+  hasKey: boolean;
+  workingCondition: boolean;
+  checkInNotes?: string;
 }
 
 export interface Repair {

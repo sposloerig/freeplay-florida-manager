@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock, MessageSquare, Mail } from 'lucide-react';
+import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock, MessageSquare, Mail, CheckCircle } from 'lucide-react';
 
 const AdminDashboardPage: React.FC = () => {
   const adminFeatures = [
@@ -10,6 +10,7 @@ const AdminDashboardPage: React.FC = () => {
       description: 'Approve submitted games, add new games, and manage the collection. Track game status and handle game-related tasks.',
       links: [
         { to: '/admin/game-approval', text: 'Approve Submitted Games', icon: Clock },
+        { to: '/admin/check-in', text: 'Game Check-In', icon: CheckCircle },
         { to: '/add', text: 'Add New Game', icon: Plus },
         { to: '/collection', text: 'View & Edit Collection', icon: GameController },
         { to: '/qr-codes', text: 'Print QR Codes', icon: QrCode }

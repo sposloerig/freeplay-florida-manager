@@ -18,6 +18,7 @@ import RepairDashboardPage from './pages/RepairDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminGameApprovalPage from './pages/AdminGameApprovalPage';
 import AdminBuyerInquiriesPage from './pages/AdminBuyerInquiriesPage';
+import AdminCheckInPage from './pages/AdminCheckInPage';
 import GameSalesPage from './pages/GameSalesPage';
 import QRCodePrintPage from './pages/QRCodePrintPage';
 import LoginPage from './pages/LoginPage';
@@ -63,6 +64,11 @@ function App() {
                     <Route path="/admin/buyer-inquiries" element={
                       <ProtectedRoute>
                         <AdminBuyerInquiriesPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/admin/check-in" element={
+                      <ProtectedRoute>
+                        <AdminCheckInPage />
                       </ProtectedRoute>
                     } />
                     <Route path="/add" element={
