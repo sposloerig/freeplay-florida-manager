@@ -18,8 +18,13 @@ const MarketplacePage: React.FC = () => {
   );
 
   const handleInquiry = (game: Game) => {
+    console.log('handleInquiry called for game:', game.name);
+    console.log('displayContactPublicly:', game.displayContactPublicly);
+    console.log('ownerEmail:', game.ownerEmail);
+    
     // Check if contact information is available publicly
     if (game.displayContactPublicly && game.ownerEmail) {
+      console.log('Using direct email contact');
       // Contact info is public - use direct email
       const subject = encodeURIComponent(`Inquiry about ${game.name} - Free Play Florida`);
       const body = encodeURIComponent(`Hi ${game.ownerName},
@@ -42,9 +47,11 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
         alert(`Please contact the owner directly at: ${game.ownerEmail}`);
       }
     } else {
+      console.log('Using inquiry modal');
       // Contact info is not public - show inquiry modal
       setSelectedGameForInquiry(game);
       setShowInquiryModal(true);
+      console.log('Modal state set:', { selectedGameForInquiry: game, showInquiryModal: true });
     }
   };
 

@@ -110,6 +110,8 @@ const BuyerInquiryModal: React.FC<BuyerInquiryModalProps> = ({
     }
   };
 
+  console.log('BuyerInquiryModal render:', { isOpen, game: game?.name });
+  
   if (!isOpen) return null;
 
   return (
