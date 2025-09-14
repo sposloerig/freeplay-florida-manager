@@ -127,7 +127,7 @@ const RepairDashboardPage: React.FC = () => {
 
   const getGameUrl = (repair: RepairWithUser) => {
     if (!repair.game?.name) return '#';
-    const slug = `${repair.game.name}-Replay`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const slug = repair.game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return `/game/${slug}`;
   };
 

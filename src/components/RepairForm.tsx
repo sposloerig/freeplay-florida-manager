@@ -57,7 +57,7 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
 
       if (gameUpdateError) throw gameUpdateError;
 
-      // Create URL-friendly slug from game name (simplified for Free Play Florida)
+      // Create URL-friendly slug from game name (matches GameDetailPage expectations)
       const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       console.log('Navigating to:', `/game/${slug}`);
       navigate(`/game/${slug}`);
