@@ -57,14 +57,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // Admin bypass for testing
+    // Admin bypass for testing - check FIRST before Supabase
     if (email === 'admin@test.com' && password === 'freeplay2024') {
       setAdminBypass(true);
       setIsManager(true);
       setUser({ email: 'admin@bypass.local' } as User);
+      setLoading(false);
+      console.log('Admin bypass login successful');
       return;
     }
 
+    // Only try Supabase if not using bypass
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
