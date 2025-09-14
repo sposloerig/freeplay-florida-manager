@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { AlertTriangle, CheckCircle, Wrench, Info, Clock, Users } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Wrench, Info, Users } from 'lucide-react';
 
 interface PublicRepairFormProps {
   gameId: string;
@@ -130,32 +130,9 @@ const PublicRepairForm: React.FC<PublicRepairFormProps> = ({ gameId, gameName })
         <div className="flex items-start">
           <Users className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-1" />
           <div>
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
-              How to Report an Issue
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Common Issues:</h4>
-                <ul className="text-blue-700 dark:text-blue-300 space-y-1">
-                  <li>• Screen problems (flickering, dark, distorted)</li>
-                  <li>• Control issues (buttons, joysticks not working)</li>
-                  <li>• Audio problems (no sound, distorted sound)</li>
-                  <li>• Game not starting or freezing</li>
-                  <li>• Physical damage or loose parts</li>
-                  <li>• Coin mechanism issues</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Be Specific:</h4>
-                <ul className="text-blue-700 dark:text-blue-300 space-y-1">
-                  <li>• Describe exactly what's happening</li>
-                  <li>• Mention which buttons/controls aren't working</li>
-                  <li>• Note if the issue is intermittent or constant</li>
-                  <li>• Include any error messages you see</li>
-                  <li>• Mention if other players reported the same issue</li>
-                </ul>
-              </div>
-            </div>
+            <p className="text-blue-700 dark:text-blue-300">
+              Please describe the issue you're experiencing with this game. For example: 'Player 1 joystick is stuck and won't move left', 'Screen keeps flickering during gameplay', 'No sound coming from speakers', etc.
+            </p>
           </div>
         </div>
       </div>
@@ -187,21 +164,6 @@ const PublicRepairForm: React.FC<PublicRepairFormProps> = ({ gameId, gameName })
             </p>
           </div>
 
-          {/* Response Time Info */}
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
-            <div className="flex items-start">
-              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
-                  Response Time
-                </h3>
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  Our maintenance team typically addresses reported issues within 24-48 hours. 
-                  Critical issues that affect game safety are prioritized and handled immediately.
-                </p>
-              </div>
-            </div>
-          </div>
 
           <div className="flex justify-end space-x-4 pt-4">
             <button
