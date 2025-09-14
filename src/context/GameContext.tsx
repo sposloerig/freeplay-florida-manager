@@ -103,16 +103,32 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           location_other: newGame.otherLocation?.trim() || null,
           status: newGame.status?.trim() || 'Operational',
           condition_notes: newGame.conditionNotes?.trim() || null,
-          // Store first image in image_url for backward compatibility
-          image_url: newGame.images && newGame.images.length > 0 ? newGame.images[0] : null,
-          // Store all images in all_images column
-          all_images: newGame.images && newGame.images.length > 0 ? newGame.images : null,
+          // Store all images in images column (text array)
+          images: newGame.images && newGame.images.length > 0 ? newGame.images : null,
           // Sales fields - all games are for sale by default
           for_sale: autoForSale,
           asking_price: newGame.askingPrice,
           sale_condition_notes: newGame.saleConditionNotes,
           missing_parts: newGame.missingParts,
-          sale_notes: newGame.saleNotes
+          sale_notes: newGame.saleNotes,
+          // Owner information
+          owner_name: newGame.ownerName?.trim() || 'Admin Added',
+          owner_email: newGame.ownerEmail?.trim() || 'admin@freeplayflorida.com',
+          owner_phone: newGame.ownerPhone?.trim() || null,
+          owner_address: newGame.ownerAddress?.trim() || null,
+          owner_notes: newGame.ownerNotes?.trim() || null,
+          display_contact_publicly: newGame.displayContactPublicly || false,
+          // Service preferences
+          allow_others_to_service: newGame.allowOthersToService || true,
+          service_notes: newGame.serviceNotes?.trim() || null,
+          // Approval workflow (admin-added games are auto-approved)
+          approval_status: 'approved',
+          approved_at: new Date().toISOString(),
+          approved_by: 'admin@test.com',
+          // Check-in fields (defaults)
+          checked_in: false,
+          has_key: false,
+          working_condition: false
         }])
         .select()
         .single();
