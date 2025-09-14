@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     // Admin bypass for testing
-    if (email === 'admin' && password === 'freeplay2024') {
+    if (email === 'admin@test.com' && password === 'freeplay2024') {
       setAdminBypass(true);
       setIsManager(true);
       setUser({ email: 'admin@bypass.local' } as User);
