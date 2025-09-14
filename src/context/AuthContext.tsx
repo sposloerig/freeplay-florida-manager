@@ -9,6 +9,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   isManager: boolean;
+  adminBypass: boolean;
+  setAdminBypass: (bypass: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,6 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isManager, setIsManager] = useState(false);
+  const [adminBypass, setAdminBypass] = useState(false);
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -54,6 +57,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    // Admin bypass for testing
+    if (email === 'admin' && password === 'freeplay2024') {
+      setAdminBypass(true);
+      setIsManager(true);
+      setUser({ email: 'admin@bypass.local' } as User);
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -68,6 +79,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      // Handle admin bypass logout
+      if (adminBypass) {
+        setAdminBypass(false);
+        setIsManager(false);
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       // First check if we have a session
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -84,12 +104,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Ensure user state is cleared and loading is set to false
       setUser(null);
       setIsManager(false);
+      setAdminBypass(false);
       setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut, isManager }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signOut, isManager, adminBypass, setAdminBypass }}>
       {children}
     </AuthContext.Provider>
   );
