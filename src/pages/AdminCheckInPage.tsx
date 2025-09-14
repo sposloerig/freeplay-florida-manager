@@ -24,7 +24,9 @@ const AdminCheckInPage: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchGames();
+    if (fetchGames) {
+      fetchGames();
+    }
   }, [fetchGames]);
 
   // Filter games based on search term
@@ -61,10 +63,9 @@ const AdminCheckInPage: React.FC = () => {
 
     setIsChecking(true);
     try {
-      const updatedGame = {
-        ...selectedGame,
+      const updatedGameData = {
         checkedIn: true,
-        checkedInAt: new Date().toISOString(),
+        checkedInAt: new Date(),
         checkedInBy: 'admin@test.com', // Current admin user
         hasKey: checkInForm.hasKey,
         workingCondition: checkInForm.workingCondition,
@@ -72,10 +73,12 @@ const AdminCheckInPage: React.FC = () => {
         checkInNotes: checkInForm.checkInNotes
       };
 
-      await updateGame(updatedGame);
+      await updateGame(selectedGame.id, updatedGameData);
       
       // Refresh games list
-      await fetchGames();
+      if (fetchGames) {
+        await fetchGames();
+      }
       
       // Reset form
       setSelectedGame(null);
