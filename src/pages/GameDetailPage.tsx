@@ -660,18 +660,17 @@ Found on: https://freeplayflorida.netlify.app/game/${slug}`);
       )}
 
       {/* Buyer Inquiry Modal */}
-      {showBuyerInquiryModal && (
-        <BuyerInquiryModal
-          game={{
-            id: game.id,
-            name: game.name,
-            askingPrice: game.askingPrice,
-            ownerName: game.ownerName,
-            ownerEmail: game.ownerEmail
-          }}
-          onClose={() => setShowBuyerInquiryModal(false)}
-        />
-      )}
+      <BuyerInquiryModal
+        isOpen={showBuyerInquiryModal}
+        game={{
+          id: game.id,
+          name: game.name,
+          askingPrice: game.askingPrice,
+          ownerName: game.ownerName,
+          ownerEmail: game.ownerEmail
+        }}
+        onClose={() => setShowBuyerInquiryModal(false)}
+      />
     </div>
   );
 };
