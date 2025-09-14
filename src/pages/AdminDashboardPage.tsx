@@ -26,10 +26,10 @@ const AdminDashboardPage: React.FC = () => {
     {
       title: 'Sales Management',
       icon: DollarSign,
-      description: 'Manage buyer inquiries, purchase offers, and sales-related communications.',
+      description: 'Review buyer inquiries and manage sales-related communications. Use the public Marketplace to view games for sale.',
       links: [
-        { to: '/games-for-sale', text: 'View Games For Sale', icon: Tag },
-        { to: '/admin/buyer-inquiries', text: 'View Buyer Inquiries', icon: Mail }
+        { to: '/admin/buyer-inquiries', text: 'View Buyer Inquiries', icon: Mail },
+        { to: '/marketplace', text: 'View Public Marketplace', icon: Tag }
       ]
     }
   ];
