@@ -52,7 +52,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
       images: [],
       imageUrls: [],
       serviceNotes: '',
-      allowOthersToService: false
+      allowOthersToService: true
     }] as GameSubmission[]
   });
 
@@ -96,7 +96,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           images: [],
           imageUrls: [],
           serviceNotes: '',
-          allowOthersToService: false
+          allowOthersToService: true
         }]
       }));
     }

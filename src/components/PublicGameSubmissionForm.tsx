@@ -26,7 +26,7 @@ const PublicGameSubmissionForm: React.FC = () => {
     ownerNotes: '',
     
     // Service Preferences
-    allowOthersToService: false,
+    allowOthersToService: true,
     serviceNotes: '',
     
     // Sales Information
