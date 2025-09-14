@@ -24,7 +24,10 @@ import {
   ChevronDown,
   Mail,
   Phone,
-  User
+  User,
+  DollarSign,
+  ShoppingCart,
+  Tag
 } from 'lucide-react';
 import { Game, Repair } from '../types';
 
@@ -298,6 +301,77 @@ const GameDetailPage: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Sales Information Section - Only visible when game is for sale */}
+            {game.forSale && (
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center mb-3">
+                  <ShoppingCart size={18} className="text-green-600 dark:text-green-400 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    For Sale
+                  </h3>
+                </div>
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center">
+                      <DollarSign size={16} className="text-green-600 dark:text-green-400 mr-2" />
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Asking Price</p>
+                        <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                          {game.askingPrice ? `$${game.askingPrice.toLocaleString()}` : 'Price on request'}
+                        </p>
+                      </div>
+                    </div>
+                    {game.acceptOffers && (
+                      <div className="flex items-center">
+                        <Tag size={16} className="text-green-600 dark:text-green-400 mr-2" />
+                        <div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Offers</p>
+                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                            Accepts Offers
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {game.saleConditionNotes && (
+                    <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <strong>Sale Condition:</strong>
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {game.saleConditionNotes}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {game.missingParts && game.missingParts.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <strong>Missing Parts:</strong>
+                      </p>
+                      <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300">
+                        {game.missingParts.map((part, index) => (
+                          <li key={index}>{part}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {game.saleNotes && (
+                    <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <strong>Additional Notes:</strong>
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                        {game.saleNotes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Condition Notes Section - Only visible to authenticated users */}
             {user && game.conditionNotes && (

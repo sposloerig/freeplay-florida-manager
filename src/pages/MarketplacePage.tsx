@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Game } from '../types';
-import { DollarSign, Mail, Phone, MapPin, Calendar, Gamepad2, AlertTriangle, Search } from 'lucide-react';
+import { DollarSign, Mail, Phone, MapPin, Calendar, Gamepad2, AlertTriangle, Search, ExternalLink } from 'lucide-react';
 
 const MarketplacePage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -129,12 +130,29 @@ const MarketplacePage: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredGames.map((game) => (
-            <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              {/* Game Image Placeholder */}
-              <div className="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <Gamepad2 className="w-16 h-16 text-white opacity-50" />
-              </div>
+          {filteredGames.map((game) => {
+            // Create URL-friendly slug from game name and location
+            const slug = `${game.name}-${game.location || 'unknown'}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            
+            return (
+              <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                {/* Game Image */}
+                <div className="relative h-48 bg-gradient-to-br from-fpf-500 to-fpf-purple-600 flex items-center justify-center">
+                  {game.images && game.images.length > 0 ? (
+                    <img
+                      src={game.images[0]}
+                      alt={game.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Gamepad2 className="w-16 h-16 text-white opacity-50" />
+                  )}
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                      For Sale
+                    </span>
+                  </div>
+                </div>
 
               <div className="p-6">
                 {/* Game Info */}
@@ -230,17 +248,27 @@ const MarketplacePage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Contact Button */}
-                <button
-                  onClick={() => handleInquiry(game)}
-                  className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Contact Owner
-                </button>
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Link
+                    to={`/game/${slug}`}
+                    className="flex-1 bg-fpf-600 text-white py-2 px-4 rounded-md hover:bg-fpf-700 transition-colors flex items-center justify-center text-sm"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View Details
+                  </Link>
+                  <button
+                    onClick={() => handleInquiry(game)}
+                    className="flex-1 bg-fpf-purple-600 text-white py-2 px-4 rounded-md hover:bg-fpf-purple-700 transition-colors flex items-center justify-center text-sm"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Contact Owner
+                  </button>
+                </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
