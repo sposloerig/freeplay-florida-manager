@@ -153,7 +153,7 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
             const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
             return (
-              <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
                 {/* Game Image */}
                 <div className="relative h-48 bg-gradient-to-br from-fpf-500 to-fpf-purple-600 flex items-center justify-center">
                   {game.images && game.images.length > 0 ? (
@@ -172,7 +172,7 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
                   </div>
                 </div>
 
-              <div className="p-6">
+              <div className="p-6 flex flex-col flex-grow">
                 {/* Game Info */}
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -273,8 +273,11 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
                   </div>
                 )}
 
+                {/* Spacer to push buttons to bottom */}
+                <div className="flex-grow"></div>
+                
                 {/* Action Buttons */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-4">
                   <Link
                     to={`/game/${slug}`}
                     className="flex-1 bg-fpf-600 text-white py-2 px-4 rounded-md hover:bg-fpf-700 transition-colors flex items-center justify-center text-sm"
