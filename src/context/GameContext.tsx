@@ -41,19 +41,30 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
         // Handle multiple images - prioritize all_images if it exists, fallback to image_url
-        images: game.all_images && Array.isArray(game.all_images) && game.all_images.length > 0 
-          ? game.all_images
-          : game.image_url 
-            ? (typeof game.image_url === 'string' ? [game.image_url] : 
-               Array.isArray(game.image_url) ? game.image_url : []) 
-            : [],
+        images: game.images || game.all_images || (game.image_url ? [game.image_url] : []),
         conditionNotes: game.condition_notes || '',
         // Sales fields
         askingPrice: game.asking_price,
         forSale: game.for_sale !== false, // Default to true
         saleConditionNotes: game.sale_condition_notes,
         missingParts: game.missing_parts || [],
-        saleNotes: game.sale_notes
+        saleNotes: game.sale_notes,
+        // Approval fields
+        approvalStatus: game.approval_status || 'pending',
+        submittedAt: game.submitted_at ? new Date(game.submitted_at) : game.dateAdded,
+        approvedAt: game.approved_at ? new Date(game.approved_at) : null,
+        approvedBy: game.approved_by,
+        rejectionReason: game.rejection_reason,
+        // Owner fields
+        ownerName: game.owner_name || '',
+        ownerEmail: game.owner_email || '',
+        ownerPhone: game.owner_phone,
+        ownerAddress: game.owner_address,
+        ownerNotes: game.owner_notes,
+        // Service fields
+        allowOthersToService: game.allow_others_to_service || false,
+        serviceNotes: game.service_notes,
+        acceptOffers: game.accept_offers || false
       })));
       setError(null);
     } catch (err) {

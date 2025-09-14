@@ -7,63 +7,29 @@ const AdminDashboardPage: React.FC = () => {
     {
       title: 'Game Management',
       icon: GameController,
-      description: 'Add, edit, or remove arcade and pinball machines from the collection. Track game status, location, maintenance history, manage sales pricing, and handle buyer inquiries.',
+      description: 'Approve submitted games, add new games, and manage the collection. Track game status and handle game-related tasks.',
       links: [
         { to: '/admin/game-approval', text: 'Approve Submitted Games', icon: Clock },
         { to: '/add', text: 'Add New Game', icon: Plus },
         { to: '/collection', text: 'View & Edit Collection', icon: GameController },
-        { to: '/games-for-sale', text: 'View Sales Page', icon: Tag },
         { to: '/qr-codes', text: 'Print QR Codes', icon: QrCode }
       ]
     },
     {
       title: 'Repair Tracking',
       icon: Wrench,
-      description: 'Manage repair requests, track maintenance history, and update repair status. Order parts and coordinate with vendors.',
+      description: 'Manage repair requests, track maintenance history, and coordinate with game owners. (Coming Soon)',
       links: [
         { to: '/repairs', text: 'Repair Dashboard', icon: Wrench }
       ]
     },
     {
-      title: 'Content Management',
-      icon: HelpCircle,
-      description: 'Update frequently asked questions, manage business hours, and handle announcements.',
+      title: 'Sales Management',
+      icon: DollarSign,
+      description: 'Manage buyer inquiries, purchase offers, and sales-related communications.',
       links: [
-        { to: '/admin/faq', text: 'Manage FAQs', icon: Settings },
-        { to: '/admin/hours', text: 'Manage Hours & Announcements', icon: Clock }
-      ]
-    },
-    {
-      title: 'Shop Management',
-      icon: ShoppingBag,
-      description: 'Manage merchandise, gift cards, and pricing. Update product inventory and descriptions.',
-      links: [
-        { to: '/admin/shop', text: 'Manage Products', icon: Tag },
-        { to: '/admin/shop', text: 'Manage Gift Cards', icon: Gift }
-      ]
-    },
-    {
-      title: 'Chatbot Settings',
-      icon: MessageSquare,
-      description: 'Configure the AI chatbot, enable or disable it, and manage chatbot settings for visitor interactions.',
-      links: [
-        { to: '/admin/chatbot', text: 'Chatbot Settings', icon: MessageSquare }
-      ]
-    },
-    {
-      title: 'Buyer Inquiries',
-      icon: Mail,
-      description: 'Manage buyer inquiries and offers for games. View, respond to, and track the status of purchase requests and offers from potential buyers.',
-      links: [
-        { to: '/admin/buyer-inquiries', text: 'View All Inquiries', icon: Mail }
-      ]
-    },
-    {
-      title: 'System Administration',
-      icon: Key,
-      description: 'Manage user accounts, reset passwords, and handle system-level administrative tasks.',
-      links: [
-        { to: '/admin/password-reset', text: 'Reset Passwords', icon: Key }
+        { to: '/games-for-sale', text: 'View Games For Sale', icon: Tag },
+        { to: '/admin/buyer-inquiries', text: 'View Buyer Inquiries', icon: Mail }
       ]
     }
   ];

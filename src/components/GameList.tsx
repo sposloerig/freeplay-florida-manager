@@ -20,8 +20,9 @@ const GameList: React.FC = () => {
     const matchesType = typeFilter === 'All' || game.type === typeFilter;
     const matchesLocation = showAllLocations ? true : game.location === locationFilter;
     const matchesStatus = statusFilter === 'All' || game.status === statusFilter;
+    const isApproved = game.approvalStatus === 'approved';
     
-    return matchesSearch && matchesType && matchesLocation && matchesStatus;
+    return matchesSearch && matchesType && matchesLocation && matchesStatus && isApproved;
   });
 
   const sortedGames = [...filteredGames].sort((a, b) => {
