@@ -78,6 +78,15 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             {game.location === 'Other' ? game.otherLocation : game.location}
           </span>
         </div>
+        
+        {/* Zone Assignment Display */}
+        {game.zone && (
+          <div className="mt-2 flex items-center">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fpf-100 text-fpf-800 dark:bg-fpf-900/20 dark:text-fpf-200">
+              📍 {game.zone}
+            </span>
+          </div>
+        )}
         <div className="mt-3 flex items-center text-gray-600 dark:text-gray-400 text-sm">
           <span className="flex items-center">
             {game.type === 'Other' ? game.otherType : game.type}

@@ -20,7 +20,7 @@ export default {
           950: '#172554',
         },
         // Vibrant purple accent
-        fpf-purple: {
+        'fpf-purple': {
           50: '#faf5ff',
           100: '#f3e8ff',
           200: '#e9d5ff',

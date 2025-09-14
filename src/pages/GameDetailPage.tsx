@@ -362,7 +362,12 @@ const GameDetailPage: React.FC = () => {
 
             {showQRCode && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <GameQRCode gameId={game.id} gameName={game.name} />
+                <GameQRCode 
+                  gameId={game.id} 
+                  gameName={game.name} 
+                  zone={game.zone}
+                  printable={isManager}
+                />
               </div>
             )}
           </div>

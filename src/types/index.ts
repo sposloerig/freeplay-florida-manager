@@ -18,6 +18,7 @@ export interface Game {
   location: GameLocation;
   otherLocation?: string;
   status: GameStatus;
+  zone?: string; // Zone 1-12 for event placement
   conditionNotes?: string;
   highScore?: number;
   yearMade?: number;

@@ -40,6 +40,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...game,
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
+        zone: game.zone,
         // Handle multiple images - prioritize all_images if it exists, fallback to image_url
         images: game.images || game.all_images || (game.image_url ? [game.image_url] : []),
         conditionNotes: game.condition_notes || '',

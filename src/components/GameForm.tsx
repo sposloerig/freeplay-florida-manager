@@ -46,6 +46,7 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
     location: 'Main Hall' as GameLocation,
     otherLocation: '',
     status: 'Operational' as GameStatus,
+    zone: '',
     conditionNotes: '',
     highScore: undefined as number | undefined,
     yearMade: undefined as number | undefined,
@@ -472,12 +473,43 @@ const GameForm: React.FC<GameFormProps> = ({ editMode = false, gameId }) => {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               <option value="Operational">Operational</option>
               <option value="In Repair">In Repair</option>
               <option value="Awaiting Parts">Awaiting Parts</option>
             </select>
+          </div>
+
+          {/* Zone Assignment (Admin Only) */}
+          <div>
+            <label htmlFor="zone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Zone Assignment
+            </label>
+            <select
+              id="zone"
+              name="zone"
+              value={formData.zone}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            >
+              <option value="">No Zone Assigned</option>
+              <option value="Zone 1">Zone 1</option>
+              <option value="Zone 2">Zone 2</option>
+              <option value="Zone 3">Zone 3</option>
+              <option value="Zone 4">Zone 4</option>
+              <option value="Zone 5">Zone 5</option>
+              <option value="Zone 6">Zone 6</option>
+              <option value="Zone 7">Zone 7</option>
+              <option value="Zone 8">Zone 8</option>
+              <option value="Zone 9">Zone 9</option>
+              <option value="Zone 10">Zone 10</option>
+              <option value="Zone 11">Zone 11</option>
+              <option value="Zone 12">Zone 12</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Assign this game to a specific zone for the event layout
+            </p>
           </div>
 
           {/* Year Made */}

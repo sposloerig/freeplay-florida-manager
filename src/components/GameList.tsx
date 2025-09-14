@@ -9,6 +9,7 @@ const GameList: React.FC = () => {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<GameType | 'All'>('All');
   const [statusFilter, setStatusFilter] = useState<GameStatus | 'All'>('All');
+  const [zoneFilter, setZoneFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'name' | 'yearMade' | 'dateAdded'>('dateAdded');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -17,9 +18,12 @@ const GameList: React.FC = () => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'All' || game.type === typeFilter;
     const matchesStatus = statusFilter === 'All' || game.status === statusFilter;
+    const matchesZone = zoneFilter === 'All' || 
+      (zoneFilter === 'Unassigned' && (!game.zone || game.zone === '')) ||
+      game.zone === zoneFilter;
     const isApproved = game.approvalStatus === 'approved';
     
-    return matchesSearch && matchesType && matchesStatus && isApproved;
+    return matchesSearch && matchesType && matchesStatus && matchesZone && isApproved;
   });
 
   const sortedGames = [...filteredGames].sort((a, b) => {
@@ -151,12 +155,38 @@ const GameList: React.FC = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as GameStatus | 'All')}
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="All">All Statuses</option>
                 <option value="Operational">Operational</option>
                 <option value="In Repair">In Repair</option>
                 <option value="Awaiting Parts">Awaiting Parts</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Zone Assignment
+              </label>
+              <select
+                value={zoneFilter}
+                onChange={(e) => setZoneFilter(e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="All">All Zones</option>
+                <option value="Unassigned">Unassigned</option>
+                <option value="Zone 1">Zone 1</option>
+                <option value="Zone 2">Zone 2</option>
+                <option value="Zone 3">Zone 3</option>
+                <option value="Zone 4">Zone 4</option>
+                <option value="Zone 5">Zone 5</option>
+                <option value="Zone 6">Zone 6</option>
+                <option value="Zone 7">Zone 7</option>
+                <option value="Zone 8">Zone 8</option>
+                <option value="Zone 9">Zone 9</option>
+                <option value="Zone 10">Zone 10</option>
+                <option value="Zone 11">Zone 11</option>
+                <option value="Zone 12">Zone 12</option>
               </select>
             </div>
           </div>
