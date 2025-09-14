@@ -18,7 +18,7 @@ interface BuyerInquiryEmailRequest {
 }
 
 const MANAGER_EMAILS = [
-  'brian@replaymuseum.com' // Update this to your Free Play Florida admin emails
+  'brian@replaymuseum.com' // Update this to your Free Play Florida admin email
 ];
 
 Deno.serve(async (req) => {
