@@ -21,6 +21,7 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
     try {
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user);
       if (!user) throw new Error('Not authenticated');
 
       // First get the game to ensure it exists
@@ -35,6 +36,7 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
       }
 
       // Create the repair record
+      console.log('Attempting to create repair for gameId:', gameId);
       const { data: repair, error: repairError } = await supabase
         .from('repairs')
         .insert({
@@ -44,6 +46,7 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
         .select()
         .single();
 
+      console.log('Repair creation result:', { repair, repairError });
       if (repairError) throw repairError;
 
       // Update game status to "In Repair"
@@ -54,8 +57,9 @@ const RepairForm: React.FC<RepairFormProps> = ({ gameId }) => {
 
       if (gameUpdateError) throw gameUpdateError;
 
-      // Create URL-friendly slug from game name
-      const slug = `${game.name}-Replay`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      // Create URL-friendly slug from game name (simplified for Free Play Florida)
+      const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      console.log('Navigating to:', `/game/${slug}`);
       navigate(`/game/${slug}`);
     } catch (err) {
       console.error('Error creating repair:', err);
