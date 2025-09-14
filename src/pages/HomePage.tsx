@@ -7,7 +7,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-screen overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
+      <div className="relative h-screen overflow-hidden bg-gradient-to-br from-fpf-700 via-fpf-purple-600 to-fpf-500">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -20,21 +20,21 @@ const HomePage: React.FC = () => {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/submit-game"
-                className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+                className="px-6 py-3 bg-fpf-500 text-white rounded-md hover:bg-fpf-600 transition-colors flex items-center shadow-lg"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Submit Your Game
               </Link>
               <Link
                 to="/collection"
-                className="px-6 py-3 bg-white text-indigo-600 rounded-md hover:bg-gray-100 transition-colors flex items-center"
+                className="px-6 py-3 bg-white text-fpf-600 rounded-md hover:bg-gray-100 transition-colors flex items-center shadow-lg"
               >
                 <Eye className="w-5 h-5 mr-2" />
                 View Games
               </Link>
               <Link
                 to="/marketplace"
-                className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+                className="px-6 py-3 bg-fpf-purple-500 text-white rounded-md hover:bg-fpf-purple-600 transition-colors flex items-center shadow-lg"
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Browse Marketplace
@@ -58,8 +58,8 @@ const HomePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="bg-indigo-100 dark:bg-indigo-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+              <div className="bg-fpf-100 dark:bg-fpf-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-8 h-8 text-fpf-600 dark:text-fpf-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Submit Games</h3>
               <p className="text-gray-600 dark:text-gray-300">
@@ -68,8 +68,8 @@ const HomePage: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <div className="bg-green-100 dark:bg-green-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-green-600 dark:text-green-400" />
+              <div className="bg-fpf-purple-100 dark:bg-fpf-purple-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-fpf-purple-600 dark:text-fpf-purple-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Community Events</h3>
               <p className="text-gray-600 dark:text-gray-300">
@@ -78,8 +78,8 @@ const HomePage: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <div className="bg-purple-100 dark:bg-purple-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <ShoppingCart className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              <div className="bg-fpf-200 dark:bg-fpf-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <ShoppingCart className="w-8 h-8 text-fpf-700 dark:text-fpf-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Marketplace</h3>
               <p className="text-gray-600 dark:text-gray-300">

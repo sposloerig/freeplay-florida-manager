@@ -38,6 +38,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
     email: '',
     phone: '',
     notes: '',
+    displayContactPublicly: false,
     
     // Games (start with 1, can add more)
     games: [{
@@ -253,6 +254,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           owner_email: formData.email.trim().toLowerCase(),
           owner_phone: formData.phone.trim(),
             owner_notes: formData.notes ? `Notes: ${formData.notes}` : null,
+          display_contact_publicly: formData.displayContactPublicly,
           
           // Service preferences
           allow_others_to_service: game.allowOthersToService,
@@ -352,7 +354,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
         </div>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          className="px-6 py-2 bg-fpf-600 text-white rounded-md hover:bg-fpf-700 transition-colors"
         >
           Return to Home
         </button>
@@ -394,7 +396,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
         {/* Owner Information Section */}
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
           <div className="flex items-center mb-4">
-            <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mr-2" />
+            <User className="w-5 h-5 text-fpf-600 dark:text-fpf-400 mr-2" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Information</h2>
           </div>
           
@@ -408,7 +410,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
                   errors.firstName ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -424,7 +426,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
                   errors.lastName ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -440,7 +442,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -456,7 +458,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
                   errors.phone ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -474,11 +476,32 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
               onChange={handleInputChange}
               rows={3}
               maxLength={350}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               placeholder="Any special requirements, setup notes, or other information..."
             />
             <div className="text-right text-sm text-gray-500 mt-1">
               {formData.notes.length}/350
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                id="displayContactPublicly"
+                name="displayContactPublicly"
+                checked={formData.displayContactPublicly}
+                onChange={handleInputChange}
+                className="mt-1 h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300 rounded"
+              />
+              <div className="ml-3">
+                <label htmlFor="displayContactPublicly" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Display my contact information publicly
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  If checked, your name and contact information will be visible to the public on the marketplace and game detail pages. This allows potential buyers or other participants to contact you directly about your games.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -488,7 +511,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <Gamepad2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mr-2" />
+              <Gamepad2 className="w-5 h-5 text-fpf-600 dark:text-fpf-400 mr-2" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Your Games ({formData.games.length}/6)
               </h2>
@@ -497,7 +520,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
               <button
                 type="button"
                 onClick={addGame}
-                className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                className="flex items-center px-4 py-2 bg-fpf-600 text-white rounded-md hover:bg-fpf-700 transition-colors"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Game
@@ -555,7 +578,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                       type="text"
                       value={game.name}
                       onChange={(e) => handleGameChange(index, 'name', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                       placeholder="e.g., Medieval Madness"
                     />
                   </div>
@@ -567,7 +590,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                     <select
                       value={game.type}
                       onChange={(e) => handleGameChange(index, 'type', e.target.value as GameType)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                     >
                       <option value="Pinball">Pinball</option>
                       <option value="Arcade">Arcade</option>
@@ -622,7 +645,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                         type="checkbox"
                         checked={game.allowOthersToService}
                         onChange={(e) => handleGameChange(index, 'allowOthersToService', e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="mt-1 mr-3 h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300 rounded"
                       />
                       <div>
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -642,7 +665,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                         value={game.serviceNotes}
                         onChange={(e) => handleGameChange(index, 'serviceNotes', e.target.value)}
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                         placeholder="Any specific service instructions, known quirks, or special requirements for this game?"
                       />
                     </div>
@@ -666,7 +689,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                           onChange={(e) => handleGameChange(index, 'askingPrice', e.target.value)}
                           min="0"
                           step="0.01"
-                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
+                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white ${
                             errors[`game${index}Price`] ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="e.g., 5000"
@@ -679,7 +702,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                           type="checkbox"
                           checked={game.acceptOffers}
                           onChange={(e) => handleGameChange(index, 'acceptOffers', e.target.checked)}
-                          className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          className="mr-2 h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300 rounded"
                         />
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           Accept offers
@@ -695,7 +718,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
                         value={game.saleNotes}
                         onChange={(e) => handleGameChange(index, 'saleNotes', e.target.value)}
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                         placeholder="Condition details, terms, etc."
                       />
                     </div>
@@ -783,7 +806,7 @@ const FreePlayFloridaSubmissionForm: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold ${
+            className={`px-8 py-3 bg-fpf-600 text-white rounded-md hover:bg-fpf-700 focus:outline-none focus:ring-2 focus:ring-fpf-500 font-semibold ${
               isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >

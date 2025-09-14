@@ -21,7 +21,10 @@ import {
   Lock,
   ImageOff,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Mail,
+  Phone,
+  User
 } from 'lucide-react';
 import { Game, Repair } from '../types';
 
@@ -170,7 +173,7 @@ const GameDetailPage: React.FC = () => {
         </p>
         <Link 
           to="/collection" 
-          className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-fpf-600 text-white rounded-md hover:bg-fpf-700 transition-colors"
         >
           <ArrowLeft size={18} className="mr-2" />
           Back to Collection
@@ -184,7 +187,7 @@ const GameDetailPage: React.FC = () => {
       <div className="mb-6">
         <button 
           onClick={() => navigate('/collection')}
-          className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+          className="inline-flex items-center text-fpf-600 dark:text-fpf-400 hover:text-fpf-800 dark:hover:text-fpf-300"
         >
           <ArrowLeft size={18} className="mr-1" />
           Back to Collection
@@ -234,7 +237,7 @@ const GameDetailPage: React.FC = () => {
                 <button
                   onClick={() => setShowQRCode(!showQRCode)}
                   aria-label="Show QR Code"
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-fpf-600 dark:hover:text-fpf-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 >
                   <QrCode size={20} />
                 </button>
@@ -243,7 +246,7 @@ const GameDetailPage: React.FC = () => {
                     <button
                       onClick={() => navigate(`/edit/${game.id}`)}
                       aria-label="Edit game"
-                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-fpf-600 dark:hover:text-fpf-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                     >
                       <Edit size={20} />
                     </button>
@@ -262,8 +265,8 @@ const GameDetailPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
               {game.yearMade && (
                 <div className="flex items-center text-gray-600 dark:text-gray-300">
-                  <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2 rounded-full mr-3">
-                    <Calendar size={18} className="text-indigo-600 dark:text-indigo-400" />
+                  <div className="bg-fpf-100 dark:bg-fpf-900/40 p-2 rounded-full mr-3">
+                    <Calendar size={18} className="text-fpf-600 dark:text-fpf-400" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Year Made</p>
@@ -274,8 +277,8 @@ const GameDetailPage: React.FC = () => {
               
               
               <div className="flex items-center text-gray-600 dark:text-gray-300">
-                <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2 rounded-full mr-3">
-                  <Trophy size={18} className="text-indigo-600 dark:text-indigo-400" />
+                <div className="bg-fpf-100 dark:bg-fpf-900/40 p-2 rounded-full mr-3">
+                  <Trophy size={18} className="text-fpf-600 dark:text-fpf-400" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Game Type</p>
@@ -285,8 +288,8 @@ const GameDetailPage: React.FC = () => {
               
               {game.highScore && (
                 <div className="flex items-center text-gray-600 dark:text-gray-300">
-                  <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2 rounded-full mr-3">
-                    <Trophy size={18} className="text-indigo-600 dark:text-indigo-400" />
+                  <div className="bg-fpf-100 dark:bg-fpf-900/40 p-2 rounded-full mr-3">
+                    <Trophy size={18} className="text-fpf-600 dark:text-fpf-400" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">High Score</p>
@@ -300,7 +303,7 @@ const GameDetailPage: React.FC = () => {
             {user && game.conditionNotes && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-3">
-                  <ClipboardList size={18} className="text-indigo-600 dark:text-indigo-400 mr-2" />
+                  <ClipboardList size={18} className="text-fpf-600 dark:text-fpf-400 mr-2" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Condition Notes
                   </h3>
@@ -308,6 +311,51 @@ const GameDetailPage: React.FC = () => {
                 <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
                   {game.conditionNotes}
                 </p>
+              </div>
+            )}
+
+            {/* Owner Contact Information - Only visible when owner allows public display */}
+            {game.displayContactPublicly && (
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center mb-3">
+                  <User size={18} className="text-fpf-600 dark:text-fpf-400 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Contact Owner
+                  </h3>
+                </div>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    The owner has made their contact information public. You can reach out directly:
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center text-gray-700 dark:text-gray-300">
+                      <User size={16} className="mr-2 text-fpf-600 dark:text-fpf-400" />
+                      <span className="font-medium">{game.ownerName}</span>
+                    </div>
+                    {game.ownerEmail && (
+                      <div className="flex items-center">
+                        <Mail size={16} className="mr-2 text-fpf-600 dark:text-fpf-400" />
+                        <a 
+                          href={`mailto:${game.ownerEmail}`}
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {game.ownerEmail}
+                        </a>
+                      </div>
+                    )}
+                    {game.ownerPhone && (
+                      <div className="flex items-center">
+                        <Phone size={16} className="mr-2 text-fpf-600 dark:text-fpf-400" />
+                        <a 
+                          href={`tel:${game.ownerPhone}`}
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {game.ownerPhone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
             
@@ -329,7 +377,7 @@ const GameDetailPage: React.FC = () => {
               </h2>
               <button
                 onClick={() => setImageGalleryVisible(!imageGalleryVisible)}
-                className="flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-3 py-1 border border-indigo-200 dark:border-indigo-800 rounded-md"
+                className="flex items-center text-sm text-fpf-600 dark:text-fpf-400 hover:text-fpf-800 dark:hover:text-fpf-300 px-3 py-1 border border-indigo-200 dark:border-indigo-800 rounded-md"
               >
                 {imageGalleryVisible ? 'Hide Gallery' : 'Show All Images'} 
                 {imageGalleryVisible ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />}

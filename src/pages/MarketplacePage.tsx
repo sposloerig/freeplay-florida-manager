@@ -187,8 +187,34 @@ const MarketplacePage: React.FC = () => {
                     <MapPin className="w-4 h-4 mr-1" />
                     <span>Owner: {game.ownerName}</span>
                   </div>
+                  {game.displayContactPublicly && (
+                    <div className="mt-2 space-y-1">
+                      {game.ownerEmail && (
+                        <div className="flex items-center">
+                          <Mail className="w-4 h-4 mr-1" />
+                          <a 
+                            href={`mailto:${game.ownerEmail}`}
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {game.ownerEmail}
+                          </a>
+                        </div>
+                      )}
+                      {game.ownerPhone && (
+                        <div className="flex items-center">
+                          <Phone className="w-4 h-4 mr-1" />
+                          <a 
+                            href={`tel:${game.ownerPhone}`}
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {game.ownerPhone}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {game.ownerAddress && (
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-1">
                       <MapPin className="w-4 h-4 mr-1 opacity-0" />
                       <span className="text-xs">{game.ownerAddress}</span>
                     </div>

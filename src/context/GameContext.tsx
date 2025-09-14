@@ -61,6 +61,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ownerPhone: game.owner_phone,
         ownerAddress: game.owner_address,
         ownerNotes: game.owner_notes,
+        displayContactPublicly: game.display_contact_publicly || false,
         // Service fields
         allowOthersToService: game.allow_others_to_service || false,
         serviceNotes: game.service_notes,

@@ -39,6 +39,7 @@ export interface Game {
   ownerPhone?: string;
   ownerAddress?: string;
   ownerNotes?: string;
+  displayContactPublicly: boolean;
   
   // Service preferences
   allowOthersToService: boolean;

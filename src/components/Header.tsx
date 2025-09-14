@@ -35,7 +35,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-indigo-700 to-purple-700 text-white shadow-lg sticky top-0 z-10 transition-all duration-300">
+    <header className="bg-gradient-to-r from-fpf-700 to-fpf-purple-700 text-white shadow-lg sticky top-0 z-10 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 md:h-20">
           <div className="flex items-center">
@@ -44,7 +44,7 @@ const Header: React.FC = () => {
                 <Gamepad2 className="w-8 h-8 md:w-10 md:h-10 text-white mr-3" />
                 <div>
                   <h1 className="text-xl md:text-2xl font-bold text-white">Free Play Florida</h1>
-                  <p className="text-xs md:text-sm text-indigo-200 hidden md:block">Arcade & Pinball Community</p>
+                  <p className="text-xs md:text-sm text-fpf-200 hidden md:block">Arcade & Pinball Community</p>
                 </div>
               </div>
             </Link>
@@ -54,7 +54,7 @@ const Header: React.FC = () => {
 
             <Link 
               to="/collection" 
-              className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
+              className={`transition-colors hover:text-fpf-200 py-2 flex items-center ${
                 location.pathname === '/collection' ? 'border-b-2 border-white font-medium' : ''
               }`}>
               <GameController size={16} className="mr-1" />
@@ -62,7 +62,7 @@ const Header: React.FC = () => {
             </Link>
             <Link 
               to="/submit-game" 
-              className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
+              className={`transition-colors hover:text-fpf-200 py-2 flex items-center ${
                 location.pathname === '/submit-game' ? 'border-b-2 border-white font-medium' : ''
               }`}>
               <Plus size={16} className="mr-1" />
@@ -70,7 +70,7 @@ const Header: React.FC = () => {
             </Link>
             <Link 
               to="/marketplace" 
-              className={`transition-colors hover:text-indigo-200 py-2 flex items-center ${
+              className={`transition-colors hover:text-fpf-200 py-2 flex items-center ${
                 location.pathname === '/marketplace' ? 'border-b-2 border-white font-medium' : ''
               }`}>
               <DollarSign size={16} className="mr-1" />
@@ -78,7 +78,7 @@ const Header: React.FC = () => {
             </Link>
             <button 
               onClick={toggleDarkMode} 
-              className="p-2 rounded-full hover:bg-indigo-600 transition-colors"
+              className="p-2 rounded-full hover:bg-fpf-600 transition-colors"
               aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -88,7 +88,7 @@ const Header: React.FC = () => {
             <div className="flex items-center space-x-2 mr-4">
               <a 
                 href="tel:+17279403928" 
-                className="text-indigo-100 hover:text-white transition-colors flex items-center"
+                className="text-fpf-100 hover:text-white transition-colors flex items-center"
               >
                 <Phone size={16} className="mr-1" />
                 <span className="sr-only">Call us</span>
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md hover:bg-indigo-600 transition-colors"
+              className="p-2 rounded-md hover:bg-fpf-600 transition-colors"
               aria-label="Open menu">
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -111,14 +111,14 @@ const Header: React.FC = () => {
       </div>
       
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-indigo-800 shadow-lg pb-4 px-4 animate-fadeDown">
+        <div className="md:hidden bg-fpf-800 shadow-lg pb-4 px-4 animate-fadeDown">
           <nav className="flex flex-col space-y-3 pt-2 pb-3">
             <Link 
               to="/collection" 
               className={`block px-3 py-2 rounded-md flex items-center ${
                 location.pathname === '/collection' 
-                  ? 'bg-indigo-900 text-white font-medium' 
-                  : 'text-indigo-100 hover:bg-indigo-700'
+                  ? 'bg-fpf-900 text-white font-medium' 
+                  : 'text-fpf-100 hover:bg-fpf-700'
               }`}>
               <GameController size={16} className="mr-1" />
               Games
@@ -127,8 +127,8 @@ const Header: React.FC = () => {
               to="/submit-game" 
               className={`block px-3 py-2 rounded-md flex items-center ${
                 location.pathname === '/submit-game' 
-                  ? 'bg-indigo-900 text-white font-medium' 
-                  : 'text-indigo-100 hover:bg-indigo-700'
+                  ? 'bg-fpf-900 text-white font-medium' 
+                  : 'text-fpf-100 hover:bg-fpf-700'
               }`}>
               <Plus size={16} className="mr-1" />
               Submit Game
@@ -137,8 +137,8 @@ const Header: React.FC = () => {
               to="/marketplace" 
               className={`block px-3 py-2 rounded-md flex items-center ${
                 location.pathname === '/marketplace' 
-                  ? 'bg-indigo-900 text-white font-medium' 
-                  : 'text-indigo-100 hover:bg-indigo-700'
+                  ? 'bg-fpf-900 text-white font-medium' 
+                  : 'text-fpf-100 hover:bg-fpf-700'
               }`}>
               <DollarSign size={16} className="mr-1" />
               Marketplace
