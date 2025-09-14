@@ -147,7 +147,7 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center max-w-6xl mx-auto">
           {filteredGames.map((game) => {
             // Create URL-friendly slug from game name only (single location event)
             const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -296,7 +296,7 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
                     }
                   >
                     <Mail className="w-4 h-4 mr-2" />
-                    {game.displayContactPublicly && game.ownerEmail ? 'Contact Owner' : 'Send Inquiry'}
+                    Send Inquiry
                   </button>
                 </div>
               </div>
