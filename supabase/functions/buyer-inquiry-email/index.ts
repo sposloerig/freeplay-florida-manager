@@ -18,10 +18,7 @@ interface BuyerInquiryEmailRequest {
 }
 
 const MANAGER_EMAILS = [
-  'amy@straylite.com',
-  'fred@replaymuseum.com',
-  'play@replaymuseum.com',
-  'brian@replaymuseum.com'
+  'brian@replaymuseum.com' // Update this to your Free Play Florida admin emails
 ];
 
 Deno.serve(async (req) => {
@@ -67,7 +64,7 @@ Deno.serve(async (req) => {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
           <h2 style="color: #333; margin: 0 0 10px 0;">New ${inquiryData.inquiry_type === 'purchase' ? 'Purchase Request' : 'Offer'}</h2>
-          <p style="color: #666; margin: 0;">From Replay Museum Sales Page</p>
+          <p style="color: #666; margin: 0;">From Free Play Florida Marketplace</p>
         </div>
         
         <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -107,14 +104,17 @@ Deno.serve(async (req) => {
         </div>
         
         <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
+          <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px;">
+            <strong>Action Required:</strong> This inquiry is for a game where the owner has chosen to keep their contact information private.
+          </p>
           <p style="margin: 0; color: #856404; font-size: 14px;">
-            <strong>Action Required:</strong> Please respond to this inquiry through your admin dashboard or by contacting the buyer directly.
+            Please review this inquiry in your admin dashboard and facilitate the connection between the buyer and the game owner.
           </p>
         </div>
         
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
           <p style="color: #666; font-size: 12px; margin: 0;">
-            This email was sent from the Replay Museum sales system.
+            This email was sent from the Free Play Florida marketplace system.
           </p>
         </div>
       </div>
@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Replay Museum <noreply@replaymuseum.com>',
+          from: 'Free Play Florida <noreply@freeplayflorida.com>',
           to: email,
           subject: subject,
           html: emailHtml,

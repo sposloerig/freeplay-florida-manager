@@ -219,10 +219,17 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
 
                 {/* Owner Info */}
                 <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center mb-1">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span>Owner: {game.ownerName}</span>
-                  </div>
+                  {game.displayContactPublicly ? (
+                    <div className="flex items-center mb-1">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      <span>Owner: {game.ownerName}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center mb-1">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      <span className="italic text-gray-500 dark:text-gray-400">Contact through inquiry form</span>
+                    </div>
+                  )}
                   {game.displayContactPublicly && (
                     <div className="mt-2 space-y-1">
                       {game.ownerEmail && (
