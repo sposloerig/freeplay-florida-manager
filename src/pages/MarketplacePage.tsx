@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 import { useGameContext } from '../context/GameContext';
 import { Game } from '../types';
 import { DollarSign, Mail, Phone, MapPin, Calendar, Gamepad2, AlertTriangle, Search, ExternalLink } from 'lucide-react';
+import BuyerInquiryModal from '../components/BuyerInquiryModal';
 
 const MarketplacePage: React.FC = () => {
   const { games: allGames, loading, error } = useGameContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [selectedGameForInquiry, setSelectedGameForInquiry] = useState<Game | null>(null);
+  const [showInquiryModal, setShowInquiryModal] = useState(false);
 
   // Filter games that are approved and for sale
   const games = allGames.filter(game => 
@@ -15,15 +18,11 @@ const MarketplacePage: React.FC = () => {
   );
 
   const handleInquiry = (game: Game) => {
-    // Check if contact information is available
-    if (!game.displayContactPublicly || !game.ownerEmail) {
-      alert(`Contact information for ${game.name} is not publicly available. Please check the game details page or contact Free Play Florida administrators for assistance.`);
-      return;
-    }
-
-    // Create pre-filled email
-    const subject = encodeURIComponent(`Inquiry about ${game.name} - Free Play Florida`);
-    const body = encodeURIComponent(`Hi ${game.ownerName},
+    // Check if contact information is available publicly
+    if (game.displayContactPublicly && game.ownerEmail) {
+      // Contact info is public - use direct email
+      const subject = encodeURIComponent(`Inquiry about ${game.name} - Free Play Florida`);
+      const body = encodeURIComponent(`Hi ${game.ownerName},
 
 I'm interested in your ${game.name} that's listed for sale on Free Play Florida.
 
@@ -35,14 +34,23 @@ Thanks!
 
 Found on: https://freeplayflorida.netlify.app/marketplace`);
 
-    // Try to open email client
-    try {
-      window.location.href = `mailto:${game.ownerEmail}?subject=${subject}&body=${body}`;
-    } catch (error) {
-      // Fallback: copy email to clipboard or show it
-      console.error('Error opening email client:', error);
-      alert(`Please contact the owner directly at: ${game.ownerEmail}`);
+      // Try to open email client
+      try {
+        window.location.href = `mailto:${game.ownerEmail}?subject=${subject}&body=${body}`;
+      } catch (error) {
+        console.error('Error opening email client:', error);
+        alert(`Please contact the owner directly at: ${game.ownerEmail}`);
+      }
+    } else {
+      // Contact info is not public - show inquiry modal
+      setSelectedGameForInquiry(game);
+      setShowInquiryModal(true);
     }
+  };
+
+  const closeInquiryModal = () => {
+    setShowInquiryModal(false);
+    setSelectedGameForInquiry(null);
   };
 
   const filteredGames = games.filter(game => {
@@ -265,16 +273,16 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
                     className={`flex-1 py-2 px-4 rounded-md transition-colors flex items-center justify-center text-sm ${
                       game.displayContactPublicly && game.ownerEmail
                         ? 'bg-fpf-purple-600 text-white hover:bg-fpf-purple-700'
-                        : 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-500'
+                        : 'bg-fpf-500 text-white hover:bg-fpf-600'
                     }`}
                     title={
                       game.displayContactPublicly && game.ownerEmail
                         ? `Send email to ${game.ownerName}`
-                        : 'Contact information not available'
+                        : 'Send inquiry through Free Play Florida'
                     }
                   >
                     <Mail className="w-4 h-4 mr-2" />
-                    {game.displayContactPublicly && game.ownerEmail ? 'Contact Owner' : 'Contact Unavailable'}
+                    {game.displayContactPublicly && game.ownerEmail ? 'Contact Owner' : 'Send Inquiry'}
                   </button>
                 </div>
               </div>
@@ -296,6 +304,19 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
           <p>• Free Play Florida facilitates connections but is not involved in transactions</p>
         </div>
       </div>
+
+      {/* Buyer Inquiry Modal */}
+      {selectedGameForInquiry && (
+        <BuyerInquiryModal
+          isOpen={showInquiryModal}
+          onClose={closeInquiryModal}
+          game={{
+            id: selectedGameForInquiry.id,
+            name: selectedGameForInquiry.name,
+            askingPrice: selectedGameForInquiry.askingPrice
+          }}
+        />
+      )}
     </div>
   );
 };
