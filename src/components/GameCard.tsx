@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Game } from '../types';
-import { Calendar, Trophy, Wrench, ImageOff } from 'lucide-react';
+import { Calendar, Trophy, Wrench, ImageOff, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface GameCardProps {
@@ -58,6 +58,17 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             onError={() => setImageError(true)}
           />
         )}
+        
+        {/* For Sale Badge */}
+        {game.forSale && (
+          <div className="absolute top-2 right-2">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-lg">
+              <DollarSign size={12} className="mr-1" />
+              FOR SALE
+            </span>
+          </div>
+        )}
+        
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
             {game.status}
@@ -71,6 +82,16 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             <span className="flex items-center">
               <Calendar size={16} className="mr-1" />
               {game.yearMade}
+            </span>
+          </div>
+        )}
+        
+        {/* For Sale Price Display */}
+        {game.forSale && (
+          <div className="mt-2 flex items-center">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300">
+              <DollarSign size={14} className="mr-1" />
+              {game.askingPrice ? `$${game.askingPrice.toLocaleString()}` : 'Price on request'}
             </span>
           </div>
         )}
