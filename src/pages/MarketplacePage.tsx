@@ -287,11 +287,7 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
                   </Link>
                   <button
                     onClick={() => handleInquiry(game)}
-                    className={`flex-1 py-2 px-4 rounded-md transition-colors flex items-center justify-center text-sm ${
-                      game.displayContactPublicly && game.ownerEmail
-                        ? 'bg-fpf-purple-600 text-white hover:bg-fpf-purple-700'
-                        : 'bg-fpf-500 text-white hover:bg-fpf-600'
-                    }`}
+                    className="flex-1 py-2 px-4 rounded-md transition-colors flex items-center justify-center text-sm bg-fpf-500 text-white hover:bg-fpf-600"
                     title={
                       game.displayContactPublicly && game.ownerEmail
                         ? `Send email to ${game.ownerName}`
