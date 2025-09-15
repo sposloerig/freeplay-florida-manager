@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Calendar, DollarSign, User, Phone, MessageSquare, ExternalLink, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { BuyerInquiry } from '../types';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const AdminBuyerInquiriesPage: React.FC = () => {
   const [inquiries, setInquiries] = useState<BuyerInquiry[]>([]);
