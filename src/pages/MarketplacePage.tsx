@@ -19,40 +19,11 @@ const MarketplacePage: React.FC = () => {
 
   const handleInquiry = (game: Game) => {
     console.log('handleInquiry called for game:', game.name);
-    console.log('displayContactPublicly:', game.displayContactPublicly);
-    console.log('ownerEmail:', game.ownerEmail);
+    console.log('Using inquiry modal for all games');
     
-    // Check if contact information is available publicly
-    if (game.displayContactPublicly && game.ownerEmail) {
-      console.log('Using direct email contact');
-      // Contact info is public - use direct email
-      const subject = encodeURIComponent(`Inquiry about ${game.name} - Free Play Florida`);
-      const body = encodeURIComponent(`Hi ${game.ownerName},
-
-I'm interested in your ${game.name} that's listed for sale on Free Play Florida.
-
-${game.askingPrice ? `I see it's listed for $${game.askingPrice.toLocaleString()}.` : ''}
-
-Could you provide more details about the condition and availability?
-
-Thanks!
-
-Found on: https://freeplayflorida.netlify.app/marketplace`);
-
-      // Try to open email client
-      try {
-        window.location.href = `mailto:${game.ownerEmail}?subject=${subject}&body=${body}`;
-      } catch (error) {
-        console.error('Error opening email client:', error);
-        alert(`Please contact the owner directly at: ${game.ownerEmail}`);
-      }
-    } else {
-      console.log('Using inquiry modal');
-      // Contact info is not public - show inquiry modal
-      setSelectedGameForInquiry(game);
-      setShowInquiryModal(true);
-      console.log('Modal state set:', { selectedGameForInquiry: game, showInquiryModal: true });
-    }
+    // Always use inquiry modal for consistent experience
+    setSelectedGameForInquiry(game);
+    setShowInquiryModal(true);
   };
 
   const closeInquiryModal = () => {
@@ -288,11 +259,7 @@ Found on: https://freeplayflorida.netlify.app/marketplace`);
                   <button
                     onClick={() => handleInquiry(game)}
                     className="flex-1 py-2 px-4 rounded-md transition-colors flex items-center justify-center text-sm bg-fpf-500 text-white hover:bg-fpf-600"
-                    title={
-                      game.displayContactPublicly && game.ownerEmail
-                        ? `Send email to ${game.ownerName}`
-                        : 'Send inquiry through Free Play Florida'
-                    }
+                    title="Send inquiry through Free Play Florida"
                   >
                     <Mail className="w-4 h-4 mr-2" />
                     Send Inquiry

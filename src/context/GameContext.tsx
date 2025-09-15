@@ -99,8 +99,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: newGame.name?.trim() || '',
           type: newGame.type?.trim() || 'Arcade',
           type_other: newGame.otherType?.trim() || null,
-          location: newGame.location?.trim() || 'Replay',
-          location_other: newGame.otherLocation?.trim() || null,
           status: newGame.status?.trim() || 'Operational',
           condition_notes: newGame.conditionNotes?.trim() || null,
           // Store all images in images column (text array)
