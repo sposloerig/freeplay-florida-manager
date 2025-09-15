@@ -666,6 +666,7 @@ Found on: https://freeplayflorida.netlify.app/game/${slug}`);
           id: game.id,
           name: game.name,
           askingPrice: game.askingPrice,
+          acceptOffers: game.acceptOffers,
           ownerName: game.ownerName,
           ownerEmail: game.ownerEmail
         }}

@@ -14,6 +14,7 @@ interface BuyerInquiryModalProps {
     id: string;
     name: string;
     askingPrice?: number;
+    acceptOffers?: boolean;
     ownerName?: string;
     ownerEmail?: string;
   };
@@ -31,8 +32,18 @@ const BuyerInquiryModal: React.FC<BuyerInquiryModalProps> = ({
     offer_amount: '',
     message: '',
   });
-  const [inquiryType, setInquiryType] = useState<'offer' | 'purchase'>('offer');
+  const [inquiryType, setInquiryType] = useState<'offer' | 'purchase'>('purchase');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pre-fill offer amount with asking price when purchase is selected
+  React.useEffect(() => {
+    if (inquiryType === 'purchase' && game.askingPrice && !formData.offer_amount) {
+      setFormData(prev => ({
+        ...prev,
+        offer_amount: game.askingPrice!.toString()
+      }));
+    }
+  }, [inquiryType, game.askingPrice, formData.offer_amount]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -104,7 +115,7 @@ const BuyerInquiryModal: React.FC<BuyerInquiryModalProps> = ({
         offer_amount: '',
         message: '',
       });
-      setInquiryType('offer');
+      setInquiryType('purchase');
       onClose();
     } catch (error) {
       console.error('Error submitting inquiry:', error);
@@ -151,24 +162,33 @@ const BuyerInquiryModal: React.FC<BuyerInquiryModalProps> = ({
                 <input
                   type="radio"
                   name="inquiryType"
-                  value="offer"
-                  checked={inquiryType === 'offer'}
-                  onChange={(e) => setInquiryType(e.target.value as 'offer' | 'purchase')}
-                  className="h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300"
-                />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Make an offer</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="inquiryType"
                   value="purchase"
                   checked={inquiryType === 'purchase'}
                   onChange={(e) => setInquiryType(e.target.value as 'offer' | 'purchase')}
                   className="h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Buy at asking price</span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  Buy at asking price
+                  {game.askingPrice && (
+                    <span className="text-fpf-600 font-medium ml-1">
+                      (${game.askingPrice.toLocaleString()})
+                    </span>
+                  )}
+                </span>
               </label>
+              {game.acceptOffers && (
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="inquiryType"
+                    value="offer"
+                    checked={inquiryType === 'offer'}
+                    onChange={(e) => setInquiryType(e.target.value as 'offer' | 'purchase')}
+                    className="h-4 w-4 text-fpf-600 focus:ring-fpf-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Make an offer</span>
+                </label>
+              )}
             </div>
           </div>
 
@@ -227,31 +247,37 @@ const BuyerInquiryModal: React.FC<BuyerInquiryModalProps> = ({
             </div>
           </div>
 
-          {/* Offer Amount (if making an offer) */}
-          {inquiryType === 'offer' && (
-            <div>
-              <label htmlFor="offer_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                <DollarSign className="w-4 h-4 inline mr-1 text-fpf-600" />
-                Your Offer Amount
-                {game.askingPrice && (
-                  <span className="text-xs text-gray-500 ml-2">
-                    (Asking: ${game.askingPrice.toLocaleString()})
-                  </span>
-                )}
-              </label>
-              <input
-                type="number"
-                id="offer_amount"
-                name="offer_amount"
-                value={formData.offer_amount}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                placeholder="Enter your offer"
-              />
-            </div>
-          )}
+          {/* Purchase/Offer Amount */}
+          <div>
+            <label htmlFor="offer_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <DollarSign className="w-4 h-4 inline mr-1 text-fpf-600" />
+              {inquiryType === 'purchase' ? 'Purchase Amount' : 'Your Offer Amount'}
+              {inquiryType === 'offer' && game.askingPrice && (
+                <span className="text-xs text-gray-500 ml-2">
+                  (Asking: ${game.askingPrice.toLocaleString()})
+                </span>
+              )}
+            </label>
+            <input
+              type="number"
+              id="offer_amount"
+              name="offer_amount"
+              value={formData.offer_amount}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+              readOnly={inquiryType === 'purchase'}
+              className={`w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 ${
+                inquiryType === 'purchase' ? 'bg-gray-100 dark:bg-gray-600 cursor-not-allowed' : ''
+              }`}
+              placeholder={inquiryType === 'purchase' ? 'Asking price will be used' : 'Enter your offer'}
+            />
+            {inquiryType === 'purchase' && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                You are purchasing at the full asking price of ${game.askingPrice?.toLocaleString() || 'TBD'}
+              </p>
+            )}
+          </div>
 
           {/* Message */}
           <div>

@@ -294,6 +294,7 @@ const MarketplacePage: React.FC = () => {
             id: selectedGameForInquiry.id,
             name: selectedGameForInquiry.name,
             askingPrice: selectedGameForInquiry.askingPrice,
+            acceptOffers: selectedGameForInquiry.acceptOffers,
             ownerName: selectedGameForInquiry.ownerName,
             ownerEmail: selectedGameForInquiry.ownerEmail
           }}
