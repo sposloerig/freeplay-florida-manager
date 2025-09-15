@@ -1,38 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Menu, X, TowerControl as GameController, Plus, DollarSign, Gamepad2, Mail } from 'lucide-react';
+import { Menu, X, TowerControl as GameController, Plus, DollarSign, Gamepad2, Mail } from 'lucide-react';
 
 const Header: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
-      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
-    setDarkMode(isDarkMode);
-    
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', newDarkMode.toString());
-    
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
 
   return (
     <header className="bg-gradient-to-r from-fpf-700 to-fpf-purple-700 text-white shadow-lg sticky top-0 z-10 transition-all duration-300">
@@ -84,12 +60,6 @@ const Header: React.FC = () => {
               <Mail size={16} className="mr-1" />
               Contact
             </Link>
-            <button 
-              onClick={toggleDarkMode} 
-              className="p-2 rounded-full hover:bg-fpf-600 transition-colors"
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
           </nav>
           
           <div className="flex items-center md:hidden">
