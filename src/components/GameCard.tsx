@@ -32,49 +32,51 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
-        {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-        {(imageError || !imageUrl) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
-            <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">
-              Game Image Coming Soon
+      <Link to={`/game/${slug}`} className="block">
+        <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 cursor-pointer">
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          {(imageError || !imageUrl) && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800">
+              <ImageOff size={32} className="text-gray-400 dark:text-gray-500 mb-2" />
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center px-4">
+                Game Image Coming Soon
+              </span>
+            </div>
+          )}
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={game.name}
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              loading="lazy"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+            />
+          )}
+          
+          {/* For Sale Badge */}
+          {game.forSale && (
+            <div className="absolute top-2 right-2">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-lg">
+                <DollarSign size={12} className="mr-1" />
+                FOR SALE
+              </span>
+            </div>
+          )}
+          
+          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
+              {game.status}
             </span>
           </div>
-        )}
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={game.name}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            loading="lazy"
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
-          />
-        )}
-        
-        {/* For Sale Badge */}
-        {game.forSale && (
-          <div className="absolute top-2 right-2">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-lg">
-              <DollarSign size={12} className="mr-1" />
-              FOR SALE
-            </span>
-          </div>
-        )}
-        
-        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
-            {game.status}
-          </span>
         </div>
-      </div>
+      </Link>
       <div className="p-4">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">{game.name}</h3>
         {game.yearMade && (
