@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Menu, X, TowerControl as GameController, Plus, DollarSign, Phone, Gamepad2 } from 'lucide-react';
+import { Moon, Sun, Menu, X, TowerControl as GameController, Plus, DollarSign, Gamepad2 } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -85,21 +85,6 @@ const Header: React.FC = () => {
           </nav>
           
           <div className="flex items-center md:hidden">
-            <div className="flex items-center space-x-2 mr-4">
-              <a 
-                href="tel:+17279403928" 
-                className="text-fpf-100 hover:text-white transition-colors flex items-center"
-              >
-                <Phone size={16} className="mr-1" />
-                <span className="sr-only">Call us</span>
-              </a>
-            </div>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-indigo-600 transition-colors mr-2"
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-md hover:bg-fpf-600 transition-colors"
