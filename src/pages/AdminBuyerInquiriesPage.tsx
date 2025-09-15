@@ -26,19 +26,13 @@ const AdminBuyerInquiriesPage: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       console.log('Current user:', user?.email);
       
+      // First, try to get inquiries without the join to see if that's the issue
       const { data, error } = await supabase
         .from('buyer_inquiries')
-        .select(`
-          *,
-          games (
-            name,
-            asking_price,
-            owner_name,
-            owner_email,
-            owner_phone
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
+      
+      console.log('Basic query result:', { data, error });
 
       if (error) {
         console.error('Supabase error:', error);
@@ -54,28 +48,28 @@ const AdminBuyerInquiriesPage: React.FC = () => {
       console.log('Raw buyer inquiries data:', data);
       console.log('Number of inquiries found:', data?.length || 0);
 
-      const mappedInquiries = data.map(inquiry => ({
-        id: inquiry.id,
-        gameId: inquiry.game_id,
-        buyerName: inquiry.buyer_name,
-        buyerEmail: inquiry.buyer_email,
-        buyerPhone: inquiry.buyer_phone,
-        offerAmount: inquiry.offer_amount,
-        message: inquiry.message,
-        status: inquiry.status,
-        createdAt: new Date(inquiry.created_at),
-        updatedAt: new Date(inquiry.updated_at),
-        game: inquiry.games ? {
-          name: inquiry.games.name,
-          askingPrice: inquiry.games.asking_price,
-          ownerName: inquiry.games.owner_name,
-          ownerEmail: inquiry.games.owner_email,
-          ownerPhone: inquiry.games.owner_phone
-        } : undefined
-      }));
+      if (data && data.length > 0) {
+        const mappedInquiries = data.map(inquiry => ({
+          id: inquiry.id,
+          gameId: inquiry.game_id,
+          buyerName: inquiry.buyer_name,
+          buyerEmail: inquiry.buyer_email,
+          buyerPhone: inquiry.buyer_phone,
+          offerAmount: inquiry.offer_amount,
+          message: inquiry.message,
+          status: inquiry.status || 'pending',
+          createdAt: new Date(inquiry.created_at),
+          updatedAt: new Date(inquiry.updated_at || inquiry.created_at),
+          // We'll fetch game details separately for now to avoid join issues
+          game: undefined
+        }));
 
-      console.log('Mapped inquiries:', mappedInquiries);
-      setInquiries(mappedInquiries);
+        console.log('Mapped inquiries:', mappedInquiries);
+        setInquiries(mappedInquiries);
+      } else {
+        console.log('No inquiries found or data is null/empty');
+        setInquiries([]);
+      }
     } catch (err) {
       console.error('Error fetching buyer inquiries:', err);
       setError('Failed to load buyer inquiries');
@@ -230,10 +224,10 @@ const AdminBuyerInquiriesPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <ExternalLink className="w-5 h-5 mr-2 text-fpf-600" />
-                    Game: {inquiry.game?.name || 'Unknown Game'}
+                    Game: {inquiry.game?.name || `Game ID: ${inquiry.gameId}`}
                   </h3>
                   
-                  {inquiry.game && (
+                  {inquiry.game ? (
                     <div className="space-y-2 text-sm">
                       {inquiry.game.askingPrice && (
                         <div className="flex items-center text-gray-600 dark:text-gray-400">
@@ -261,6 +255,10 @@ const AdminBuyerInquiriesPage: React.FC = () => {
                           Owner Phone: {inquiry.game.ownerPhone}
                         </div>
                       )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <p>Game details not available (join issue). Game ID: {inquiry.gameId}</p>
                     </div>
                   )}
                 </div>
