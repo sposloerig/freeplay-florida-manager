@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { DollarSign, Search, Filter, MapPin, Calendar, AlertTriangle, MessageSquare, Phone, Mail, Tag, ShoppingCart, Info, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import ImageModal from '../components/ImageModal';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface GameForSale {
   id: string;

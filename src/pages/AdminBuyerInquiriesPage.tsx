@@ -9,7 +9,12 @@ const AdminBuyerInquiriesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchInquiries();
+    // Add a small delay to ensure authentication is ready
+    const timer = setTimeout(() => {
+      fetchInquiries();
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchInquiries = async () => {

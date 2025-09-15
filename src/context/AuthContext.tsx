@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (email === 'admin@test.com' && password === 'freeplay2024') {
       setAdminBypass(true);
       setIsManager(true);
-      setUser({ email: 'admin@bypass.local' } as User);
+      setUser({ email: 'admin@test.com' } as User);  // Use the actual email for RLS policies
       setLoading(false);
       console.log('Admin bypass login successful');
       return;

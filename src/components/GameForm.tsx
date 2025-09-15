@@ -3,13 +3,8 @@ import { Game, GameType, GameStatus } from '../types';
 import { useGameContext } from '../context/GameContext';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, X, Upload, Loader2, DollarSign, Plus, Trash2, MessageSquare, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import imageCompression from 'browser-image-compression';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface GameFormProps {
   editMode?: boolean;
