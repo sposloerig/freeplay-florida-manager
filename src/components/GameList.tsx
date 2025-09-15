@@ -1,66 +1,35 @@
 import React, { useState } from 'react';
-import { GameType, GameLocation, GameStatus } from '../types';
+import { GameType } from '../types';
 import { useGameContext } from '../context/GameContext';
 import GameCard from './GameCard';
-import { Filter, Search, SortAsc, SortDesc, Gamepad2, PillIcon as PinballIcon } from 'lucide-react';
+import { Search, Gamepad2, PillIcon as PinballIcon } from 'lucide-react';
 
 const GameList: React.FC = () => {
   const { games } = useGameContext();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<GameType | 'All'>('All');
-  const [statusFilter, setStatusFilter] = useState<GameStatus | 'All'>('All');
-  const [zoneFilter, setZoneFilter] = useState<string>('All');
-  const [sortBy, setSortBy] = useState<'name' | 'yearMade' | 'dateAdded'>('dateAdded');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const filteredGames = games.filter((game) => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'All' || game.type === typeFilter;
-    const matchesStatus = statusFilter === 'All' || game.status === statusFilter;
-    const matchesZone = zoneFilter === 'All' || 
-      (zoneFilter === 'Unassigned' && (!game.zone || game.zone === '')) ||
-      game.zone === zoneFilter;
     const isApproved = game.approvalStatus === 'approved';
     
-    return matchesSearch && matchesType && matchesStatus && matchesZone && isApproved;
+    return matchesSearch && matchesType && isApproved;
   });
 
-  const sortedGames = [...filteredGames].sort((a, b) => {
-    if (sortBy === 'name') {
-      return sortDirection === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    } else if (sortBy === 'yearMade') {
-      const yearA = a.yearMade || 0;
-      const yearB = b.yearMade || 0;
-      return sortDirection === 'asc' ? yearA - yearB : yearB - yearA;
-    } else {
-      return sortDirection === 'asc'
-        ? new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime()
-        : new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
-    }
-  });
-
-  const toggleSort = (field: 'name' | 'yearMade' | 'dateAdded') => {
-    if (sortBy === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(field);
-      setSortDirection('asc');
-    }
-  };
+  // Simple alphabetical sort by name
+  const sortedGames = [...filteredGames].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="w-full">
       <div className="mb-6 space-y-4">
-        {/* Quick Type Filters */}
+        {/* Type Filter Buttons */}
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setTypeFilter('All')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
               typeFilter === 'All'
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-fpf-600 text-white'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
@@ -71,7 +40,7 @@ const GameList: React.FC = () => {
             onClick={() => setTypeFilter('Pinball')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
               typeFilter === 'Pinball'
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-fpf-600 text-white'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
@@ -82,7 +51,7 @@ const GameList: React.FC = () => {
             onClick={() => setTypeFilter('Arcade')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
               typeFilter === 'Arcade'
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-fpf-600 text-white'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
@@ -91,107 +60,18 @@ const GameList: React.FC = () => {
           </button>
         </div>
 
-        {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row md:items-center gap-3">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search games..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-            />
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            >
-              <Filter size={16} className="mr-2" />
-              More Filters
-            </button>
-
-            <div className="flex space-x-2">
-              <button
-                onClick={() => toggleSort('name')}
-                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
-                  sortBy === 'name'
-                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                Name
-                {sortBy === 'name' && (
-                  sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
-                )}
-              </button>
-              <button
-                onClick={() => toggleSort('yearMade')}
-                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
-                  sortBy === 'yearMade'
-                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                Year
-                {sortBy === 'yearMade' && (
-                  sortDirection === 'asc' ? <SortAsc size={16} className="ml-1" /> : <SortDesc size={16} className="ml-1" />
-                )}
-              </button>
-            </div>
-          </div>
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search games..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-800 dark:text-white"
+          />
         </div>
       </div>
-
-      {isFilterOpen && (
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner animate-fadeIn">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Status
-              </label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as GameStatus | 'All')}
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="All">All Statuses</option>
-                <option value="Operational">Operational</option>
-                <option value="In Repair">In Repair</option>
-                <option value="Awaiting Parts">Awaiting Parts</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Zone Assignment
-              </label>
-              <select
-                value={zoneFilter}
-                onChange={(e) => setZoneFilter(e.target.value)}
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="All">All Zones</option>
-                <option value="Unassigned">Unassigned</option>
-                <option value="Zone 1">Zone 1</option>
-                <option value="Zone 2">Zone 2</option>
-                <option value="Zone 3">Zone 3</option>
-                <option value="Zone 4">Zone 4</option>
-                <option value="Zone 5">Zone 5</option>
-                <option value="Zone 6">Zone 6</option>
-                <option value="Zone 7">Zone 7</option>
-                <option value="Zone 8">Zone 8</option>
-                <option value="Zone 9">Zone 9</option>
-                <option value="Zone 10">Zone 10</option>
-                <option value="Zone 11">Zone 11</option>
-                <option value="Zone 12">Zone 12</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      )}
 
       {filteredGames.length === 0 ? (
         <div className="text-center py-10">
