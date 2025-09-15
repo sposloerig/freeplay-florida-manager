@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Menu, X, TowerControl as GameController, Plus, DollarSign, Gamepad2 } from 'lucide-react';
+import { Moon, Sun, Menu, X, TowerControl as GameController, Plus, DollarSign, Gamepad2, Mail } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -76,6 +76,14 @@ const Header: React.FC = () => {
               <DollarSign size={16} className="mr-1" />
               Marketplace
             </Link>
+            <Link 
+              to="/contact" 
+              className={`transition-colors hover:text-fpf-200 py-2 flex items-center ${
+                location.pathname === '/contact' ? 'border-b-2 border-white font-medium' : ''
+              }`}>
+              <Mail size={16} className="mr-1" />
+              Contact
+            </Link>
             <button 
               onClick={toggleDarkMode} 
               className="p-2 rounded-full hover:bg-fpf-600 transition-colors"
@@ -127,6 +135,16 @@ const Header: React.FC = () => {
               }`}>
               <DollarSign size={16} className="mr-1" />
               Marketplace
+            </Link>
+            <Link 
+              to="/contact" 
+              className={`block px-3 py-2 rounded-md flex items-center ${
+                location.pathname === '/contact' 
+                  ? 'bg-fpf-900 text-white font-medium' 
+                  : 'text-fpf-100 hover:bg-fpf-700'
+              }`}>
+              <Mail size={16} className="mr-1" />
+              Contact
             </Link>
           </nav>
         </div>

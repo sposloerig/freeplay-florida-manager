@@ -25,6 +25,7 @@ import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SubmitGamePage from './pages/SubmitGamePage';
 import MarketplacePage from './pages/MarketplacePage';
+import ContactPage from './pages/ContactPage';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
                     <Route path="/submit-game" element={<SubmitGamePage />} />
                     <Route path="/marketplace" element={<MarketplacePage />} />
+                    <Route path="/contact" element={<ContactPage />} />
                     
                     {/* Public repair reporting - no authentication required */}
                     <Route path="/report-issue" element={<PublicRepairPage />} />
