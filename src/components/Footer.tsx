@@ -48,11 +48,6 @@ const Footer: React.FC = () => {
                   Marketplace
                 </Link>
               </li>
-              <li>
-                <Link to="/report-issue" className="hover:text-indigo-400 transition-colors">
-                  Report Issue
-                </Link>
-              </li>
             </ul>
           </div>
 
