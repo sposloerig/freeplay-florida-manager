@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CheckCircle, Key, Wrench, MapPin, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, CheckCircle, Key, Wrench, MapPin, AlertCircle, Edit3 } from 'lucide-react';
 import { useGameContext } from '../context/GameContext';
 import { Game } from '../types';
 
@@ -183,9 +184,19 @@ const AdminCheckInPage: React.FC = () => {
       {selectedGame && (
         <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white mb-2">
-              Check In: {selectedGame.name}
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">
+                Check In: {selectedGame.name}
+              </h2>
+              <Link
+                to={`/edit/${selectedGame.id}`}
+                className="inline-flex items-center px-3 py-2 bg-fpf-600 text-white rounded-md hover:bg-fpf-700 transition-colors text-sm"
+                title="Edit game details if information is incorrect"
+              >
+                <Edit3 size={16} className="mr-2" />
+                Edit Game Details
+              </Link>
+            </div>
             <div className="bg-gray-700 rounded-lg p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
                 <div>
@@ -211,6 +222,14 @@ const AdminCheckInPage: React.FC = () => {
                 <div>
                   <span className="font-medium">Status:</span> {getStatusBadge(selectedGame)}
                 </div>
+              </div>
+              
+              {/* Notice about editing */}
+              <div className="mt-3 p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
+                <p className="text-sm text-blue-200">
+                  <AlertCircle size={16} className="inline mr-2" />
+                  Notice incorrect information? Use the "Edit Game Details" button above to make corrections before checking in.
+                </p>
               </div>
             </div>
           </div>
