@@ -21,6 +21,11 @@ const AdminBuyerInquiriesPage: React.FC = () => {
     try {
       setLoading(true);
       console.log('Fetching buyer inquiries...');
+      
+      // Check current user
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user?.email);
+      
       const { data, error } = await supabase
         .from('buyer_inquiries')
         .select(`
@@ -37,6 +42,12 @@ const AdminBuyerInquiriesPage: React.FC = () => {
 
       if (error) {
         console.error('Supabase error:', error);
+        console.error('Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
 
