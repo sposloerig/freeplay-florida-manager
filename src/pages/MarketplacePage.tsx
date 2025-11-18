@@ -96,7 +96,9 @@ const MarketplacePage: React.FC = () => {
               <option value="all">All Types</option>
               <option value="Arcade">Arcade</option>
               <option value="Pinball">Pinball</option>
-              <option value="Skeeball">Skeeball</option>
+              <option value="Console">Console</option>
+              <option value="Computer">Computer</option>
+              <option value="Handheld">Handheld</option>
               <option value="Other">Other</option>
             </select>
           </div>
