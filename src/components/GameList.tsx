@@ -29,7 +29,7 @@ const GameList: React.FC = () => {
             onClick={() => setTypeFilter('All')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
               typeFilter === 'All'
-                ? 'bg-fpf-600 text-white'
+                ? 'bg-indigo-600 text-white'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
@@ -37,10 +37,21 @@ const GameList: React.FC = () => {
             All Games
           </button>
           <button
+            onClick={() => setTypeFilter('Arcade')}
+            className={`flex items-center px-4 py-2 rounded-full transition-colors ${
+              typeFilter === 'Arcade'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Gamepad2 size={18} className="mr-2" />
+            Arcade
+          </button>
+          <button
             onClick={() => setTypeFilter('Pinball')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
               typeFilter === 'Pinball'
-                ? 'bg-fpf-600 text-white'
+                ? 'bg-indigo-600 text-white'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
@@ -48,15 +59,26 @@ const GameList: React.FC = () => {
             Pinball
           </button>
           <button
-            onClick={() => setTypeFilter('Arcade')}
+            onClick={() => setTypeFilter('Console')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
-              typeFilter === 'Arcade'
-                ? 'bg-fpf-600 text-white'
+              typeFilter === 'Console'
+                ? 'bg-indigo-600 text-white'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             <Gamepad2 size={18} className="mr-2" />
-            Arcade
+            Console
+          </button>
+          <button
+            onClick={() => setTypeFilter('Other')}
+            className={`flex items-center px-4 py-2 rounded-full transition-colors ${
+              typeFilter === 'Other'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Gamepad2 size={18} className="mr-2" />
+            Other
           </button>
         </div>
 
@@ -68,7 +90,7 @@ const GameList: React.FC = () => {
             placeholder="Search games..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fpf-500 dark:bg-gray-800 dark:text-white"
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
           />
         </div>
       </div>
