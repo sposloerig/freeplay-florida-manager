@@ -221,6 +221,7 @@ const PublicGameSubmissionForm: React.FC = () => {
               >
                 <option value="Arcade">Arcade</option>
                 <option value="Pinball">Pinball</option>
+                <option value="Skeeball">Skeeball</option>
                 <option value="Console">Console</option>
                 <option value="Computer">Computer</option>
                 <option value="Handheld">Handheld</option>

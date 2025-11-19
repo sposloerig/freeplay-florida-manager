@@ -1,6 +1,6 @@
 import { User } from '@supabase/supabase-js';
 
-export type GameType = 'Pinball' | 'Arcade' | 'Console' | 'Computer' | 'Handheld' | 'Other';
+export type GameType = 'Pinball' | 'Arcade' | 'Console' | 'Computer' | 'Handheld' | 'Skeeball' | 'Other';
 
 export type GameLocation = 'Main Hall' | 'Side Room' | 'Outdoor Area' | 'Other';
 

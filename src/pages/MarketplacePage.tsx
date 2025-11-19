@@ -96,6 +96,7 @@ const MarketplacePage: React.FC = () => {
               <option value="all">All Types</option>
               <option value="Arcade">Arcade</option>
               <option value="Pinball">Pinball</option>
+              <option value="Skeeball">Skeeball</option>
               <option value="Console">Console</option>
               <option value="Computer">Computer</option>
               <option value="Handheld">Handheld</option>
@@ -120,31 +121,13 @@ const MarketplacePage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {filteredGames.map((game) => {
             // Create URL-friendly slug from game name only (single location event)
             const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
             return (
               <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
-                {/* Game Image */}
-                <div className="relative h-48 bg-gradient-to-br from-fpf-500 to-fpf-purple-600 flex items-center justify-center">
-                  {game.images && game.images.length > 0 ? (
-                    <img
-                      src={game.images[0]}
-                      alt={game.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Gamepad2 className="w-16 h-16 text-white opacity-50" />
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      For Sale
-                    </span>
-                  </div>
-                </div>
-
               <div className="p-6 flex flex-col flex-grow">
                 {/* Game Info */}
                 <div className="mb-4">

@@ -59,6 +59,17 @@ const GameList: React.FC = () => {
             Pinball
           </button>
           <button
+            onClick={() => setTypeFilter('Skeeball')}
+            className={`flex items-center px-4 py-2 rounded-full transition-colors ${
+              typeFilter === 'Skeeball'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Gamepad2 size={18} className="mr-2" />
+            Skeeball
+          </button>
+          <button
             onClick={() => setTypeFilter('Console')}
             className={`flex items-center px-4 py-2 rounded-full transition-colors ${
               typeFilter === 'Console'
