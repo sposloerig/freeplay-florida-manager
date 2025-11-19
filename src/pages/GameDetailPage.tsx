@@ -32,6 +32,7 @@ import {
   Printer
 } from 'lucide-react';
 import { Game, Repair } from '../types';
+import { generateQRPrintHTML } from '../utils/qrPrintStyles';
 
 const GameDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -220,116 +221,13 @@ Found on: https://fplay.us/game/${game.id}`);
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>QR Code - ${game.name}</title>
-          <style>
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
-            @page {
-              size: 2in 1in;
-              margin: 0;
-            }
-            body { 
-              font-family: Arial, sans-serif; 
-              margin: 0;
-              padding: 0;
-              width: 2in;
-              height: 1in;
-              display: flex;
-              align-items: flex-start;
-              justify-content: flex-start;
-            }
-            .qr-container { 
-              width: 2in;
-              height: 1in;
-              padding: 0.1in 0.05in 0.05in 0.08in;
-              background: white;
-              display: flex;
-              flex-direction: row;
-              align-items: flex-start;
-              justify-content: flex-start;
-              gap: 0.08in;
-            }
-            .qr-section {
-              flex-shrink: 0;
-            }
-            .text-section {
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-start;
-              text-align: left;
-              padding-top: 0.02in;
-            }
-            .game-title { 
-              font-size: 10px; 
-              font-weight: bold; 
-              margin-bottom: 4px;
-              line-height: 1.2;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-            }
-            .zone-info { 
-              font-size: 8px; 
-              color: #2563eb; 
-              margin-bottom: 4px;
-              font-weight: bold;
-            }
-            #qr-code {
-              margin: 0;
-            }
-            #qr-code img {
-              display: block;
-              margin: 0;
-            }
-            .instructions { 
-              font-size: 7px; 
-              margin-top: 6px; 
-              color: #333;
-              line-height: 1.4;
-            }
-            @media print {
-              body { 
-                margin: 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="qr-container">
-            <div class="qr-section">
-              <div id="qr-code"></div>
-            </div>
-            <div class="text-section">
-              <div class="game-title">${game.name}</div>
-              ${game.zone ? `<div class="zone-info">📍 ${game.zone}</div>` : ''}
-              <div class="instructions">
-                Scan if game broken<br/>or needs service
-              </div>
-            </div>
-          </div>
-          <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
-          <script>
-            const qr = qrcode(0, 'M');
-            qr.addData('${repairUrl}');
-            qr.make();
-            document.getElementById('qr-code').innerHTML = qr.createImgTag(2.2, 0);
-            setTimeout(() => {
-              window.print();
-              setTimeout(() => window.close(), 100);
-            }, 500);
-          </script>
-        </body>
-      </html>
-    `);
+    const html = generateQRPrintHTML({
+      gameName: game.name,
+      repairUrl,
+      zone: game.zone
+    });
+
+    printWindow.document.write(html);
     printWindow.document.close();
   };
 

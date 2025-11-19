@@ -1,6 +1,7 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Printer } from 'lucide-react';
+import { generateQRPrintHTML } from '../utils/qrPrintStyles';
 
 interface GameQRCodeProps {
   gameId: string;
@@ -41,175 +42,19 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>QR Code - ${gameName}</title>
-          <style>
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
-            @page {
-              size: 2in 1in;
-              margin: 0;
-            }
-            body { 
-              font-family: Arial, sans-serif; 
-              margin: 0;
-              padding: 0;
-              width: 2in;
-              height: 1in;
-              display: flex;
-              align-items: flex-start;
-              justify-content: flex-start;
-            }
-            .qr-container { 
-              width: 2in;
-              height: 1in;
-              padding: 0.1in 0.05in 0.05in 0.08in;
-              background: white;
-              display: flex;
-              flex-direction: row;
-              align-items: flex-start;
-              justify-content: flex-start;
-              gap: 0.08in;
-            }
-            .qr-section {
-              flex-shrink: 0;
-            }
-            .text-section {
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-start;
-              text-align: left;
-              padding-top: 0.02in;
-            }
-            .game-title { 
-              font-size: 10px; 
-              font-weight: bold; 
-              margin-bottom: 4px;
-              line-height: 1.2;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-            }
-            .zone-info { 
-              font-size: 8px; 
-              color: #2563eb; 
-              margin-bottom: 4px;
-              font-weight: bold;
-            }
-            #qr-code {
-              margin: 0;
-            }
-            #qr-code img {
-              display: block;
-              margin: 0;
-            }
-            .sales-section {
-              background: #f0f9ff;
-              border: 1px solid #0ea5e9;
-              border-radius: 2px;
-              padding: 2px;
-              margin: 2px 0;
-              font-size: 6px;
-            }
-            .for-sale-badge {
-              background: #0ea5e9;
-              color: white;
-              padding: 1px 3px;
-              border-radius: 2px;
-              font-size: 6px;
-              font-weight: bold;
-              margin-bottom: 1px;
-            }
-            .price {
-              font-size: 8px;
-              font-weight: bold;
-              color: #0ea5e9;
-              margin-bottom: 1px;
-            }
-            .owner-name {
-              font-size: 6px;
-              font-weight: bold;
-              margin-bottom: 1px;
-            }
-            .contact-detail {
-              font-size: 5px;
-              margin: 0;
-            }
-            .marketplace-info {
-              font-size: 6px;
-              color: #0ea5e9;
-              font-weight: bold;
-            }
-            .instructions { 
-              font-size: 7px; 
-              margin-top: 6px; 
-              color: #333;
-              line-height: 1.4;
-            }
-            @media print {
-              body { 
-                margin: 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-              }
-              .qr-container { 
-                border: none;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="qr-container">
-            <div class="qr-section">
-              <div id="qr-code"></div>
-            </div>
-            <div class="text-section">
-              <div class="game-title">${gameName}</div>
-              ${zone ? `<div class="zone-info">📍 ${zone}</div>` : ''}
-              ${forSale ? `
-                <div class="sales-section">
-                  <div class="for-sale-badge">🏷️ FOR SALE</div>
-                  ${askingPrice ? `<div class="price">$${askingPrice.toLocaleString()}</div>` : '<div class="price">Price on request</div>'}
-                  ${displayContactPublicly && (ownerEmail || ownerPhone) ? `
-                    <div class="contact-info">
-                      ${ownerName ? `<div class="owner-name">Owner: ${ownerName}</div>` : ''}
-                      ${ownerEmail ? `<div class="contact-detail">📧 ${ownerEmail}</div>` : ''}
-                      ${ownerPhone ? `<div class="contact-detail">📞 ${ownerPhone}</div>` : ''}
-                    </div>
-                  ` : `
-                    <div class="marketplace-info">
-                      Visit fplay.us/marketplace<br/>
-                      to make an offer or purchase
-                    </div>
-                  `}
-                </div>
-              ` : ''}
-              <div class="instructions">
-                Scan if game broken<br/>or needs service
-              </div>
-            </div>
-          </div>
-          <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
-          <script>
-            const qr = qrcode(0, 'M');
-            qr.addData('${repairUrl}');
-            qr.make();
-            // Optimized size for left-aligned layout
-            document.getElementById('qr-code').innerHTML = qr.createImgTag(2.2, 0);
-            setTimeout(() => {
-              window.print();
-              setTimeout(() => window.close(), 100);
-            }, 500);
-          </script>
-        </body>
-      </html>
-    `);
+    const html = generateQRPrintHTML({
+      gameName,
+      repairUrl,
+      zone,
+      forSale,
+      askingPrice,
+      ownerName,
+      ownerEmail,
+      ownerPhone,
+      displayContactPublicly
+    });
+
+    printWindow.document.write(html);
     printWindow.document.close();
   };
 
