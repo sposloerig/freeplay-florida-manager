@@ -95,5 +95,6 @@ export interface BuyerInquiry {
 export const MANAGER_EMAILS = [
   // Add your Free Play Florida admin emails here
   'admin@freeplayflorida.com',
-  'test@admin.com' // Temporary admin account
+  'test@admin.com', // Temporary admin account
+  'b@red5.cc' // Brian's admin account
 ];

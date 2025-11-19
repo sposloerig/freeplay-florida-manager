@@ -1,6 +1,102 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock, MessageSquare, Mail, CheckCircle } from 'lucide-react';
+import { TowerControl as GameController, Wrench, Calendar, HelpCircle, ShoppingBag, Plus, Settings, Users, Trophy, Gift, Tag, DollarSign, Key, QrCode, Clock, MessageSquare, Mail, CheckCircle, Download } from 'lucide-react';
+import { useGameContext } from '../context/GameContext';
+
+const AdminDashboardPage: React.FC = () => {
+  const { games } = useGameContext();
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportCSV = () => {
+    setExporting(true);
+    
+    try {
+      // Define CSV headers
+      const headers = [
+        'ID',
+        'Name',
+        'Type',
+        'Type Other',
+        'Status',
+        'Zone',
+        'Year Made',
+        'High Score',
+        'Condition Notes',
+        'Approval Status',
+        'Owner Name',
+        'Owner Email',
+        'Owner Phone',
+        'Owner Address',
+        'Allow Others To Service',
+        'Service Notes',
+        'For Sale',
+        'Asking Price',
+        'Accept Offers',
+        'Sale Condition Notes',
+        'Sale Notes',
+        'Checked In',
+        'Has Key',
+        'Working Condition',
+        'Date Added',
+        'Last Updated'
+      ];
+
+      // Convert games to CSV rows
+      const rows = games.map(game => [
+        game.id,
+        `"${game.name.replace(/"/g, '""')}"`, // Escape quotes
+        game.type,
+        game.otherType || '',
+        game.status,
+        game.zone || '',
+        game.yearMade || '',
+        game.highScore || '',
+        game.conditionNotes ? `"${game.conditionNotes.replace(/"/g, '""')}"` : '',
+        game.approvalStatus,
+        game.ownerName ? `"${game.ownerName.replace(/"/g, '""')}"` : '',
+        game.ownerEmail || '',
+        game.ownerPhone || '',
+        game.ownerAddress ? `"${game.ownerAddress.replace(/"/g, '""')}"` : '',
+        game.allowOthersToService ? 'Yes' : 'No',
+        game.serviceNotes ? `"${game.serviceNotes.replace(/"/g, '""')}"` : '',
+        game.forSale ? 'Yes' : 'No',
+        game.askingPrice || '',
+        game.acceptOffers ? 'Yes' : 'No',
+        game.saleConditionNotes ? `"${game.saleConditionNotes.replace(/"/g, '""')}"` : '',
+        game.saleNotes ? `"${game.saleNotes.replace(/"/g, '""')}"` : '',
+        game.checkedIn ? 'Yes' : 'No',
+        game.hasKey ? 'Yes' : 'No',
+        game.workingCondition ? 'Yes' : 'No',
+        game.dateAdded ? new Date(game.dateAdded).toISOString() : '',
+        game.lastUpdated ? new Date(game.lastUpdated).toISOString() : ''
+      ]);
+
+      // Combine headers and rows
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.join(','))
+      ].join('\n');
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `freeplay-games-export-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Show success message briefly
+      setTimeout(() => setExporting(false), 1000);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      alert('Failed to export CSV. Please try again.');
+      setExporting(false);
+    }
+  };
 
 const AdminDashboardPage: React.FC = () => {
   const adminFeatures = [
@@ -81,7 +177,34 @@ const AdminDashboardPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-12 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+      {/* Export Section */}
+      <div className="mt-12 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start flex-1">
+            <Download className="w-6 h-6 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
+                Export Game Data
+              </h3>
+              <p className="text-green-800 dark:text-green-200 text-sm">
+                Download all game data as CSV for backup, analysis, or external use. Includes all game details, owner info, sales data, and check-in status.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleExportCSV}
+            disabled={exporting}
+            className={`ml-4 flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm ${
+              exporting ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+          >
+            <Download size={18} className="mr-2" />
+            {exporting ? 'Exporting...' : `Export ${games.length} Games`}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
         <div className="flex items-start">
           <Settings className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
           <div>
