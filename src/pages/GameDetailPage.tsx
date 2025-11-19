@@ -34,16 +34,13 @@ import {
 import { Game, Repair } from '../types';
 
 const GameDetailPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const { games, getGame, deleteGame } = useGameContext();
   const { user, isManager } = useAuth();
   const navigate = useNavigate();
   
-  // Find game by slug (URL-friendly name) - Move this before any state that depends on it
-  const game = games.find(g => {
-    const gameSlug = g.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return gameSlug === slug;
-  });
+  // Find game by ID
+  const game = games.find(g => g.id === id);
   
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -58,7 +55,7 @@ const GameDetailPage: React.FC = () => {
   const [showBuyerInquiryModal, setShowBuyerInquiryModal] = useState(false);
 
   useEffect(() => {
-    if (!slug) {
+    if (!id) {
       setError('Game ID is missing');
       setLoading(false);
       return;
@@ -75,7 +72,7 @@ const GameDetailPage: React.FC = () => {
     } else {
       setLoading(false);
     }
-  }, [slug, game, user]);
+  }, [id, game, user]);
 
   const fetchRepairs = async () => {
     if (!game) return;
@@ -189,7 +186,7 @@ Could you provide more details about the condition and availability?
 
 Thanks!
 
-Found on: https://fplay.us/game/${slug}`);
+Found on: https://fplay.us/game/${game.id}`);
 
       // Try to open email client
       try {
@@ -328,15 +325,15 @@ Found on: https://fplay.us/game/${slug}`);
     printWindow.document.close();
   };
 
-  if (!slug || !game) {
+  if (!id || !game) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
         <AlertTriangle size={48} className="mx-auto text-yellow-500 mb-4" />
         <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-          {!slug ? 'Invalid Game ID' : 'Game Not Found'}
+          {!id ? 'Invalid Game ID' : 'Game Not Found'}
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mb-8">
-          {!slug ? 'The game ID is missing or invalid.' : 'The game you\'re looking for doesn\'t exist or has been removed.'}
+          {!id ? 'The game ID is missing or invalid.' : 'The game you\'re looking for doesn\'t exist or has been removed.'}
         </p>
         <Link 
           to="/collection" 

@@ -123,9 +123,6 @@ const MarketplacePage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {filteredGames.map((game) => {
-            // Create URL-friendly slug from game name only (single location event)
-            const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            
             return (
               <div key={game.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
               <div className="p-6 flex flex-col flex-grow">
@@ -235,7 +232,7 @@ const MarketplacePage: React.FC = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-2 mt-4">
                   <Link
-                    to={`/game/${slug}`}
+                    to={`/game/${game.id}`}
                     className="flex-1 bg-fpf-600 text-white py-2 px-4 rounded-md hover:bg-fpf-700 transition-colors flex items-center justify-center text-sm"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />

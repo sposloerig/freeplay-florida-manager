@@ -240,7 +240,6 @@ const AdminContactsPage: React.FC = () => {
               <div className="p-6">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {contact.games.map((game) => {
-                    const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                     return (
                       <div key={game.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                         <div className="flex items-start justify-between mb-2">
@@ -280,7 +279,7 @@ const AdminContactsPage: React.FC = () => {
                         
                         <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                           <Link
-                            to={`/game/${slug}`}
+                            to={`/game/${game.id}`}
                             className="inline-flex items-center text-sm text-fpf-600 hover:text-fpf-700 font-medium"
                           >
                             <ExternalLink size={14} className="mr-1" />

@@ -40,7 +40,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/collection" element={<CollectionPage />} />
-                    <Route path="/game/:slug" element={<GameDetailPage />} />
+                    <Route path="/game/:id" element={<GameDetailPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
                     <Route path="/submit-game" element={<SubmitGamePage />} />

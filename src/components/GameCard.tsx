@@ -27,12 +27,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     }
   };
 
-  // Create URL-friendly slug from game name only (single location event)
-  const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <Link to={`/game/${slug}`} className="block">
+      <Link to={`/game/${game.id}`} className="block">
         <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 cursor-pointer">
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -119,7 +116,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
         </div>
         <div className="mt-4 pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-end">
           <Link 
-            to={`/game/${slug}`}
+            to={`/game/${game.id}`}
             className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium text-sm transition-colors"
           >
             View Details →

@@ -236,7 +236,6 @@ const GameList: React.FC = () => {
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {sortedGames.map((game) => {
-                  const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                   const getStatusColor = (status: string) => {
                     switch (status) {
                       case 'Operational':
@@ -306,7 +305,7 @@ const GameList: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
-                          to={`/game/${slug}`}
+                          to={`/game/${game.id}`}
                           className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 inline-flex items-center"
                         >
                           View Details
@@ -323,7 +322,6 @@ const GameList: React.FC = () => {
           {/* Mobile List View */}
           <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
             {sortedGames.map((game) => {
-              const slug = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
               const getStatusColor = (status: string) => {
                 switch (status) {
                   case 'Operational':
@@ -340,7 +338,7 @@ const GameList: React.FC = () => {
               return (
                 <Link
                   key={game.id}
-                  to={`/game/${slug}`}
+                  to={`/game/${game.id}`}
                   className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-2">
