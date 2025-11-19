@@ -47,77 +47,110 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
         <head>
           <title>QR Code - ${gameName}</title>
           <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            @page {
+              size: 2in 1in;
+              margin: 0;
+            }
             body { 
               font-family: Arial, sans-serif; 
               text-align: center; 
-              padding: 20px; 
               margin: 0;
+              padding: 0;
+              width: 2in;
+              height: 1in;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
             .qr-container { 
-              border: 2px solid #000; 
-              padding: 20px; 
-              margin: 20px auto; 
-              max-width: ${forSale ? '400px' : '300px'};
+              width: 2in;
+              height: 1in;
+              padding: 0.05in;
               background: white;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
             }
             .game-title { 
-              font-size: 18px; 
+              font-size: 9px; 
               font-weight: bold; 
-              margin-bottom: 10px; 
+              margin-bottom: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 1.9in;
             }
             .zone-info { 
-              font-size: 16px; 
+              font-size: 8px; 
               color: #2563eb; 
-              margin-bottom: 15px;
+              margin-bottom: 2px;
               font-weight: bold;
+            }
+            #qr-code {
+              margin: 2px 0;
+            }
+            #qr-code img {
+              display: block;
+              margin: 0 auto;
             }
             .sales-section {
               background: #f0f9ff;
-              border: 2px solid #0ea5e9;
-              border-radius: 8px;
-              padding: 15px;
-              margin: 15px 0;
+              border: 1px solid #0ea5e9;
+              border-radius: 2px;
+              padding: 2px;
+              margin: 2px 0;
+              font-size: 6px;
             }
             .for-sale-badge {
               background: #0ea5e9;
               color: white;
-              padding: 4px 8px;
-              border-radius: 4px;
-              font-size: 12px;
+              padding: 1px 3px;
+              border-radius: 2px;
+              font-size: 6px;
               font-weight: bold;
-              margin-bottom: 8px;
+              margin-bottom: 1px;
             }
             .price {
-              font-size: 20px;
+              font-size: 8px;
               font-weight: bold;
               color: #0ea5e9;
-              margin-bottom: 10px;
+              margin-bottom: 1px;
             }
             .owner-name {
-              font-size: 14px;
+              font-size: 6px;
               font-weight: bold;
-              margin-bottom: 5px;
+              margin-bottom: 1px;
             }
             .contact-detail {
-              font-size: 12px;
-              margin: 2px 0;
+              font-size: 5px;
+              margin: 0;
             }
             .marketplace-info {
-              font-size: 11px;
+              font-size: 6px;
               color: #0ea5e9;
               font-weight: bold;
             }
             .instructions { 
-              font-size: 12px; 
-              margin-top: 15px; 
-              color: #666;
-              border-top: 1px solid #ddd;
-              padding-top: 10px;
+              font-size: 6px; 
+              margin-top: 2px; 
+              color: #333;
+              padding-top: 2px;
             }
             @media print {
-              body { margin: 0; }
-              .qr-container { border: 2px solid #000; }
-              .sales-section { border: 2px solid #0ea5e9; }
+              body { 
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+              .qr-container { 
+                border: none;
+              }
             }
           </style>
         </head>
@@ -145,17 +178,20 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
             ` : ''}
             <div id="qr-code"></div>
             <div class="instructions">
-              <strong>Primary:</strong> Scan to report issues<br/>
-              Free Play Florida
+              Scan to report issues
             </div>
           </div>
           <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
           <script>
-            const qr = qrcode(0, 'H');
+            const qr = qrcode(0, 'M');
             qr.addData('${repairUrl}');
             qr.make();
-            document.getElementById('qr-code').innerHTML = qr.createImgTag(${forSale ? '6' : '4'}, 8);
-            setTimeout(() => window.print(), 500);
+            // Size optimized for 2" x 1" label (approximately 1.5" QR code)
+            document.getElementById('qr-code').innerHTML = qr.createImgTag(2, 0);
+            setTimeout(() => {
+              window.print();
+              setTimeout(() => window.close(), 100);
+            }, 500);
           </script>
         </body>
       </html>
@@ -209,10 +245,10 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
       {printable && (
         <button
           onClick={handlePrint}
-          className="flex items-center px-4 py-2 bg-fpf-600 text-white rounded-md hover:bg-fpf-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm"
         >
           <Printer size={16} className="mr-2" />
-          Print QR Code
+          Print Label (2" x 1")
         </button>
       )}
     </div>

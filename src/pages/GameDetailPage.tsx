@@ -28,7 +28,8 @@ import {
   User,
   DollarSign,
   ShoppingCart,
-  Tag
+  Tag,
+  Printer
 } from 'lucide-react';
 import { Game, Repair } from '../types';
 
@@ -203,6 +204,116 @@ Found on: https://fplay.us/game/${slug}`);
     }
   };
 
+  const handleQuickPrint = () => {
+    if (!game) return;
+    
+    const baseUrl = 'https://fplay.us';
+    const repairUrl = game.shortId 
+      ? `${baseUrl}/r/${game.shortId}`
+      : `${baseUrl}/report-issue?gameId=${game.id}`;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>QR Code - ${game.name}</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            @page {
+              size: 2in 1in;
+              margin: 0;
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              text-align: center; 
+              margin: 0;
+              padding: 0;
+              width: 2in;
+              height: 1in;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .qr-container { 
+              width: 2in;
+              height: 1in;
+              padding: 0.05in;
+              background: white;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            }
+            .game-title { 
+              font-size: 9px; 
+              font-weight: bold; 
+              margin-bottom: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 1.9in;
+            }
+            .zone-info { 
+              font-size: 8px; 
+              color: #2563eb; 
+              margin-bottom: 2px;
+              font-weight: bold;
+            }
+            #qr-code {
+              margin: 2px 0;
+            }
+            #qr-code img {
+              display: block;
+              margin: 0 auto;
+            }
+            .instructions { 
+              font-size: 6px; 
+              margin-top: 2px; 
+              color: #333;
+              padding-top: 2px;
+            }
+            @media print {
+              body { 
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="qr-container">
+            <div class="game-title">${game.name}</div>
+            ${game.zone ? `<div class="zone-info">📍 ${game.zone}</div>` : ''}
+            <div id="qr-code"></div>
+            <div class="instructions">
+              Scan to report issues
+            </div>
+          </div>
+          <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+          <script>
+            const qr = qrcode(0, 'M');
+            qr.addData('${repairUrl}');
+            qr.make();
+            document.getElementById('qr-code').innerHTML = qr.createImgTag(2, 0);
+            setTimeout(() => {
+              window.print();
+              setTimeout(() => window.close(), 100);
+            }, 500);
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   if (!slug || !game) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
@@ -279,16 +390,26 @@ Found on: https://fplay.us/game/${slug}`);
                 <button
                   onClick={() => setShowQRCode(!showQRCode)}
                   aria-label="Show QR Code"
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-fpf-600 dark:hover:text-fpf-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 >
                   <QrCode size={20} />
                 </button>
+                {isManager && (
+                  <button
+                    onClick={handleQuickPrint}
+                    aria-label="Print Label"
+                    title="Print 2x1 Label"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  >
+                    <Printer size={20} />
+                  </button>
+                )}
                 {user && (
                   <>
                     <button
                       onClick={() => navigate(`/edit/${game.id}`)}
                       aria-label="Edit game"
-                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-fpf-600 dark:hover:text-fpf-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                     >
                       <Edit size={20} />
                     </button>
