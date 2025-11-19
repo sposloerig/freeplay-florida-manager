@@ -232,52 +232,62 @@ Found on: https://fplay.us/game/${slug}`);
             }
             body { 
               font-family: Arial, sans-serif; 
-              text-align: center; 
               margin: 0;
               padding: 0;
               width: 2in;
               height: 1in;
               display: flex;
-              align-items: center;
-              justify-content: center;
+              align-items: flex-start;
+              justify-content: flex-start;
             }
             .qr-container { 
               width: 2in;
               height: 1in;
-              padding: 0.05in;
+              padding: 0.1in 0.05in 0.05in 0.08in;
               background: white;
               display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              justify-content: flex-start;
+              gap: 0.08in;
+            }
+            .qr-section {
+              flex-shrink: 0;
+            }
+            .text-section {
+              flex: 1;
+              display: flex;
               flex-direction: column;
-              align-items: center;
-              justify-content: center;
+              justify-content: flex-start;
+              text-align: left;
+              padding-top: 0.02in;
             }
             .game-title { 
-              font-size: 9px; 
+              font-size: 10px; 
               font-weight: bold; 
-              margin-bottom: 2px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-width: 1.9in;
+              margin-bottom: 4px;
+              line-height: 1.2;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
             }
             .zone-info { 
               font-size: 8px; 
               color: #2563eb; 
-              margin-bottom: 2px;
+              margin-bottom: 4px;
               font-weight: bold;
             }
             #qr-code {
-              margin: 2px 0;
+              margin: 0;
             }
             #qr-code img {
               display: block;
-              margin: 0 auto;
+              margin: 0;
             }
             .instructions { 
-              font-size: 6px; 
-              margin-top: 2px; 
+              font-size: 7px; 
+              margin-top: 6px; 
               color: #333;
-              padding-top: 2px;
+              line-height: 1.4;
             }
             @media print {
               body { 
@@ -290,11 +300,15 @@ Found on: https://fplay.us/game/${slug}`);
         </head>
         <body>
           <div class="qr-container">
-            <div class="game-title">${game.name}</div>
-            ${game.zone ? `<div class="zone-info">📍 ${game.zone}</div>` : ''}
-            <div id="qr-code"></div>
-            <div class="instructions">
-              Scan to report issues
+            <div class="qr-section">
+              <div id="qr-code"></div>
+            </div>
+            <div class="text-section">
+              <div class="game-title">${game.name}</div>
+              ${game.zone ? `<div class="zone-info">📍 ${game.zone}</div>` : ''}
+              <div class="instructions">
+                Scan if game broken<br/>or needs service
+              </div>
             </div>
           </div>
           <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
@@ -302,7 +316,7 @@ Found on: https://fplay.us/game/${slug}`);
             const qr = qrcode(0, 'M');
             qr.addData('${repairUrl}');
             qr.make();
-            document.getElementById('qr-code').innerHTML = qr.createImgTag(2, 0);
+            document.getElementById('qr-code').innerHTML = qr.createImgTag(2.2, 0);
             setTimeout(() => {
               window.print();
               setTimeout(() => window.close(), 100);

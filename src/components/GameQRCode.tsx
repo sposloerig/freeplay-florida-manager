@@ -58,46 +58,56 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
             }
             body { 
               font-family: Arial, sans-serif; 
-              text-align: center; 
               margin: 0;
               padding: 0;
               width: 2in;
               height: 1in;
               display: flex;
-              align-items: center;
-              justify-content: center;
+              align-items: flex-start;
+              justify-content: flex-start;
             }
             .qr-container { 
               width: 2in;
               height: 1in;
-              padding: 0.05in;
+              padding: 0.1in 0.05in 0.05in 0.08in;
               background: white;
               display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              justify-content: flex-start;
+              gap: 0.08in;
+            }
+            .qr-section {
+              flex-shrink: 0;
+            }
+            .text-section {
+              flex: 1;
+              display: flex;
               flex-direction: column;
-              align-items: center;
-              justify-content: center;
+              justify-content: flex-start;
+              text-align: left;
+              padding-top: 0.02in;
             }
             .game-title { 
-              font-size: 9px; 
+              font-size: 10px; 
               font-weight: bold; 
-              margin-bottom: 2px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-width: 1.9in;
+              margin-bottom: 4px;
+              line-height: 1.2;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
             }
             .zone-info { 
               font-size: 8px; 
               color: #2563eb; 
-              margin-bottom: 2px;
+              margin-bottom: 4px;
               font-weight: bold;
             }
             #qr-code {
-              margin: 2px 0;
+              margin: 0;
             }
             #qr-code img {
               display: block;
-              margin: 0 auto;
+              margin: 0;
             }
             .sales-section {
               background: #f0f9ff;
@@ -137,10 +147,10 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
               font-weight: bold;
             }
             .instructions { 
-              font-size: 6px; 
-              margin-top: 2px; 
+              font-size: 7px; 
+              margin-top: 6px; 
               color: #333;
-              padding-top: 2px;
+              line-height: 1.4;
             }
             @media print {
               body { 
@@ -156,29 +166,33 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
         </head>
         <body>
           <div class="qr-container">
-            <div class="game-title">${gameName}</div>
-            ${zone ? `<div class="zone-info">📍 ${zone}</div>` : ''}
-            ${forSale ? `
-              <div class="sales-section">
-                <div class="for-sale-badge">🏷️ FOR SALE</div>
-                ${askingPrice ? `<div class="price">$${askingPrice.toLocaleString()}</div>` : '<div class="price">Price on request</div>'}
-                ${displayContactPublicly && (ownerEmail || ownerPhone) ? `
-                  <div class="contact-info">
-                    ${ownerName ? `<div class="owner-name">Owner: ${ownerName}</div>` : ''}
-                    ${ownerEmail ? `<div class="contact-detail">📧 ${ownerEmail}</div>` : ''}
-                    ${ownerPhone ? `<div class="contact-detail">📞 ${ownerPhone}</div>` : ''}
-                  </div>
-                ` : `
-                  <div class="marketplace-info">
-                    Visit fplay.us/marketplace<br/>
-                    to make an offer or purchase
-                  </div>
-                `}
+            <div class="qr-section">
+              <div id="qr-code"></div>
+            </div>
+            <div class="text-section">
+              <div class="game-title">${gameName}</div>
+              ${zone ? `<div class="zone-info">📍 ${zone}</div>` : ''}
+              ${forSale ? `
+                <div class="sales-section">
+                  <div class="for-sale-badge">🏷️ FOR SALE</div>
+                  ${askingPrice ? `<div class="price">$${askingPrice.toLocaleString()}</div>` : '<div class="price">Price on request</div>'}
+                  ${displayContactPublicly && (ownerEmail || ownerPhone) ? `
+                    <div class="contact-info">
+                      ${ownerName ? `<div class="owner-name">Owner: ${ownerName}</div>` : ''}
+                      ${ownerEmail ? `<div class="contact-detail">📧 ${ownerEmail}</div>` : ''}
+                      ${ownerPhone ? `<div class="contact-detail">📞 ${ownerPhone}</div>` : ''}
+                    </div>
+                  ` : `
+                    <div class="marketplace-info">
+                      Visit fplay.us/marketplace<br/>
+                      to make an offer or purchase
+                    </div>
+                  `}
+                </div>
+              ` : ''}
+              <div class="instructions">
+                Scan if game broken<br/>or needs service
               </div>
-            ` : ''}
-            <div id="qr-code"></div>
-            <div class="instructions">
-              Scan to report issues
             </div>
           </div>
           <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
@@ -186,8 +200,8 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
             const qr = qrcode(0, 'M');
             qr.addData('${repairUrl}');
             qr.make();
-            // Size optimized for 2" x 1" label (approximately 1.5" QR code)
-            document.getElementById('qr-code').innerHTML = qr.createImgTag(2, 0);
+            // Optimized size for left-aligned layout
+            document.getElementById('qr-code').innerHTML = qr.createImgTag(2.2, 0);
             setTimeout(() => {
               window.print();
               setTimeout(() => window.close(), 100);
