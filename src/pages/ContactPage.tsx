@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, User, MessageSquare, AlertCircle, CheckCircle } from 'lucide-react';
+import { Mail, MapPin, Send, AlertCircle, CheckCircle } from 'lucide-react';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -90,19 +90,6 @@ const ContactPage: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start space-x-3">
-                  <Phone className="w-5 h-5 text-fpf-600 dark:text-fpf-400 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Phone</p>
-                    <a 
-                      href="tel:+17279403928" 
-                      className="text-fpf-600 hover:text-fpf-700 dark:text-fpf-400 dark:hover:text-fpf-300"
-                    >
-                      (727) 940-3928
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
                   <MapPin className="w-5 h-5 text-fpf-600 dark:text-fpf-400 mt-1 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">Event Location</p>
@@ -120,8 +107,7 @@ const ContactPage: React.FC = () => {
                   Response Time
                 </h3>
                 <p className="text-sm text-fpf-700 dark:text-fpf-300">
-                  We typically respond to inquiries within 24-48 hours during business days. 
-                  For urgent matters, please call us directly.
+                  We typically respond to inquiries within 24-48 hours during business days.
                 </p>
               </div>
             </div>
