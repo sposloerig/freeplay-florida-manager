@@ -349,43 +349,37 @@ Found on: https://fplay.us/game/${slug}`);
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="md:flex">
-          {/* Main image */}
-          <div className="md:w-1/2 h-64 md:h-auto relative cursor-pointer" onClick={() => game.images.length > 0 && setActiveImageIndex(0)}>
-            {mainImageError ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700">
-                <ImageOff size={48} className="text-gray-400 dark:text-gray-500 mb-3" />
-                <span className="text-base font-medium text-gray-500 dark:text-gray-400 text-center px-4">
-                  Game Image Coming Soon
-                </span>
-              </div>
-            ) : game.images && game.images.length > 0 ? (
+          {/* Main image - only show if images exist */}
+          {game.images && game.images.length > 0 && !mainImageError && (
+            <div className="md:w-1/2 h-64 md:h-auto relative cursor-pointer" onClick={() => setActiveImageIndex(0)}>
               <img 
                 src={game.images[0]} 
                 alt={game.name}
                 className="w-full h-full object-cover"
                 onError={() => setMainImageError(true)}
               />
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700">
-                <ImageOff size={48} className="text-gray-400 dark:text-gray-500 mb-3" />
-                <span className="text-base font-medium text-gray-500 dark:text-gray-400 text-center px-4">
-                  No Images Available
+              <div className="absolute bottom-4 left-4">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(game.status)}`}>
+                  {game.status}
                 </span>
               </div>
-            )}
-            <div className="absolute bottom-4 left-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(game.status)}`}>
-                {game.status}
-              </span>
             </div>
-          </div>
+          )}
           
           {/* Game details */}
-          <div className="md:w-1/2 p-6 md:p-8">
+          <div className={`${game.images && game.images.length > 0 && !mainImageError ? 'md:w-1/2' : 'w-full'} p-6 md:p-8`}>
             <div className="flex justify-between items-start">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {game.name}
-              </h1>
+              <div className="flex-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  {game.name}
+                </h1>
+                {/* Show status badge here if no image */}
+                {(!game.images || game.images.length === 0 || mainImageError) && (
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(game.status)}`}>
+                    {game.status}
+                  </span>
+                )}
+              </div>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setShowQRCode(!showQRCode)}
