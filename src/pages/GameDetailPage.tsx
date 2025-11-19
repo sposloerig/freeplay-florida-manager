@@ -556,19 +556,30 @@ Found on: https://fplay.us/game/${slug}`);
               </div>
             )}
 
-            {/* Owner Contact Information - Only visible when owner allows public display */}
-            {game.displayContactPublicly && (
+            {/* Owner Contact Information - Always visible to admins, or when owner allows public display */}
+            {(isManager || game.displayContactPublicly) && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-3">
                   <User size={18} className="text-fpf-600 dark:text-fpf-400 mr-2" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Contact Owner
+                    {isManager ? 'Owner Information' : 'Contact Owner'}
                   </h3>
+                  {isManager && !game.displayContactPublicly && (
+                    <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 rounded-full">
+                      Private - Admin Only
+                    </span>
+                  )}
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    The owner has made their contact information public. You can reach out directly:
-                  </p>
+                  {isManager && !game.displayContactPublicly ? (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <strong>Admin View:</strong> This contact information is private and only visible to managers.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      The owner has made their contact information public. You can reach out directly:
+                    </p>
+                  )}
                   <div className="space-y-2">
                     <div className="flex items-center text-gray-700 dark:text-gray-300">
                       <User size={16} className="mr-2 text-fpf-600 dark:text-fpf-400" />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GameType } from '../types';
 import { useGameContext } from '../context/GameContext';
+import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Search, Gamepad2, PillIcon as PinballIcon, Calendar, DollarSign, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
@@ -9,6 +10,7 @@ type SortDirection = 'asc' | 'desc';
 
 const GameList: React.FC = () => {
   const { games } = useGameContext();
+  const { isManager } = useAuth();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<GameType | 'All'>('All');
   const [sortField, setSortField] = useState<SortField>('name');
@@ -262,6 +264,11 @@ const GameList: React.FC = () => {
                                 </span>
                               )}
                             </div>
+                            {isManager && game.ownerName && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                Owner: {game.ownerName}
+                              </div>
+                            )}
                             {game.forSale && game.askingPrice && (
                               <div className="text-xs text-green-600 dark:text-green-400 font-semibold">
                                 ${game.askingPrice.toLocaleString()}
