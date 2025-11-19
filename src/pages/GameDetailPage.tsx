@@ -50,9 +50,12 @@ const GameDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<number, boolean>>({});
-  const [mainImageError, setMainImageError] = useState(!game?.images?.[0]);
+  const [mainImageError, setMainImageError] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showBuyerInquiryModal, setShowBuyerInquiryModal] = useState(false);
+
+  // Check if game has valid images
+  const hasValidImages = game?.images && game.images.length > 0 && game.images[0] && game.images[0].trim() !== '';
 
   useEffect(() => {
     if (!id) {
@@ -67,12 +70,17 @@ const GameDetailPage: React.FC = () => {
       return;
     }
 
+    // Set main image error if no valid images
+    if (!hasValidImages) {
+      setMainImageError(true);
+    }
+
     if (user) {
       fetchRepairs();
     } else {
       setLoading(false);
     }
-  }, [id, game, user]);
+  }, [id, game, user, hasValidImages]);
 
   const fetchRepairs = async () => {
     if (!game) return;
@@ -360,8 +368,8 @@ Found on: https://fplay.us/game/${game.id}`);
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="md:flex">
-          {/* Main image - only show if images exist */}
-          {game.images && game.images.length > 0 && !mainImageError && (
+          {/* Main image - only show if valid images exist and no error */}
+          {hasValidImages && !mainImageError && (
             <div className="md:w-1/2 h-64 md:h-auto relative cursor-pointer" onClick={() => setActiveImageIndex(0)}>
               <img 
                 src={game.images[0]} 
@@ -378,14 +386,14 @@ Found on: https://fplay.us/game/${game.id}`);
           )}
           
           {/* Game details */}
-          <div className={`${game.images && game.images.length > 0 && !mainImageError ? 'md:w-1/2' : 'w-full'} p-6 md:p-8`}>
+          <div className={`${hasValidImages && !mainImageError ? 'md:w-1/2' : 'w-full'} p-6 md:p-8`}>
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                   {game.name}
                 </h1>
                 {/* Show status badge here if no image */}
-                {(!game.images || game.images.length === 0 || mainImageError) && (
+                {(!hasValidImages || mainImageError) && (
                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(game.status)}`}>
                     {game.status}
                   </span>
@@ -667,7 +675,7 @@ Found on: https://fplay.us/game/${game.id}`);
         </div>
         
         {/* Image gallery */}
-        {game.images && game.images.length > 0 && (
+        {hasValidImages && (
           <div className="p-6 md:p-8 border-t border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
