@@ -4,6 +4,7 @@ import { Printer } from 'lucide-react';
 
 interface GameQRCodeProps {
   gameId: string;
+  shortId?: string;
   gameName: string;
   zone?: string;
   printable?: boolean;
@@ -17,7 +18,8 @@ interface GameQRCodeProps {
 }
 
 const GameQRCode: React.FC<GameQRCodeProps> = ({ 
-  gameId, 
+  gameId,
+  shortId,
   gameName, 
   zone, 
   printable = false,
@@ -29,7 +31,10 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
   displayContactPublicly = false
 }) => {
   const baseUrl = window.location.origin;
-  const repairUrl = `${baseUrl}/report-issue?gameId=${gameId}`;
+  // Use short URL if short_id is available, otherwise fall back to full URL
+  const repairUrl = shortId 
+    ? `${baseUrl}/r/${shortId}`
+    : `${baseUrl}/report-issue?gameId=${gameId}`;
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');

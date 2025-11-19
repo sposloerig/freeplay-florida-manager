@@ -512,7 +512,8 @@ Found on: https://freeplayflorida.netlify.app/game/${slug}`);
             {showQRCode && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <GameQRCode 
-                  gameId={game.id} 
+                  gameId={game.id}
+                  shortId={game.shortId}
                   gameName={game.name} 
                   zone={game.zone}
                   printable={isManager}

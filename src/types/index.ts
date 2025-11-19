@@ -12,6 +12,7 @@ export type ServicePreference = 'owner_only' | 'allow_others' | 'no_service';
 
 export interface Game {
   id: string;
+  shortId?: string; // 6-character ID for QR codes
   name: string;
   type: GameType;
   otherType?: string;

@@ -33,6 +33,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setGames(data.map(game => ({
         ...game,
+        shortId: game.short_id,
         dateAdded: new Date(game.created_at),
         lastUpdated: new Date(game.updated_at),
         zone: game.zone,

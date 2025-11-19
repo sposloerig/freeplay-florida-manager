@@ -26,6 +26,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import SubmitGamePage from './pages/SubmitGamePage';
 import MarketplacePage from './pages/MarketplacePage';
 import ContactPage from './pages/ContactPage';
+import ShortIdRedirectPage from './pages/ShortIdRedirectPage';
 
 function App() {
   return (
@@ -45,6 +46,9 @@ function App() {
                     <Route path="/submit-game" element={<SubmitGamePage />} />
                     <Route path="/marketplace" element={<MarketplacePage />} />
                     <Route path="/contact" element={<ContactPage />} />
+                    
+                    {/* Short ID redirect for QR codes */}
+                    <Route path="/r/:shortId" element={<ShortIdRedirectPage />} />
                     
                     {/* Public repair reporting - no authentication required */}
                     <Route path="/report-issue" element={<PublicRepairPage />} />

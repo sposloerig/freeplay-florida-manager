@@ -236,7 +236,7 @@ const QRCodePrintPage: React.FC = () => {
               Click this QR Code and tell us!
             </p>
             <div className="qr-code-container">
-              <GameQRCode gameId={game.id} gameName={game.name} />
+              <GameQRCode gameId={game.id} shortId={game.shortId} gameName={game.name} />
             </div>
           </div>
         ))}
