@@ -188,7 +188,7 @@ Could you provide more details about the condition and availability?
 
 Thanks!
 
-Found on: https://freeplayflorida.netlify.app/game/${slug}`);
+Found on: https://fplay.us/game/${slug}`);
 
       // Try to open email client
       try {

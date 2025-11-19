@@ -30,7 +30,8 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
   ownerPhone,
   displayContactPublicly = false
 }) => {
-  const baseUrl = window.location.origin;
+  // Use fplay.us for shorter QR codes (falls back to current domain if not available)
+  const baseUrl = 'https://fplay.us';
   // Use short URL if short_id is available, otherwise fall back to full URL
   const repairUrl = shortId 
     ? `${baseUrl}/r/${shortId}`
@@ -136,7 +137,7 @@ const GameQRCode: React.FC<GameQRCodeProps> = ({
                   </div>
                 ` : `
                   <div class="marketplace-info">
-                    Visit freeplayflorida.netlify.app/marketplace<br/>
+                    Visit fplay.us/marketplace<br/>
                     to make an offer or purchase
                   </div>
                 `}
