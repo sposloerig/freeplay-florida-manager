@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import { GameType } from '../types';
 import { useGameContext } from '../context/GameContext';
 import { Link } from 'react-router-dom';
-import { Search, Gamepad2, PillIcon as PinballIcon, Calendar, DollarSign, ChevronRight } from 'lucide-react';
+import { Search, Gamepad2, PillIcon as PinballIcon, Calendar, DollarSign, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+
+type SortField = 'name' | 'type' | 'year' | 'status' | 'zone';
+type SortDirection = 'asc' | 'desc';
 
 const GameList: React.FC = () => {
   const { games } = useGameContext();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<GameType | 'All'>('All');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const filteredGames = games.filter((game) => {
     const matchesSearch = game.name.toLowerCase().includes(search.toLowerCase());
@@ -17,8 +22,43 @@ const GameList: React.FC = () => {
     return matchesSearch && matchesType && isApproved;
   });
 
-  // Simple alphabetical sort by name
-  const sortedGames = [...filteredGames].sort((a, b) => a.name.localeCompare(b.name));
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // Sort games based on selected field and direction
+  const sortedGames = [...filteredGames].sort((a, b) => {
+    let comparison = 0;
+    
+    switch (sortField) {
+      case 'name':
+        comparison = a.name.localeCompare(b.name);
+        break;
+      case 'type':
+        const typeA = a.type === 'Other' ? a.otherType || 'Other' : a.type;
+        const typeB = b.type === 'Other' ? b.otherType || 'Other' : b.type;
+        comparison = typeA.localeCompare(typeB);
+        break;
+      case 'year':
+        comparison = (a.yearMade || 0) - (b.yearMade || 0);
+        break;
+      case 'status':
+        comparison = a.status.localeCompare(b.status);
+        break;
+      case 'zone':
+        const zoneA = a.zone || 'zzz'; // Push empty zones to end
+        const zoneB = b.zone || 'zzz';
+        comparison = zoneA.localeCompare(zoneB);
+        break;
+    }
+    
+    return sortDirection === 'asc' ? comparison : -comparison;
+  });
 
   return (
     <div className="w-full">
@@ -117,20 +157,75 @@ const GameList: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Game Name
+                  <th 
+                    scope="col" 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    onClick={() => handleSort('name')}
+                  >
+                    <div className="flex items-center">
+                      Game Name
+                      {sortField === 'name' ? (
+                        sortDirection === 'asc' ? <ArrowUp size={14} className="ml-1" /> : <ArrowDown size={14} className="ml-1" />
+                      ) : (
+                        <ArrowUpDown size={14} className="ml-1 opacity-30" />
+                      )}
+                    </div>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Type
+                  <th 
+                    scope="col" 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    onClick={() => handleSort('type')}
+                  >
+                    <div className="flex items-center">
+                      Type
+                      {sortField === 'type' ? (
+                        sortDirection === 'asc' ? <ArrowUp size={14} className="ml-1" /> : <ArrowDown size={14} className="ml-1" />
+                      ) : (
+                        <ArrowUpDown size={14} className="ml-1 opacity-30" />
+                      )}
+                    </div>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Year
+                  <th 
+                    scope="col" 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    onClick={() => handleSort('year')}
+                  >
+                    <div className="flex items-center">
+                      Year
+                      {sortField === 'year' ? (
+                        sortDirection === 'asc' ? <ArrowUp size={14} className="ml-1" /> : <ArrowDown size={14} className="ml-1" />
+                      ) : (
+                        <ArrowUpDown size={14} className="ml-1 opacity-30" />
+                      )}
+                    </div>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Status
+                  <th 
+                    scope="col" 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    onClick={() => handleSort('status')}
+                  >
+                    <div className="flex items-center">
+                      Status
+                      {sortField === 'status' ? (
+                        sortDirection === 'asc' ? <ArrowUp size={14} className="ml-1" /> : <ArrowDown size={14} className="ml-1" />
+                      ) : (
+                        <ArrowUpDown size={14} className="ml-1 opacity-30" />
+                      )}
+                    </div>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Zone
+                  <th 
+                    scope="col" 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    onClick={() => handleSort('zone')}
+                  >
+                    <div className="flex items-center">
+                      Zone
+                      {sortField === 'zone' ? (
+                        sortDirection === 'asc' ? <ArrowUp size={14} className="ml-1" /> : <ArrowDown size={14} className="ml-1" />
+                      ) : (
+                        <ArrowUpDown size={14} className="ml-1 opacity-30" />
+                      )}
+                    </div>
                   </th>
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Actions
