@@ -23,7 +23,7 @@ export const QR_PRINT_STYLES = `
     height: 1in;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     overflow: hidden;
   }
   
@@ -33,42 +33,57 @@ export const QR_PRINT_STYLES = `
     padding: 0.08in;
     background: white;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.1in;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
   }
   
   .qr-section {
-    flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    margin: 0.02in 0;
   }
   
   .text-section {
-    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: left;
-    min-width: 0;
+  }
+  
+  .scan-text {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.1;
+    margin-bottom: 0.02in;
+    text-align: left;
   }
   
   .game-title { 
-    font-size: 11px; 
-    font-weight: bold; 
-    margin-bottom: 3px;
-    line-height: 1.2;
+    font-size: 8px; 
+    font-weight: normal; 
+    margin-bottom: 0.02in;
+    line-height: 1;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    color: #666;
   }
   
   .zone-info { 
-    font-size: 8px; 
+    font-size: 7px; 
     color: #2563eb; 
-    margin-bottom: 3px;
+    margin-bottom: 0.02in;
     font-weight: bold;
+  }
+  
+  .report-text {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.1;
+    margin-top: 0.02in;
+    text-align: left;
   }
   
   #qr-code {
@@ -180,40 +195,19 @@ export function generateQRPrintHTML(options: QRPrintTemplateOptions): string {
       </head>
       <body>
         <div class="qr-container">
+          <div class="scan-text">SCAN<br>ME</div>
+          ${forSale ? `<div class="game-title">${gameName}${askingPrice ? ` - $${askingPrice.toLocaleString()}` : ''}</div>` : `<div class="game-title">${gameName}</div>`}
           <div class="qr-section">
             <div id="qr-code"></div>
           </div>
-          <div class="text-section">
-            <div class="game-title">${gameName}</div>
-            ${zone ? `<div class="zone-info">📍 ${zone}</div>` : ''}
-            ${forSale ? `
-              <div class="sales-section">
-                <div class="for-sale-badge">🏷️ FOR SALE</div>
-                ${askingPrice ? `<div class="price">$${askingPrice.toLocaleString()}</div>` : '<div class="price">Price on request</div>'}
-                ${displayContactPublicly && (ownerEmail || ownerPhone) ? `
-                  <div class="contact-info">
-                    ${ownerName ? `<div class="owner-name">Owner: ${ownerName}</div>` : ''}
-                    ${ownerEmail ? `<div class="contact-detail">📧 ${ownerEmail}</div>` : ''}
-                    ${ownerPhone ? `<div class="contact-detail">📞 ${ownerPhone}</div>` : ''}
-                  </div>
-                ` : `
-                  <div class="marketplace-info">
-                    Visit fplay.us/marketplace<br/>to make offer
-                  </div>
-                `}
-              </div>
-            ` : ''}
-            <div class="instructions">
-              Scan if game broken<br/>or needs service
-            </div>
-          </div>
+          <div class="report-text">TO REPORT<br>ISSUE</div>
         </div>
         <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
         <script>
           const qr = qrcode(0, 'M');
           qr.addData('${repairUrl}');
           qr.make();
-          document.getElementById('qr-code').innerHTML = qr.createImgTag(2.4, 0);
+          document.getElementById('qr-code').innerHTML = qr.createImgTag(2.5, 0);
           setTimeout(() => {
             window.print();
             setTimeout(() => window.close(), 100);
